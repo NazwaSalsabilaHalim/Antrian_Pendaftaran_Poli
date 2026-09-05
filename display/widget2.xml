@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xml>
+  <track>
+    <path>sounds/tingtong.mp3</path>
+    <title>tingtong</title>
+  </track>
+  <track>
+    <path>sounds/nomorantrian.mp3</path>
+    <title>nomorantrian</title>
+  </track>
+  <track>
+    <path>sounds/P.mp3</path>
+    <title>P</title>
+  </track>
+  <track>
+    <path>sounds/0004.mp3</path>
+    <title>0004</title>
+  </track>
+  <track>
+    <path>sounds/puluh.mp3</path>
+    <title>puluh</title>
+  </track>
+  <track>
+    <path>sounds/0007.mp3</path>
+    <title>0007</title>
+  </track>
+  <track>
+    <path>sounds/keloket.mp3</path>
+    <title>keloket</title>
+  </track>
+  <track>
+    <path>sounds/0002.mp3</path>
+    <title>0002</title>
+  </track>
+  <track>
+    <path>sounds/stop.mp3</path>
+    <title>stop</title>
+  </track>
+</xml>

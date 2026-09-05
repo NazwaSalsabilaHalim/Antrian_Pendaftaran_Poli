@@ -1,0 +1,13 @@
+<?php
+  // file: connectdb.php
+  // author: E. Setio Dewo, Maret 2003
+
+  $db_username = "batam2014";
+  $db_hostname = "localhost";
+  $db_password = "rFaeZT3VjeaGANsn";
+  $db_name = "batam-antrian_pendaftaran";
+
+  $con = _connect($db_hostname, $db_username, $db_password);
+  $db  = _select_db($db_name, $con);
+
+?>

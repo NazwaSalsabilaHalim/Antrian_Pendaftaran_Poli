@@ -1,0 +1,33 @@
+const BASE = import.meta.env.VITE_API_BASE || 'http://localhost/KP/antrian_pendaftaran'
+const API = `${BASE}/react-api`
+
+async function req(path, options = {}) {
+  const res = await fetch(`${API}/${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  })
+  const data = await res.json().catch(() => null)
+  if (!res.ok || !data || data.ok === false) {
+    throw new Error(data?.error || `Gagal memanggil ${path}`)
+  }
+  return data
+}
+
+const post = (path, body) => req(path, { method: 'POST', body: JSON.stringify(body) })
+const get = (path) => req(path)
+
+export const api = {
+  base: BASE,
+  getTombol: () => get('tombol.php'),
+  getCounter: () => get('counter.php'),
+  ambilNomor: (tombolId) => post('ambil_nomor.php', { tombol_id: tombolId }),
+  tekanCounter: (counterId, tombolId) => post('tekan_counter.php', { counter_id: counterId, tombol_id: tombolId }),
+  panggilUlang: (panggilId) => post('panggil_ulang.php', { panggil_id: panggilId }),
+  getDisplayQueue: () => get('display_queue.php'),
+  getLiveMonitor: () => get('live_monitor.php'),
+  panggilKonfirmasi: (panggilId) => post('panggil_konfirmasi.php', { panggil_id: panggilId }),
+  getStatistik: (tanggal) => get(`statistik.php${tanggal ? `?tanggal=${tanggal}` : ''}`),
+  // struk cetak masih pakai file lama karena berisi logika format printer thermal (ESC/POS)
+  cetakStrukUrl: (tid, tombolNama, nomor, prefix) =>
+    `${BASE}/index_btn.php?exe=cetak_struk&tid=${encodeURIComponent(tid)}&tombol=${encodeURIComponent(tombolNama)}&no=${encodeURIComponent(nomor)}&prefix=${encodeURIComponent(prefix)}`,
+}

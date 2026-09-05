@@ -1,0 +1,27 @@
+<?php
+/**
+ * ============================================================================
+ * Konfigurasi Video
+ * ============================================================================
+ */
+
+define('VIDEO_URL', 'video');
+
+/**
+ * Daftar video untuk display
+ *
+ * Format yang diperbolehkan adalah MP4, OGG, OGV, WEBM, dan WAV
+ * Cara penulisan seperti ini :
+ * 'file' => 'mime_type'
+ *
+ * Contohnya :
+ * 'video1.mp4' => 'video/mp4'
+ *
+ * Untuk daftar MIME Type untuk video silahkan cek di link dibawah ini
+ * {@link http://en.wikipedia.org/wiki/Internet_media_type}
+ */
+$video = array(
+  'Awal Bros Hospital Indonesia Full.mp4' => 'video/mp4',
+  // 'big_buck_bunny.ogv' => 'video/ogg',
+  // 'big_buck_bunny.webm' => 'video/webm',
+);
