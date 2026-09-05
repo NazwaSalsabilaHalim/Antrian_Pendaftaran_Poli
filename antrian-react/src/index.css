@@ -3113,12 +3113,12 @@ table.data-table {
 }
 
 /* =========================================================
-   AMBIL NOMOR PAGE
+   AMBIL NOMOR PAGE - KIOSK PASIEN
    ========================================================= */
 
 .ambil-page {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
@@ -3132,23 +3132,23 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 17px;
+  gap: 20px;
 
-  margin-bottom: 26px;
-  padding: 22px 24px;
+  margin-bottom: 28px;
+  padding: 28px 32px;
 
   overflow: hidden;
 
-  border-radius: 17px;
+  border-radius: 20px;
 
   background:
     linear-gradient(
       120deg,
-      rgba(47, 57, 169, 0.08),
-      rgba(73, 164, 187, 0.06)
+      rgba(47, 57, 169, 0.10),
+      rgba(73, 164, 187, 0.08)
     );
 
-  border: 1px solid rgba(47, 57, 169, 0.09);
+  border: 1px solid rgba(47, 57, 169, 0.10);
 }
 
 .ambil-hero::after {
@@ -3156,22 +3156,22 @@ table.data-table {
 
   position: absolute;
 
-  width: 180px;
-  height: 180px;
+  width: 240px;
+  height: 240px;
 
-  right: -65px;
-  top: -85px;
+  right: -90px;
+  top: -110px;
 
   border-radius: 50%;
 
-  border: 30px solid rgba(73, 164, 187, 0.07);
+  border: 40px solid rgba(73, 164, 187, 0.07);
 
   pointer-events: none;
 }
 
 .ambil-hero__icon {
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
 
   display: flex;
   align-items: center;
@@ -3179,7 +3179,7 @@ table.data-table {
 
   flex-shrink: 0;
 
-  border-radius: 14px;
+  border-radius: 17px;
 
   background:
     linear-gradient(
@@ -3191,7 +3191,7 @@ table.data-table {
   color: white;
 
   box-shadow:
-    0 8px 18px rgba(47, 57, 169, 0.18);
+    0 10px 22px rgba(47, 57, 169, 0.20);
 }
 
 .ambil-hero__content {
@@ -3201,12 +3201,12 @@ table.data-table {
 .ambil-hero__eyebrow {
   display: block;
 
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
-  letter-spacing: 1.2px;
+  letter-spacing: 1.4px;
 
   color: var(--c3);
 }
@@ -3214,7 +3214,7 @@ table.data-table {
 .ambil-hero__content h1 {
   margin: 0;
 
-  font-size: 25px;
+  font-size: 32px;
   line-height: 1.2;
 
   font-weight: 800;
@@ -3223,53 +3223,15 @@ table.data-table {
 }
 
 .ambil-hero__content p {
-  margin: 5px 0 0;
+  margin: 7px 0 0;
 
-  font-size: 12px;
+  font-size: 15px;
 
   color: var(--muted);
 }
 
 .ambil-hero__step {
-  position: relative;
-  z-index: 1;
-
-  display: flex;
-  align-items: center;
-
-  gap: 9px;
-
-  margin-left: auto;
-
-  padding-right: 5px;
-}
-
-.ambil-hero__step > span {
-  width: 35px;
-  height: 35px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 10px;
-
-  background: white;
-
-  color: var(--c1);
-
-  font-size: 11px;
-  font-weight: 800;
-
-  box-shadow:
-    0 3px 10px rgba(28, 35, 51, 0.06);
-}
-
-.ambil-hero__step small {
-  font-size: 9px;
-  line-height: 1.4;
-
-  color: var(--muted);
+  display: none;
 }
 
 /* =========================
@@ -3280,12 +3242,12 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 11px;
+  gap: 12px;
 
-  margin-bottom: 20px;
-  padding: 13px 15px;
+  margin-bottom: 22px;
+  padding: 16px 18px;
 
-  border-radius: 11px;
+  border-radius: 14px;
 
   background: #fff4f3;
 
@@ -3295,8 +3257,8 @@ table.data-table {
 }
 
 .ambil-error > span {
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
@@ -3308,7 +3270,7 @@ table.data-table {
 
   background: #f9d9d6;
 
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -3318,13 +3280,13 @@ table.data-table {
 }
 
 .ambil-error strong {
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .ambil-error p {
-  margin: 2px 0 0;
+  margin: 3px 0 0;
 
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* =========================
@@ -3336,14 +3298,14 @@ table.data-table {
 
   overflow: hidden;
 
-  border-radius: 17px;
+  border-radius: 20px;
 
   background: white;
 
-  border: 1px solid rgba(21, 216, 179, 0.18);
+  border: 1px solid rgba(21, 216, 179, 0.20);
 
   box-shadow:
-    0 8px 25px rgba(28, 35, 51, 0.06);
+    0 10px 30px rgba(28, 35, 51, 0.08);
 }
 
 .ambil-ticket__top {
@@ -3351,15 +3313,15 @@ table.data-table {
   align-items: center;
   justify-content: space-between;
 
-  padding: 14px 20px;
+  padding: 17px 24px;
 
   border-bottom: 1px solid #edf2f3;
 
   background:
     linear-gradient(
       90deg,
-      rgba(21, 216, 179, 0.07),
-      rgba(73, 164, 187, 0.04)
+      rgba(21, 216, 179, 0.08),
+      rgba(73, 164, 187, 0.05)
     );
 }
 
@@ -3367,9 +3329,9 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 7px;
+  gap: 8px;
 
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 
   color: #168a78;
@@ -3382,15 +3344,15 @@ table.data-table {
 .ambil-ticket__category {
   max-width: 45%;
 
-  padding: 5px 9px;
+  padding: 7px 12px;
 
-  border-radius: 7px;
+  border-radius: 9px;
 
   background: rgba(47, 57, 169, 0.07);
 
   color: var(--c1);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 
   text-align: right;
@@ -3403,9 +3365,9 @@ table.data-table {
   align-items: center;
   justify-content: space-between;
 
-  gap: 30px;
+  gap: 35px;
 
-  padding: 25px 24px;
+  padding: 32px;
 }
 
 .ambil-ticket__left {
@@ -3414,19 +3376,19 @@ table.data-table {
 }
 
 .ambil-ticket__left > span {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
 
   color: var(--muted);
 }
 
 .ambil-ticket__left > strong {
-  margin-top: 3px;
+  margin-top: 6px;
 
-  font-size: 50px;
+  font-size: 72px;
   line-height: 1;
 
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 
   font-weight: 900;
 
@@ -3434,12 +3396,12 @@ table.data-table {
 }
 
 .ambil-ticket__left p {
-  max-width: 500px;
+  max-width: 560px;
 
-  margin: 9px 0 0;
+  margin: 12px 0 0;
 
-  font-size: 11px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.6;
 
   color: var(--muted);
 }
@@ -3448,17 +3410,17 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 9px;
+  gap: 11px;
 
-  padding: 12px 14px;
+  padding: 16px 18px;
 
-  border-radius: 10px;
+  border-radius: 13px;
 
   background: #f7f9fc;
 
   color: var(--c2);
 
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -3467,9 +3429,9 @@ table.data-table {
   align-items: center;
   justify-content: space-between;
 
-  gap: 15px;
+  gap: 18px;
 
-  padding: 11px 20px;
+  padding: 15px 24px;
 
   border-top: 1px solid #edf0f4;
 
@@ -3477,7 +3439,7 @@ table.data-table {
 }
 
 .ambil-ticket__bottom > span {
-  font-size: 9px;
+  font-size: 11px;
 
   color: var(--muted);
 }
@@ -3486,27 +3448,27 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 6px;
+  gap: 8px;
 
-  padding: 6px 9px;
+  padding: 11px 16px;
 
   border: none;
-  border-radius: 7px;
+  border-radius: 10px;
 
-  background: transparent;
+  background: rgba(47, 57, 169, 0.08);
 
   color: var(--c1);
 
   font-family: inherit;
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 
   cursor: pointer;
 }
 
 .ambil-ticket__bottom button:hover {
-  background: rgba(47, 57, 169, 0.06);
+  background: rgba(47, 57, 169, 0.14);
 }
 
 /* =========================
@@ -3514,45 +3476,36 @@ table.data-table {
    ========================= */
 
 .ambil-selection {
-  padding: 24px;
+  padding: 30px;
 
-  border-radius: 17px;
+  border-radius: 20px;
 
   background: white;
 
   border: 1px solid var(--border);
 
   box-shadow:
-    0 5px 20px rgba(28, 35, 51, 0.04);
+    0 7px 24px rgba(28, 35, 51, 0.05);
 }
 
 .ambil-selection__heading {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
 
   gap: 20px;
 
-  margin-bottom: 21px;
+  margin-bottom: 26px;
 }
 
 .ambil-selection__heading > div:first-child > span {
-  display: block;
-
-  margin-bottom: 5px;
-
-  font-size: 9px;
-  font-weight: 800;
-
-  letter-spacing: 1.1px;
-
-  color: var(--c3);
+  display: none;
 }
 
 .ambil-selection__heading h2 {
   margin: 0;
 
-  font-size: 19px;
+  font-size: 25px;
 
   font-weight: 800;
 
@@ -3560,9 +3513,9 @@ table.data-table {
 }
 
 .ambil-selection__heading p {
-  margin: 5px 0 0;
+  margin: 7px 0 0;
 
-  font-size: 11px;
+  font-size: 14px;
 
   color: var(--muted);
 }
@@ -3571,25 +3524,25 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 7px;
+  gap: 8px;
 
-  padding: 7px 10px;
+  padding: 9px 13px;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
   background: #f5f7fb;
 
   color: var(--muted);
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 
   white-space: nowrap;
 }
 
 .ambil-selection__indicator span {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 
   border-radius: 50%;
 
@@ -3606,23 +3559,23 @@ table.data-table {
   grid-template-columns:
     repeat(2, minmax(0, 1fr));
 
-  gap: 16px;
+  gap: 22px;
 }
 
 .ambil-option {
   position: relative;
 
-  min-height: 230px;
+  min-height: 310px;
 
   display: flex;
   flex-direction: column;
 
-  padding: 22px;
+  padding: 30px;
 
   overflow: hidden;
 
-  border: 1px solid #e4e8f0;
-  border-radius: 15px;
+  border: 2px solid #e4e8f0;
+  border-radius: 20px;
 
   background: #fff;
 
@@ -3639,16 +3592,21 @@ table.data-table {
 }
 
 .ambil-option:hover:not(:disabled) {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
 
-  border-color: rgba(47, 57, 169, 0.25);
+  border-color: rgba(47, 57, 169, 0.30);
 
   box-shadow:
-    0 12px 30px rgba(47, 57, 169, 0.09);
+    0 16px 35px rgba(47, 57, 169, 0.12);
+}
+
+.ambil-option:active:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .ambil-option:disabled {
   cursor: wait;
+  opacity: 0.72;
 }
 
 .ambil-option::before {
@@ -3660,7 +3618,7 @@ table.data-table {
   top: 0;
   bottom: 0;
 
-  width: 4px;
+  width: 6px;
 
   background: var(--c1);
 }
@@ -3680,21 +3638,21 @@ table.data-table {
 
   position: absolute;
 
-  width: 130px;
-  height: 130px;
+  width: 180px;
+  height: 180px;
 
-  right: -55px;
-  top: -55px;
+  right: -75px;
+  top: -75px;
 
   border-radius: 50%;
 
-  background: rgba(47, 57, 169, 0.035);
+  background: rgba(47, 57, 169, 0.045);
 
   pointer-events: none;
 }
 
 .ambil-option--1::after {
-  background: rgba(46, 111, 160, 0.04);
+  background: rgba(46, 111, 160, 0.05);
 }
 
 /* =========================
@@ -3705,14 +3663,14 @@ table.data-table {
   position: relative;
   z-index: 1;
 
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 13px;
+  border-radius: 18px;
 
   background: rgba(47, 57, 169, 0.08);
 
@@ -3732,10 +3690,10 @@ table.data-table {
 .ambil-option__number {
   position: absolute;
 
-  top: 22px;
-  right: 23px;
+  top: 28px;
+  right: 30px;
 
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
 
   color: #c1c7d3;
@@ -3749,18 +3707,18 @@ table.data-table {
   position: relative;
   z-index: 1;
 
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .ambil-option__label {
   display: block;
 
-  margin-bottom: 5px;
+  margin-bottom: 7px;
 
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 800;
 
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
 
   color: var(--c3);
 }
@@ -3770,8 +3728,8 @@ table.data-table {
 
   margin: 0;
 
-  font-size: 17px;
-  line-height: 1.35;
+  font-size: 24px;
+  line-height: 1.3;
 
   font-weight: 800;
 
@@ -3781,12 +3739,12 @@ table.data-table {
 }
 
 .ambil-option__content p {
-  max-width: 400px;
+  max-width: 450px;
 
-  margin: 6px 0 0;
+  margin: 9px 0 0;
 
-  font-size: 10px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.6;
 
   color: var(--muted);
 }
@@ -3806,11 +3764,12 @@ table.data-table {
   gap: 10px;
 
   margin-top: auto;
-  padding-top: 20px;
+
+  padding-top: 25px;
 
   color: var(--c1);
 
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -3820,7 +3779,7 @@ table.data-table {
 
 .ambil-option:hover:not(:disabled)
 .ambil-option__action svg {
-  transform: translateX(3px);
+  transform: translateX(5px);
 }
 
 .ambil-option__action svg {
@@ -3834,26 +3793,26 @@ table.data-table {
 .ambil-loading {
   grid-column: 1 / -1;
 
-  min-height: 190px;
+  min-height: 220px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 6px;
+  gap: 8px;
 
   border: 1px dashed #dce2eb;
-  border-radius: 14px;
+  border-radius: 16px;
 
   color: var(--muted);
 }
 
 .ambil-loading__spinner {
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
 
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 
   border: 3px solid #e7ebf2;
   border-top-color: var(--c1);
@@ -3864,13 +3823,13 @@ table.data-table {
 }
 
 .ambil-loading strong {
-  font-size: 11px;
+  font-size: 13px;
 
-  color: var(--text-soft);
+  color: var(--text);
 }
 
 .ambil-loading span {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 @keyframes ambil-spin {
@@ -3887,12 +3846,12 @@ table.data-table {
   display: flex;
   align-items: center;
 
-  gap: 11px;
+  gap: 13px;
 
-  margin-top: 16px;
-  padding: 13px 15px;
+  margin-top: 18px;
+  padding: 16px 18px;
 
-  border-radius: 11px;
+  border-radius: 13px;
 
   background:
     rgba(73, 164, 187, 0.06);
@@ -3901,8 +3860,8 @@ table.data-table {
 }
 
 .ambil-info__icon {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -3910,9 +3869,9 @@ table.data-table {
 
   flex-shrink: 0;
 
-  border-radius: 9px;
+  border-radius: 10px;
 
-  background: rgba(73, 164, 187, 0.1);
+  background: rgba(73, 164, 187, 0.10);
 
   color: var(--c3);
 }
@@ -3923,44 +3882,69 @@ table.data-table {
 }
 
 .ambil-info strong {
-  font-size: 10px;
+  font-size: 12px;
 
-  color: var(--text-soft);
+  color: var(--text);
 }
 
 .ambil-info p {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
 
-  font-size: 9px;
+  font-size: 11px;
+  line-height: 1.5;
 
   color: var(--muted);
 }
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE KIOSK
    ========================= */
 
 @media (max-width: 850px) {
+
+  .ambil-page {
+    max-width: 100%;
+  }
+
+  .ambil-hero {
+    padding: 24px;
+  }
+
   .ambil-options {
     grid-template-columns: 1fr;
+  }
+
+  .ambil-option {
+    min-height: 280px;
   }
 }
 
 @media (max-width: 650px) {
-  .ambil-hero {
-    align-items: flex-start;
+
+  .ambil-page {
+    padding: 0 12px;
   }
 
-  .ambil-hero__step {
-    display: none;
+  .ambil-hero {
+    margin-bottom: 20px;
+    padding: 22px;
+  }
+
+  .ambil-hero__icon {
+    width: 54px;
+    height: 54px;
   }
 
   .ambil-hero__content h1 {
-    font-size: 22px;
+    font-size: 25px;
+  }
+
+  .ambil-hero__content p {
+    font-size: 13px;
   }
 
   .ambil-selection {
-    padding: 18px;
+    padding: 20px;
   }
 
   .ambil-selection__heading {
@@ -3968,13 +3952,30 @@ table.data-table {
     flex-direction: column;
   }
 
+  .ambil-selection__heading h2 {
+    font-size: 21px;
+  }
+
+  .ambil-selection__heading p {
+    font-size: 12px;
+  }
+
   .ambil-option {
-    min-height: 215px;
+    min-height: 270px;
+    padding: 25px;
+  }
+
+  .ambil-option__content h3 {
+    font-size: 21px;
   }
 
   .ambil-ticket__content {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .ambil-ticket__left > strong {
+    font-size: 60px;
   }
 
   .ambil-ticket__bottom {

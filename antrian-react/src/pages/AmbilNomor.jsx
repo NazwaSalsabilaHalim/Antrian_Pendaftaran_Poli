@@ -149,6 +149,7 @@ export default function AmbilNomor() {
       )}
 
       {/* CHOOSE REGISTRATION */}
+      {!tiket && (
       <section className="ambil-selection">
 
         <div className="ambil-selection__heading">
@@ -239,7 +240,7 @@ export default function AmbilNomor() {
         </div>
 
       </section>
-
+      )}
       {/* INFO */}
       <section className="ambil-info">
 

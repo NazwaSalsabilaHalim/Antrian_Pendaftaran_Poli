@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   LayoutGrid,
-  Ticket,
+  // Ticket,
   Users,
   History,
   Tv,
@@ -17,12 +17,12 @@ const NAV = [
     description: 'Monitoring',
     icon: LayoutGrid,
   },
-  {
-    to: '/ambil-nomor',
-    label: 'Ambil Nomor',
-    description: 'Pendaftaran',
-    icon: Ticket,
-  },
+  // {
+  //   to: '/ambil-nomor',
+  //   label: 'Ambil Nomor',
+  //   description: 'Pendaftaran',
+  //   icon: Ticket,
+  // },
   {
     to: '/loket',
     label: 'Loket',
@@ -39,7 +39,7 @@ const NAV = [
 
 const PAGE_INFO = {
   '/overview': ['Overview', 'Status seluruh loket secara real-time'],
-  '/ambil-nomor': ['Ambil Nomor', 'Pengambilan nomor antrian pasien'],
+  // '/ambil-nomor': ['Ambil Nomor', 'Pengambilan nomor antrian pasien'],
   '/loket': ['Loket', 'Panggil nomor antrian dari loket'],
   '/dashboard': ['Riwayat & Statistik', 'Rekap antrian harian'],
 }

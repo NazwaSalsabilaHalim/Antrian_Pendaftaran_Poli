@@ -12,10 +12,13 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/overview" replace />} />
         <Route path="/overview" element={<Overview />} />
-        <Route path="/ambil-nomor" element={<AmbilNomor />} />
         <Route path="/loket" element={<Loket />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
+
+      {/* Halaman Ambil Nomor, layar penuh, tanpa sidebar - dibuka di tab/monitor terpisah */}
+      <Route path="/ambil-nomor" element={<AmbilNomor />} />
+      
       {/* TV Display berdiri sendiri, layar penuh, tanpa sidebar - dibuka di tab/monitor terpisah */}
       <Route path="/display" element={<TVDisplay />} />
     </Routes>
