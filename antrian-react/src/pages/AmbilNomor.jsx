@@ -20,6 +20,16 @@ export default function AmbilNomor() {
     api.getTombol().then((d) => setTombolList(d.tombol)).catch((e) => setError(e.message))
   }, [])
 
+  useEffect(() => {
+    if (!tiket) return
+
+    const timer = setTimeout(() => {
+      setTiket(null)
+    }, 10000)
+
+    return () => clearTimeout(timer)
+  }, [tiket])
+
   async function handleAmbil(tombol) {
     setError('')
     setLoadingId(tombol.TombolID)

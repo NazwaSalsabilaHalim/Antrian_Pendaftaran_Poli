@@ -27,6 +27,7 @@ export const api = {
   getLiveMonitor: () => get('live_monitor.php'),
   panggilKonfirmasi: (panggilId) => post('panggil_konfirmasi.php', { panggil_id: panggilId }),
   getStatistik: (tanggal) => get(`statistik.php${tanggal ? `?tanggal=${tanggal}` : ''}`),
+  getRiwayat: (params = '') => get(`riwayat.php${params ? `?${params}` : ''}`),
   // struk cetak masih pakai file lama karena berisi logika format printer thermal (ESC/POS)
   cetakStrukUrl: (tid, tombolNama, nomor, prefix) =>
     `${BASE}/index_btn.php?exe=cetak_struk&tid=${encodeURIComponent(tid)}&tombol=${encodeURIComponent(tombolNama)}&no=${encodeURIComponent(nomor)}&prefix=${encodeURIComponent(prefix)}`,
