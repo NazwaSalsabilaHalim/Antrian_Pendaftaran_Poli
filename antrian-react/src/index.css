@@ -53,6 +53,21 @@
   --card-radius-lg: 22px;
   --card-shadow: 0 6px 18px rgba(22, 45, 38, 0.06);
   --card-shadow-hover: 0 14px 30px rgba(22, 45, 38, 0.10);
+
+  /* =========================================================
+     SKALA TIPOGRAFI
+     Satu sumber ukuran font untuk elemen sejenis di semua
+     halaman (page intro, section title, dst) supaya tidak
+     ada halaman yang tampil beda sendiri.
+     ========================================================= */
+  --fs-page-title: 28px;
+  --fs-page-subtitle: 14px;
+  --fs-eyebrow: 10px;
+  --fs-section-title: 16px;
+  --fs-card-title: 15px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+  --fs-tiny: 11px;
 }
 
 * {
@@ -108,12 +123,6 @@ button {
   background: linear-gradient(180deg, #ffffff 0%, var(--surface-soft) 100%);
   border-right: 1px solid var(--border);
   z-index: 20;
-}
-
-.sidebar__brand,
-.sidebar__brand-mark,
-.sidebar__brand-icon {
-  /* base reset shared by brand row */
 }
 
 .sidebar__brand {
@@ -514,7 +523,7 @@ button {
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   margin: 0 0 14px;
   color: var(--text);
@@ -963,6 +972,80 @@ input:focus {
 }
 
 /* =========================================================
+   PAGE INTRO
+   Header "hero" yang dipakai SAMA di setiap halaman panel
+   petugas (Overview, Dashboard, Loket) — eyebrow, judul,
+   subjudul, dan status badge memakai ukuran font yang sama
+   dari --fs-page-title / --fs-page-subtitle / --fs-eyebrow,
+   supaya tidak ada halaman yang tampil beda sendiri.
+   ========================================================= */
+
+.page-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.page-intro__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+
+  font-size: var(--fs-eyebrow);
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  color: var(--tertiary);
+}
+
+.page-intro__title {
+  margin: 0;
+
+  font-size: var(--fs-page-title);
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.page-intro__subtitle {
+  margin: 7px 0 0;
+
+  font-size: var(--fs-page-subtitle);
+  color: var(--muted);
+}
+
+.page-intro__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 13px;
+  border-radius: 20px;
+
+  background: var(--success-bg);
+  border: 1px solid rgba(47, 155, 108, 0.2);
+
+  font-size: var(--fs-tiny);
+  font-weight: 700;
+  color: #1c7a52;
+
+  white-space: nowrap;
+}
+
+.page-intro__status span {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: var(--success);
+
+  box-shadow: 0 0 0 4px rgba(47, 155, 108, 0.12);
+}
+
+/* =========================================================
    PER LOKET
    ========================================================= */
 
@@ -980,7 +1063,7 @@ input:focus {
 
 .loket-title {
   margin: 0 0 4px;
-  font-size: 16px;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: var(--text);
 }
@@ -1307,13 +1390,28 @@ input:focus {
   height: 100%;
 }
 
+/* PENTING — perbaikan card "Per Loket" terpotong:
+   Sebelumnya jenis-pasien-card & loket-card sama-sama diberi
+   flex:1 sehingga tinggi keduanya dipaksa terbagi rata,
+   padahal konten "Per Loket" bisa lebih tinggi dari jatah
+   yang diberikan. Karena kartu ini punya overflow:hidden
+   (lihat .shell__content .card), kelebihan tinggi jadi
+   terpotong. Sekarang jenis-pasien-card & loket-card
+   mengikuti tinggi kontennya sendiri (flex: 0 0 auto),
+   sementara jam-chart-card (kolom kanan) yang mengisi sisa
+   ruang supaya kedua kolom tetap sama tinggi. */
 .dashboard-2col .jenis-pasien-card,
-.dashboard-2col .loket-card,
+.dashboard-2col .loket-card {
+  flex: 0 0 auto;
+  overflow: visible;
+  margin-top: 0;
+}
+
 .dashboard-2col .jam-chart-card {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-top: 0
+  margin-top: 0;
 }
 
 .jam-chart-title {
@@ -1343,7 +1441,7 @@ input:focus {
 
   color: var(--text);
 
-  font-size: 16px;
+  font-size: var(--fs-section-title);
   font-weight: 700;
 }
 
@@ -1507,76 +1605,6 @@ table.data-table {
 .loket-page {
   width: 100%;
   max-width: 1400px;
-}
-
-
-/* =========================================================
-   PAGE INTRO
-   ========================================================= */
-
-.loket-intro {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.loket-intro__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 7px;
-
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
-  color: var(--tertiary);
-}
-
-.loket-intro__title {
-  margin: 0;
-
-  font-size: 30px;
-  line-height: 1.15;
-  font-weight: 800;
-  color: var(--text);
-}
-
-.loket-intro__subtitle {
-  margin: 7px 0 0;
-
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.loket-intro__status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  padding: 9px 13px;
-  border-radius: 20px;
-
-  background: var(--success-bg);
-  border: 1px solid rgba(47, 155, 108, 0.2);
-
-  font-size: 11px;
-  font-weight: 700;
-  color: #1c7a52;
-
-  white-space: nowrap;
-}
-
-.loket-intro__status span {
-  width: 7px;
-  height: 7px;
-  flex-shrink: 0;
-
-  border-radius: 50%;
-  background: var(--success);
-
-  box-shadow: 0 0 0 4px rgba(47, 155, 108, 0.12);
 }
 
 
@@ -2151,11 +2179,6 @@ table.data-table {
    ========================================================= */
 
 @media (max-width: 900px) {
-  .loket-intro {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .loket-counter-card {
     flex-wrap: wrap;
   }
@@ -2167,10 +2190,15 @@ table.data-table {
   .loket-queue-grid {
     grid-template-columns: 1fr;
   }
+
+  .page-intro {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 600px) {
-  .loket-intro__title {
+  .page-intro__title {
     font-size: 25px;
   }
 
@@ -2211,12 +2239,24 @@ table.data-table {
 
 /* =========================================================
    AMBIL NOMOR PAGE — KIOSK PASIEN
+   Konten diposisikan di tengah viewport secara vertikal
+   (bukan menempel ke atas) supaya nyaman dilihat di layar
+   kiosk yang biasanya tinggi/landscape besar.
    ========================================================= */
 
 .ambil-page {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+
+  /* Halaman ini dirender berdiri sendiri (fullscreen di mini TV
+     kiosk pasien), tanpa topbar/sidebar staf di atasnya — jadi
+     tinggi acuannya 100vh penuh, bukan dikurangi tinggi topbar. */
+  min-height: 100vh;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .ambil-hero {
@@ -3321,12 +3361,12 @@ table.data-table {
     text-align: left;
   }
 
-  .loket-intro {
+  .page-intro {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .loket-intro__title {
+  .page-intro__title {
     font-size: 25px;
   }
 
@@ -3352,6 +3392,10 @@ table.data-table {
     right: 18px;
     bottom: 18px;
     min-width: 0;
+  }
+
+  .ambil-page {
+    min-height: auto;
   }
 
   .ambil-hero {

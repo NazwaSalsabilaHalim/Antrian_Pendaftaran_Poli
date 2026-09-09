@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useInterval } from '../hooks/useInterval'
+import { MonitorPlay } from 'lucide-react'
 
 const POLL_MS = 5000
 const ACCENTS = ['accent-a', 'accent-b', 'accent-c', 'accent-d']
@@ -21,6 +22,30 @@ export default function Overview() {
 
   return (
     <div>
+
+      {/* PAGE INTRO — sama dengan halaman Loket & Dashboard */}
+      <div className="page-intro">
+        <div>
+          <div className="page-intro__eyebrow">
+            <MonitorPlay size={15} />
+            PANEL PETUGAS
+          </div>
+
+          <h1 className="page-intro__title">
+            Monitor Antrian
+          </h1>
+
+          <p className="page-intro__subtitle">
+            Pantau nomor yang sedang dilayani dan daftar tunggu tiap loket secara langsung.
+          </p>
+        </div>
+
+        <div className="page-intro__status">
+          <span />
+          Live
+        </div>
+      </div>
+
       {error && <div className="error-banner">{error}</div>}
 
       <div className="section-header">

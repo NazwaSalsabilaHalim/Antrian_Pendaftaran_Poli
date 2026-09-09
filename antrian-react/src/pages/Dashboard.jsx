@@ -13,6 +13,7 @@ import {
 } from 'recharts'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { BarChart3 } from 'lucide-react'
 
 const REFRESH_MS = 15000
 
@@ -49,8 +50,6 @@ export default function Dashboard() {
       api.getRiwayat(`tanggal=${tanggal}`)
     ])
       .then(([statistik, riwayatData]) => {
-        console.log('HASIL RIWAYAT:', riwayatData)
-        console.log('ITEM RIWAYAT:', riwayatData.riwayat?.[0])
         setData(statistik)
         setRiwayat(riwayatData.riwayat || [])
         setError('')
@@ -227,7 +226,29 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className="page-title">Dashboard Antrian</h1>
+
+      {/* PAGE INTRO — sama dengan halaman Loket & Overview */}
+      <div className="page-intro">
+        <div>
+          <div className="page-intro__eyebrow">
+            <BarChart3 size={15} />
+            PANEL PETUGAS
+          </div>
+
+          <h1 className="page-intro__title">
+            Dashboard Antrian
+          </h1>
+
+          <p className="page-intro__subtitle">
+            Pantau statistik, riwayat, dan performa pelayanan antrian pasien secara real-time.
+          </p>
+        </div>
+
+        <div className="page-intro__status">
+          <span />
+          Data diperbarui otomatis
+        </div>
+      </div>
 
       {error && (
         <div className="error-banner">

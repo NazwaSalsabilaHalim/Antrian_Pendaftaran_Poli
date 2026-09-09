@@ -87,24 +87,24 @@ export default function Loket() {
   return (
     <div className="loket-page">
 
-      {/* PAGE INTRO */}
-      <div className="loket-intro">
+      {/* PAGE INTRO — sama dengan halaman Dashboard & Overview */}
+      <div className="page-intro">
         <div>
-          <div className="loket-intro__eyebrow">
+          <div className="page-intro__eyebrow">
             <Users size={15} />
             PANEL PETUGAS
           </div>
 
-          <h1 className="loket-intro__title">
+          <h1 className="page-intro__title">
             Panggil Antrian
           </h1>
 
-          <p className="loket-intro__subtitle">
+          <p className="page-intro__subtitle">
             Kelola dan panggil nomor antrian pasien dari loket pelayanan.
           </p>
         </div>
 
-        <div className="loket-intro__status">
+        <div className="page-intro__status">
           <span />
           Sistem siap digunakan
         </div>
