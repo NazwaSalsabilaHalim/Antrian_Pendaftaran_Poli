@@ -4,6 +4,7 @@ import { useInterval } from '../hooks/useInterval'
 import { buildAntrianSounds, playQueue } from '../utils/audioQueue'
 
 const POLL_MS = 10000
+const AUDIO_ENABLED_KEY = 'tv_audio_enabled'
 
 function FlapRow({ value }) {
   return (
@@ -35,7 +36,9 @@ function useClock() {
 
 export default function TVDisplay() {
   const [current, setCurrent] = useState(null)
-  const [audioReady, setAudioReady] = useState(false)
+  const [audioReady, setAudioReady] = useState(
+    () => localStorage.getItem(AUDIO_ENABLED_KEY) === 'true'
+  )
 
   const audioRef = useRef(null)
   const lastPanggilId = useRef(0)
@@ -84,7 +87,7 @@ export default function TVDisplay() {
 
   useInterval(poll, POLL_MS)
 
-  function enableAudio() {
+  async function enableAudio() {
     const el = audioRef.current
 
     if (!el) return
@@ -93,16 +96,59 @@ export default function TVDisplay() {
     // mendapatkan izin autoplay dari browser.
     el.src = `${api.base}/display/sounds_jelek/tingtong.mp3`
 
+    try {
+      await el.play()
+
+      el.pause()
+      el.currentTime = 0
+
+      setAudioReady(true)
+
+      // Simpan bahwa user sudah mengizinkan audio
+      localStorage.setItem(AUDIO_ENABLED_KEY, 'true')
+    } catch (e) {
+      console.warn('Audio belum bisa diaktifkan', e)
+    }
+  }
+
+  function disableAudio() {
+    const el = audioRef.current
+
+    if (el) {
+      el.pause()
+      el.currentTime = 0
+      el.removeAttribute('src')
+      el.load()
+    }
+
+    setAudioReady(false)
+
+    localStorage.removeItem(AUDIO_ENABLED_KEY)
+  }
+
+  useEffect(() => {
+    const enabled =
+      localStorage.getItem(AUDIO_ENABLED_KEY) === 'true'
+
+    if (!enabled) return
+
+    const el = audioRef.current
+
+    if (!el) return
+
+    el.src = `${api.base}/display/sounds_jelek/tingtong.mp3`
+
     el.play()
       .then(() => {
         el.pause()
         el.currentTime = 0
         setAudioReady(true)
       })
-      .catch((e) => {
-        console.warn('Audio belum bisa diaktifkan', e)
+      .catch(() => {
+        // Browser masih membutuhkan interaksi user
+        setAudioReady(false)
       })
-  }
+  }, [])
 
   const time = now.toLocaleTimeString('id-ID', {
     hour: '2-digit',
@@ -167,15 +213,25 @@ export default function TVDisplay() {
       </header>
 
       {/* Audio */}
-      {!audioReady && (
-        <button
-          className="tv-audio-gate"
-          onClick={enableAudio}
-        >
-          <span className="tv-audio-icon">🔊</span>
-          Aktifkan Audio
-        </button>
-      )}
+      <div className="tv-audio-control">
+        {audioReady ? (
+          <button
+            className="tv-audio-gate tv-audio-gate--active"
+            onClick={disableAudio}
+          >
+            <span className="tv-audio-icon">🔊</span>
+            Nonaktifkan Audio
+          </button>
+        ) : (
+          <button
+            className="tv-audio-gate"
+            onClick={enableAudio}
+          >
+            <span className="tv-audio-icon">🔇</span>
+            Aktifkan Audio
+          </button>
+        )}
+      </div>
 
       {/* Main display */}
       <main className="tv-main">
