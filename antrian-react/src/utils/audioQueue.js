@@ -1,61 +1,96 @@
 /**
- * Menyusun daftar file suara (ting-tong, "nomor antrian", angka, "ke loket", nomor loket)
- * lalu memutarnya berurutan lewat satu <audio> element.
- * Path file suara diambil dari server PHP lama: {BASE}/display/sounds_jelek/xxx.mp3
+ * Menyusun daftar file suara:
+ * ting-tong → nomor antrian → prefix → angka → ke loket → nomor loket
  */
 export function buildAntrianSounds(base, { nomor, prefix, loket }) {
   const suara = []
-  const url = (name) => `${base}/display/sounds_jelek/${name}`
+
+  const url = (name) => `/sounds_jelek/${name}`
 
   suara.push(url('tingtong.mp3'))
   suara.push(url('nomorantrian.mp3'))
 
-  if (prefix) suara.push(url(`${prefix}.mp3`))
+  if (prefix) {
+    suara.push(url(`${prefix}.mp3`))
+  }
 
   const n = parseInt(nomor, 10)
 
-  if (n <= 9) {
+  if (n >= 0 && n <= 11) {
     suara.push(url(`${n}.mp3`))
-  } else if (n === 10) {
-    suara.push(url('10.mp3'))
-  } else if (n === 11) {
-    suara.push(url('11.mp3'))
+
   } else if (n >= 12 && n <= 19) {
-    const satuan = String(n).slice(1)
-    suara.push(url(`${satuan}.mp3`))
+    const satuan = n % 10
+
+    if (satuan !== 0) {
+      suara.push(url(`${satuan}.mp3`))
+    }
+
     suara.push(url('belas.mp3'))
+
   } else if (n >= 20 && n <= 99) {
-    const s = String(n)
-    const puluhan = s.charAt(0)
-    const satuan = s.charAt(1)
+    const puluhan = Math.floor(n / 10)
+    const satuan = n % 10
+
     suara.push(url(`${puluhan}.mp3`))
     suara.push(url('puluh.mp3'))
-    if (satuan !== '0') suara.push(url(`${satuan}.mp3`))
+
+    if (satuan !== 0) {
+      suara.push(url(`${satuan}.mp3`))
+    }
   }
 
   suara.push(url('keloket.mp3'))
 
   if (loket) {
     const nomorLoket = String(loket).replace(/\D/g, '')
-    if (nomorLoket) suara.push(url(`${nomorLoket}.mp3`))
+
+    if (nomorLoket) {
+      suara.push(url(`${nomorLoket}.mp3`))
+    }
   }
 
   return suara
 }
 
-/** Putar daftar file suara berurutan menggunakan satu elemen <audio> yang sudah ada di DOM. */
 export function playQueue(audioEl, sounds) {
+  if (!audioEl || !sounds?.length) {
+    console.warn('Audio atau daftar suara kosong')
+    return
+  }
+
   let index = 0
 
-  function playNext() {
-    if (index >= sounds.length) return
+  const playNext = async () => {
+    if (index >= sounds.length) {
+      audioEl.onended = null
+      return
+    }
+
+    const currentSound = sounds[index]
+
     audioEl.pause()
     audioEl.currentTime = 0
-    audioEl.src = sounds[index]
-    audioEl.play().catch((err) => console.warn('Gagal memutar suara:', err))
-    audioEl.onended = () => {
-      index++
-      playNext()
+    audioEl.src = currentSound
+    audioEl.load()
+
+    console.log(
+      `🔊 Memutar ${index + 1}/${sounds.length}:`,
+      currentSound
+    )
+
+    try {
+      await audioEl.play()
+
+      audioEl.onended = () => {
+        index++
+        playNext()
+      }
+
+    } catch (err) {
+      console.error('❌ Gagal memutar:', currentSound)
+      console.error(err)
+      audioEl.onended = null
     }
   }
 

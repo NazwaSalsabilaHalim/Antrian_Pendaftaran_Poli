@@ -2,9 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useInterval } from '../hooks/useInterval'
 import { buildAntrianSounds, playQueue } from '../utils/audioQueue'
+import logoAwalBros from './LOGOAWALBROS.png'
 
 const POLL_MS = 10000
-const AUDIO_ENABLED_KEY = 'tv_audio_enabled'
 
 function FlapRow({ value }) {
   return (
@@ -34,121 +34,181 @@ function useClock() {
   return now
 }
 
-export default function TVDisplay() {
-  const [current, setCurrent] = useState(null)
-  const [audioReady, setAudioReady] = useState(
-    () => localStorage.getItem(AUDIO_ENABLED_KEY) === 'true'
+/*
+ * Memecah "A3" -> { prefix: "A", nomor: 3 }
+ * atau "12" -> { prefix: "", nomor: 12 }
+ */
+function parseNomorDisplay(nomorDisplay) {
+  const match = String(nomorDisplay || '').match(/^([A-Za-z]*)(\d+)$/)
+
+  if (!match) {
+    return { prefix: '', nomor: 0 }
+  }
+
+  return {
+    prefix: match[1] || '',
+    nomor: parseInt(match[2], 10),
+  }
+}
+
+function CounterCard({ counterNama, serving }) {
+  const hasNomor = Boolean(serving?.nomor_display)
+
+  return (
+    <div className={`tv-counter-card${hasNomor ? ' tv-counter-card--active' : ''}`}>
+      <div className="tv-counter-card__label">
+        {counterNama}
+      </div>
+
+      {hasNomor ? (
+        <>
+          <div className="tv-number-wrap">
+            <FlapRow value={serving.nomor_display} />
+          </div>
+
+          <div className="tv-counter-card__meta">
+            {serving.tombol_nama}
+          </div>
+        </>
+      ) : (
+        <div className="tv-counter-card__empty">
+          MENUNGGU PANGGILAN
+        </div>
+      )}
+    </div>
   )
+}
+
+export default function TVDisplay() {
+  const [counterList, setCounterList] = useState([])
+  const [servingByCounter, setServingByCounter] = useState({})
+  const [audioReady, setAudioReady] = useState(false)
 
   const audioRef = useRef(null)
-  const lastPanggilId = useRef(0)
+  const prevServingRef = useRef({})
+  const isFirstPoll = useRef(true)
 
   const now = useClock()
 
-  const poll = useCallback(async () => {
-    try {
-      const d = await api.getDisplayQueue()
-
-      const panggilId = d.panggil_id || 0
-
-      const isBaru =
-        panggilId > 0 &&
-        panggilId !== lastPanggilId.current
-
-      const isUlang =
-        panggilId === lastPanggilId.current &&
-        d.panggil_ulang
-
-      if (isBaru || isUlang) {
-        lastPanggilId.current = panggilId
-
-        setCurrent(d)
-
-        const konfirmasi = await api.panggilKonfirmasi(panggilId)
-
-        if (
-          konfirmasi.found &&
-          audioReady &&
-          audioRef.current
-        ) {
-          const sounds = buildAntrianSounds(api.base, {
-            nomor: konfirmasi.nomor,
-            prefix: konfirmasi.prefix,
-            loket: konfirmasi.counter_id,
-          })
-
-          playQueue(audioRef.current, sounds)
-        }
-      }
-    } catch (e) {
-      console.warn('Gagal polling antrian:', e.message)
-    }
-  }, [audioReady])
-
-  useInterval(poll, POLL_MS)
-
-  async function enableAudio() {
-    const el = audioRef.current
-
-    if (!el) return
-
-    // Gunakan file audio yang benar-benar ada untuk
-    // mendapatkan izin autoplay dari browser.
-    el.src = `${api.base}/display/sounds_jelek/tingtong.mp3`
-
-    try {
-      await el.play()
-
-      el.pause()
-      el.currentTime = 0
-
-      setAudioReady(true)
-
-      // Simpan bahwa user sudah mengizinkan audio
-      localStorage.setItem(AUDIO_ENABLED_KEY, 'true')
-    } catch (e) {
-      console.warn('Audio belum bisa diaktifkan', e)
-    }
-  }
-
-  function disableAudio() {
-    const el = audioRef.current
-
-    if (el) {
-      el.pause()
-      el.currentTime = 0
-      el.removeAttribute('src')
-      el.load()
-    }
-
-    setAudioReady(false)
-
-    localStorage.removeItem(AUDIO_ENABLED_KEY)
-  }
-
+  /*
+   * ================================
+   * AMBIL DAFTAR LOKET (sekali di awal)
+   * ================================
+   */
   useEffect(() => {
-    const enabled =
-      localStorage.getItem(AUDIO_ENABLED_KEY) === 'true'
+    api
+      .getCounter()
+      .then((d) => setCounterList(d.counter || []))
+      .catch((e) => console.warn('Gagal ambil daftar counter:', e.message))
+  }, [])
 
-    if (!enabled) return
-
+  /*
+   * ================================
+   * AUDIO
+   * ================================
+   *
+   * Autoplay diaktifkan langsung saat halaman dibuka.
+   * Butuh browser/device yang dijalankan dengan flag
+   * --autoplay-policy=no-user-gesture-required
+   * (lihat shortcut TV Display).
+   */
+  useEffect(() => {
+    console.log('🎯 TVDisplay AUDIO EFFECT DIJALANKAN')
     const el = audioRef.current
-
     if (!el) return
 
-    el.src = `${api.base}/display/sounds_jelek/tingtong.mp3`
+    el.preload = 'auto'
+    el.volume = 1
 
-    el.play()
-      .then(() => {
+    const unlockAudio = async () => {
+      try {
+        const audioUrl = '/sounds_jelek/tingtong.mp3'
+        el.src = audioUrl
+        el.load()
+        await el.play()
+        console.log('🔊 Audio berhasil diaktifkan')
         el.pause()
         el.currentTime = 0
         setAudioReady(true)
-      })
-      .catch(() => {
-        // Browser masih membutuhkan interaksi user
+        window.removeEventListener('click', unlockAudio)
+        window.removeEventListener('keydown', unlockAudio)
+        window.removeEventListener('touchstart', unlockAudio)
+      } catch (e) {
+        console.error('❌ Audio gagal diaktifkan otomatis, menunggu interaksi...', e)
         setAudioReady(false)
-      })
+      }
+    }
+
+    unlockAudio()
+
+    window.addEventListener('click', unlockAudio)
+    window.addEventListener('keydown', unlockAudio)
+    window.addEventListener('touchstart', unlockAudio)
+
+    return () => {
+      window.removeEventListener('click', unlockAudio)
+      window.removeEventListener('keydown', unlockAudio)
+      window.removeEventListener('touchstart', unlockAudio)
+      el.pause()
+      el.removeAttribute('src')
+      el.load()
+    }
   }, [])
+
+  /*
+   * ================================
+   * POLLING LIVE MONITOR (per-loket)
+   * ================================
+   */
+  const poll = useCallback(async () => {
+    try {
+      const d = await api.getLiveMonitor()
+      const serving = d.serving || []
+
+      const nextMap = {}
+      serving.forEach((s) => {
+        nextMap[s.counter_id] = s
+      })
+
+      // Deteksi loket mana yang punya panggilan BARU dibanding poll sebelumnya
+      if (!isFirstPoll.current) {
+        serving.forEach((s) => {
+          const prev = prevServingRef.current[s.counter_id]
+
+          const isBaru =
+            !prev ||
+            prev.dipanggil_pukul !== s.dipanggil_pukul ||
+            prev.nomor_display !== s.nomor_display
+
+          if (isBaru && audioReady && audioRef.current) {
+            const { prefix, nomor } = parseNomorDisplay(s.nomor_display)
+
+            const sounds = buildAntrianSounds(null, {
+              nomor,
+              prefix,
+              loket: s.counter_id,
+            })
+
+            playQueue(audioRef.current, sounds)
+          }
+        })
+      }
+
+      prevServingRef.current = nextMap
+      isFirstPoll.current = false
+
+      setServingByCounter(nextMap)
+    } catch (e) {
+      console.warn('Gagal polling live monitor:', e.message)
+    }
+  }, [audioReady])
+
+  // Poll langsung sekali saat mount, lalu ulangi tiap POLL_MS
+  useEffect(() => {
+    poll()
+  }, [poll])
+
+  useInterval(poll, POLL_MS)
 
   const time = now.toLocaleTimeString('id-ID', {
     hour: '2-digit',
@@ -166,7 +226,11 @@ export default function TVDisplay() {
   return (
     <div className="tv-screen">
 
-      <audio ref={audioRef} />
+      {/* Audio tidak lagi memiliki tombol kontrol */}
+      <audio
+        ref={audioRef}
+        preload="auto"
+      />
 
       {/* Decorative background */}
       <div className="tv-bg-shape tv-bg-shape--one" />
@@ -177,19 +241,7 @@ export default function TVDisplay() {
       <header className="tv-header">
 
         <div className="tv-brand">
-          <div className="tv-brand__logo">
-            AP
-          </div>
-
-          <div>
-            <div className="tv-brand__name">
-              Antrian Pendaftaran
-            </div>
-
-            <div className="tv-brand__subtitle">
-              Sistem Informasi Antrian Pasien
-            </div>
-          </div>
+          <img src={logoAwalBros} alt="Logo" />
         </div>
 
         <div className="tv-header__right">
@@ -200,6 +252,7 @@ export default function TVDisplay() {
           </div>
 
           <div className="tv-clock">
+
             <div className="tv-clock__time">
               {time}
             </div>
@@ -207,75 +260,34 @@ export default function TVDisplay() {
             <div className="tv-clock__date">
               {date}
             </div>
+
           </div>
 
         </div>
+
       </header>
 
-      {/* Audio */}
-      <div className="tv-audio-control">
-        {audioReady ? (
-          <button
-            className="tv-audio-gate tv-audio-gate--active"
-            onClick={disableAudio}
-          >
-            <span className="tv-audio-icon">🔊</span>
-            Nonaktifkan Audio
-          </button>
-        ) : (
-          <button
-            className="tv-audio-gate"
-            onClick={enableAudio}
-          >
-            <span className="tv-audio-icon">🔇</span>
-            Aktifkan Audio
-          </button>
-        )}
-      </div>
-
-      {/* Main display */}
+      {/* Main display — satu kartu per loket */}
       <main className="tv-main">
 
         <div className="tv-main__label">
           NOMOR ANTRIAN
         </div>
 
-        {current?.nomor ? (
-          <>
-            <div className="tv-number-wrap">
-              <FlapRow value={current.nomor} />
-            </div>
+        <div className="tv-counters-grid">
+          {counterList.map((c) => (
+            <CounterCard
+              key={c.CounterID}
+              counterNama={c.Nama}
+              serving={servingByCounter[c.CounterID]}
+            />
+          ))}
+        </div>
 
-            <div className="tv-counter">
-              <div>
-                <div className="tv-counter__label">
-                  SILAKAN MENUJU
-                </div>
-
-                <div className="tv-counter__name">
-                  {current.counter_nama || 'LOKET'}
-                </div>
-              </div>
-            </div>
-
-            <div className="tv-status">
-              <span className="tv-status__dot" />
-              Nomor Anda sedang dipanggil
-            </div>
-          </>
-        ) : (
+        {counterList.length === 0 && (
           <div className="tv-empty">
-            <div className="tv-empty__icon">
-              —
-            </div>
-
-            <div className="tv-empty__title">
-              MENUNGGU PANGGILAN
-            </div>
-
-            <div className="tv-empty__subtitle">
-              Mohon menunggu, nomor antrian berikutnya akan segera dipanggil
-            </div>
+            <div className="tv-empty__icon">—</div>
+            <div className="tv-empty__title">MEMUAT DATA LOKET...</div>
           </div>
         )}
 
@@ -289,6 +301,7 @@ export default function TVDisplay() {
         </div>
 
         <div className="tv-footer__text">
+
           <span className="tv-footer__label">
             INFORMASI
           </span>
@@ -297,6 +310,7 @@ export default function TVDisplay() {
             Selamat datang di Rumah Sakit Awal Bros Yasmine Dumai,
             Konfirmasi ke Admission apabila anda mengalami keterlambatan.
           </marquee>
+
         </div>
 
       </footer>

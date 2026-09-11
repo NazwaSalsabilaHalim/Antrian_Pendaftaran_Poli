@@ -160,96 +160,96 @@ export default function AmbilNomor() {
 
       {/* CHOOSE REGISTRATION */}
       {!tiket && (
-        <section className="ambil-selection">
+      <section className="ambil-selection">
 
-          <div className="ambil-selection__heading">
-            <div>
-              <span>LANGKAH 01</span>
-              <h2>Pilih Jenis Pendaftaran</h2>
-              <p>
-                Ketuk salah satu pilihan di bawah untuk mendapatkan nomor antrian.
-              </p>
-            </div>
-
-            <div className="ambil-selection__indicator">
-              <span />
-              Pilih salah satu
-            </div>
+        <div className="ambil-selection__heading">
+          <div>
+            <span>LANGKAH 01</span>
+            <h2>Pilih Jenis Pendaftaran</h2>
+            <p>
+              Ketuk salah satu pilihan di bawah untuk mendapatkan nomor antrian.
+            </p>
           </div>
 
-          <div className="ambil-options">
+          <div className="ambil-selection__indicator">
+            <span />
+            Pilih salah satu
+          </div>
+        </div>
 
-            {tombolList.map((t, index) => {
-              const isLoading = loadingId === t.TombolID
+        <div className="ambil-options">
 
-              return (
-                <button
-                  key={t.TombolID}
-                  type="button"
-                  className={`ambil-option ambil-option--${index % 3}`}
-                  disabled={loadingId !== null}
-                  onClick={() => handleAmbil(t)}
-                >
+          {tombolList.map((t, index) => {
+            const isLoading = loadingId === t.TombolID
 
-                  {/* ICON */}
-                  <div className="ambil-option__icon">
-                    {getIcon(index)}
-                  </div>
+            return (
+              <button
+                key={t.TombolID}
+                type="button"
+                className={`ambil-option ambil-option--${index % 3}`}
+                disabled={loadingId !== null}
+                onClick={() => handleAmbil(t)}
+              >
 
-                  {/* NUMBER */}
-                  <span className="ambil-option__number">
-                    0{index + 1}
+                {/* ICON */}
+                <div className="ambil-option__icon">
+                  {getIcon(index)}
+                </div>
+
+                {/* NUMBER */}
+                <span className="ambil-option__number">
+                  0{index + 1}
+                </span>
+
+                {/* CONTENT */}
+                <div className="ambil-option__content">
+
+                  <span className="ambil-option__label">
+                    JENIS PENDAFTARAN
                   </span>
 
-                  {/* CONTENT */}
-                  <div className="ambil-option__content">
+                  <h3>
+                    {t.Nama}
+                  </h3>
 
-                    <span className="ambil-option__label">
-                      JENIS PENDAFTARAN
-                    </span>
+                  <p>
+                    {index === 0
+                      ? 'Untuk pasien dengan asuransi atau perusahaan.'
+                      : 'Untuk pasien umum tanpa asuransi perusahaan.'}
+                  </p>
 
-                    <h3>
-                      {t.Nama}
-                    </h3>
+                </div>
 
-                    <p>
-                      {index === 0
-                        ? 'Untuk pasien dengan asuransi atau perusahaan.'
-                        : 'Untuk pasien umum tanpa asuransi perusahaan.'}
-                    </p>
+                {/* ACTION */}
+                <div className="ambil-option__action">
 
-                  </div>
+                  <span>
+                    {isLoading
+                      ? 'Memproses...'
+                      : 'Ambil Nomor'}
+                  </span>
 
-                  {/* ACTION */}
-                  <div className="ambil-option__action">
+                  {!isLoading && (
+                    <ArrowRight size={19} />
+                  )}
 
-                    <span>
-                      {isLoading
-                        ? 'Memproses...'
-                        : 'Ambil Nomor'}
-                    </span>
+                </div>
 
-                    {!isLoading && (
-                      <ArrowRight size={19} />
-                    )}
+              </button>
+            )
+          })}
 
-                  </div>
+          {tombolList.length === 0 && !error && (
+            <div className="ambil-loading">
+              <div className="ambil-loading__spinner" />
+              <strong>Memuat jenis pendaftaran...</strong>
+              <span>Mohon tunggu sebentar</span>
+            </div>
+          )}
 
-                </button>
-              )
-            })}
+        </div>
 
-            {tombolList.length === 0 && !error && (
-              <div className="ambil-loading">
-                <div className="ambil-loading__spinner" />
-                <strong>Memuat jenis pendaftaran...</strong>
-                <span>Mohon tunggu sebentar</span>
-              </div>
-            )}
-
-          </div>
-
-        </section>
+      </section>
       )}
       {/* INFO */}
       <section className="ambil-info">

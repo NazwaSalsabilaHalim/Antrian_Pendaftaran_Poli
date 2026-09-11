@@ -40,19 +40,12 @@ export default function Overview() {
           </p>
         </div>
 
-        <div className="page-intro__status">
-          <span />
-          Live
-        </div>
       </div>
 
       {error && <div className="error-banner">{error}</div>}
 
       <div className="section-header">
         <h2 className="section-title">Sedang Dilayani</h2>
-        <span className="live-dot">
-          <span className="live-dot__ping" /> Live
-        </span>
       </div>
 
       {data && data.serving.length === 0 && (

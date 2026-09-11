@@ -14,6 +14,7 @@ import {
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { BarChart3 } from 'lucide-react'
+import * as XLSX from 'xlsx'
 
 const REFRESH_MS = 15000
 
@@ -58,33 +59,55 @@ export default function Dashboard() {
       .catch((e) => setError(e.message))
   }, [tanggal])
 
-  function exportCSV() {
-    const header = ['No', 'Nomor Antrian', 'Jenis Pasien', 'Loket', 'Status', 'Waktu Diambil', 'Waktu Dipanggil']
+  // Membaca file Excel yang diupload user
+  const exportExcel = () => {
+    if (riwayat.length === 0) return
+    // Mapping data ke format yang lebih rapi untuk ditampilkan
+    const dataForExcel = riwayat.map((row) => ({
+      'No. Antrian': row.nomor,
+      'Prefix': row.prefix || '-',
+      'Jenis Pasien': row.jenis_pasien,
+      'Counter': row.counter_nama,
+      'Status': row.status,
+      'Dipanggil': row.panggil === 'Y' ? 'Ya' : 'Tidak',
+      'Panggil Ulang': row.panggil_ulang === 'Y' ? 'Ya' : 'Tidak',
+      'Tanggal': row.tanggal,
+      'Waktu Ambil Nomor': row.tanggal_insert,
+      'Waktu Dipanggil': row.tanggal_panggil,
+    }))
+    const ws = XLSX.utils.json_to_sheet(dataForExcel)
 
-    const rows = riwayat.map((r, index) => [
-      index + 1,
-      r.nomor,
-      r.jenis_pasien,
-      r.counter_nama,
-      r.status,
-      formatTanggalWaktu(r.tanggal_insert),
-      formatTanggalWaktu(r.tanggal_panggil)
-    ])
+    // Atur lebar tiap kolom (dalam karakter)
+    ws['!cols'] = [
+      { wch: 12 }, // No. Antrian
+      { wch: 8 },  // Prefix
+      { wch: 26 }, // Jenis Pasien
+      { wch: 14 }, // Counter
+      { wch: 12 }, // Status
+      { wch: 10 }, // Dipanggil
+      { wch: 14 }, // Panggil Ulang
+      { wch: 12 }, // Tanggal
+      { wch: 20 }, // Waktu Ambil Nomor
+      { wch: 20 }, // Waktu Dipanggil
+    ]
 
-    const csvContent = [header, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(';'))
-      .join('\n')
+    // Bikin header row bold (opsional, tampilan lebih rapi)
+    const range = XLSX.utils.decode_range(ws['!ref'])
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: col })
+      if (ws[cellRef]) {
+        ws[cellRef].s = {
+          font: { bold: true },
+          fill: { fgColor: { rgb: 'E6F3EE' } },
+        }
+      }
+    }
 
-    // \uFEFF di depan supaya Excel baca UTF-8 dengan benar (karakter é, ü, dll aman)
-    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Antrian')
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `riwayat-antrian-${tanggal}.csv`
-    link.click()
-
-    URL.revokeObjectURL(url)
+    const today = new Date().toISOString().slice(0, 10)
+    XLSX.writeFile(wb, `riwayat-antrian-${today}.xlsx`)
   }
 
   function exportPDF() {
@@ -278,10 +301,10 @@ export default function Dashboard() {
 
         <button
           className="btn btn-outline"
-          onClick={exportCSV}
+          onClick={exportExcel}
           disabled={riwayat.length === 0}
         >
-          Export CSV
+          Export Excel
         </button>
 
         <button

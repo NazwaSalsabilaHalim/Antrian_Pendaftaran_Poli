@@ -2239,24 +2239,20 @@ table.data-table {
 
 /* =========================================================
    AMBIL NOMOR PAGE — KIOSK PASIEN
-   Konten diposisikan di tengah viewport secara vertikal
-   (bukan menempel ke atas) supaya nyaman dilihat di layar
-   kiosk yang biasanya tinggi/landscape besar.
+   Halaman ini dirender berdiri sendiri (fullscreen di mini TV
+   kiosk pasien), TIDAK ada topbar/sidebar staf di atasnya —
+   jadi tinggi acuannya 100vh penuh, bukan dikurangi apa pun.
+   Konten diposisikan di tengah viewport secara vertikal.
    ========================================================= */
 
 .ambil-page {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-
-  /* Halaman ini dirender berdiri sendiri (fullscreen di mini TV
-     kiosk pasien), tanpa topbar/sidebar staf di atasnya — jadi
-     tinggi acuannya 100vh penuh, bukan dikurangi tinggi topbar. */
-  min-height: 100vh;
-  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 100vh !important;
 }
 
 .ambil-hero {
@@ -2792,9 +2788,11 @@ table.data-table {
 
 /* =========================================================
    TV DISPLAY
-   Layar penuh untuk ruang tunggu — tetap gelap & mencolok
-   secara sengaja (beda konteks dari kartu-kartu di atas),
-   tapi warnanya ditarik dari token yang sama.
+   Layar penuh untuk ruang tunggu — tenang, gelap, dan
+   nyaman dilihat lama, warnanya ditarik dari token yang sama.
+   (Catatan: hanya SATU definisi .tv-screen/.tv-header/dst di
+   bawah — versi lama yang terduplikasi sudah dihapus supaya
+   tidak ada aturan yang saling menimpa tanpa disadari.)
    ========================================================= */
 
 .tv-screen {
@@ -2806,8 +2804,8 @@ table.data-table {
   flex-direction: column;
 
   background:
-    radial-gradient(circle at 78% 15%, rgba(74, 169, 160, 0.20), transparent 30%),
-    linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 45%, var(--secondary) 100%);
+    radial-gradient(circle at 85% 10%, rgba(74, 169, 160, 0.14), transparent 35%),
+    linear-gradient(180deg, var(--primary-dark) 0%, #0f4436 55%, #0c3a4f 100%);
 
   color: #ffffff;
   font-family: var(--font-body);
@@ -2817,7 +2815,8 @@ table.data-table {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(2px);
+  filter: blur(3px);
+  opacity: 0.7;
 }
 
 .tv-bg-shape--one {
@@ -2825,7 +2824,7 @@ table.data-table {
   height: 520px;
   top: -260px;
   right: -150px;
-  background: rgba(74, 169, 160, 0.14);
+  background: rgba(74, 169, 160, 0.10);
 }
 
 .tv-bg-shape--two {
@@ -2833,13 +2832,13 @@ table.data-table {
   height: 420px;
   bottom: -250px;
   left: -120px;
-  background: rgba(47, 111, 158, 0.14);
+  background: rgba(47, 111, 158, 0.10);
 }
 
 .tv-bg-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.06;
+  opacity: 0.04;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
@@ -2855,8 +2854,8 @@ table.data-table {
   align-items: center;
   justify-content: space-between;
   padding: 28px 44px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(10, 40, 32, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(6, 30, 24, 0.28);
   backdrop-filter: blur(10px);
 }
 
@@ -2864,6 +2863,13 @@ table.data-table {
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.tv-brand img {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .tv-brand__logo {
@@ -2881,7 +2887,7 @@ table.data-table {
 }
 
 .tv-brand__name {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -2889,7 +2895,7 @@ table.data-table {
 .tv-brand__subtitle {
   margin-top: 3px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .tv-header__right {
@@ -2904,9 +2910,9 @@ table.data-table {
   gap: 8px;
   padding: 9px 14px;
   border-radius: 999px;
-  background: rgba(74, 169, 160, 0.16);
-  border: 1px solid rgba(74, 169, 160, 0.32);
-  color: #a9ecd8;
+  background: rgba(74, 169, 160, 0.14);
+  border: 1px solid rgba(74, 169, 160, 0.28);
+  color: var(--secondary-soft);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -2936,14 +2942,14 @@ table.data-table {
 }
 
 .tv-clock {
-  min-width: 150px;
+  min-width: 160px;
   padding-left: 24px;
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
   text-align: right;
 }
 
 .tv-clock__time {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -2951,7 +2957,7 @@ table.data-table {
 .tv-clock__date {
   margin-top: 3px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .tv-audio-gate {
@@ -2992,6 +2998,8 @@ table.data-table {
   line-height: 1;
 }
 
+/* ---------- KONTEN UTAMA: NOMOR ANTRIAN (diperbesar) ---------- */
+
 .tv-main {
   position: relative;
   z-index: 2;
@@ -3000,27 +3008,27 @@ table.data-table {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px 90px;
+  padding: 30px 20px 110px;
   text-align: center;
 }
 
 .tv-main__label {
-  margin-bottom: 22px;
-  font-size: 16px;
+  margin-bottom: 30px;
+  font-size: 19px;
   font-weight: 800;
-  letter-spacing: 0.25em;
-  color: #ffffff;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.tv-number-wrap {
-  padding: 16px 38px;
-  border-radius: 28px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 25px 70px rgba(6, 30, 24, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+/* .tv-number-wrap {
+  padding: 26px 56px;
+  border-radius: 32px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 30px 80px rgba(4, 20, 16, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
   backdrop-filter: blur(12px);
   animation: tv-number-in 0.45s ease;
-}
+} */
 
 @keyframes tv-number-in {
   from {
@@ -3037,22 +3045,23 @@ table.data-table {
 .tv-flap-row {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 14px;
 }
 
+/* Ukuran kotak nomor jauh lebih besar — untuk dibaca dari jarak TV */
 .tv-flap-char {
-  min-width: 100px;
-  height: 125px;
+  min-width: 140px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 18px;
   background: linear-gradient(180deg, #ffffff 0%, #f1f9f5 48%, #dfeee7 50%, #ffffff 52%, #f5faf8 100%);
   color: var(--text);
-  font-size: 76px;
+  font-size: 108px;
   font-weight: 900;
   line-height: 1;
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
 }
 
@@ -3066,96 +3075,216 @@ table.data-table {
   background: rgba(0, 0, 0, 0.12);
 }
 
+/* ---------- INFO COUNTER (diperbesar & lebih jelas) ---------- */
+
 .tv-counter {
-  margin-top: 28px;
+  margin-top: 40px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 13px;
-  padding: 12px 20px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  text-align: left;
-}
-
-.tv-counter__icon {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background: #6fe0b8;
-  color: #0b3b2e;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.tv-counter__label {
-  margin-bottom: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #ffffff;
+  gap: 6px;
+  padding: 20px 40px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   text-align: center;
 }
 
-.tv-counter__name {
-  margin-top: 2px;
-  font-size: 22px;
-  font-weight: 900;
-  color: #ffffff;
-}
-
-.tv-status {
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12px;
+.tv-counter__label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   color: rgba(255, 255, 255, 0.7);
 }
 
+.tv-counter__name {
+  font-size: 40px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.tv-status {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
 .tv-status__dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #6fe0b8;
+}
+
+/* ---------- GRID MULTI-COUNTER ---------- */
+
+.tv-counters-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 44px;
+  width: 100%;
+}
+
+.tv-counter-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+
+  width: fit-content;
+  min-width: 480px;
+  max-width: 700px;
+
+  padding: 56px 64px 62px;
+  border-radius: 36px;
+
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 50px rgba(4, 20, 16, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+.tv-counter-card--active {
+  border-color: rgba(111, 224, 184, 0.35);
+  background: linear-gradient(145deg, rgba(111, 224, 184, 0.10), rgba(255, 255, 255, 0.03));
+}
+
+.tv-counter-card__label {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+}
+
+.tv-counter-card--active .tv-counter-card__label {
+  color: #ffffff;
+}
+
+/* Lapisan "card kedua" dihilangkan total — cuma jadi
+   pembungkus tata letak, tanpa background/border/shadow sendiri */
+.tv-counter-card .tv-number-wrap {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  animation: tv-number-in 0.45s ease;
+}
+
+.tv-counter-card .tv-flap-row {
+  gap: 14px;
+}
+
+.tv-counter-card .tv-flap-char {
+  min-width: 170px;
+  height: 218px;
+  border-radius: 18px;
+  font-size: 128px;
+}
+
+.tv-counter-card__meta {
+  font-size: 22px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: center;
+}
+
+.tv-counter-card__empty {
+  padding: 40px 16px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- RESPONSIVE: multi-counter grid ---------- */
+
+@media (max-width: 900px) {
+  .tv-counters-grid {
+    gap: 24px;
+  }
+
+  .tv-counter-card {
+    min-width: 280px;
+    padding: 36px 36px 40px;
+    gap: 22px;
+  }
+
+  .tv-counter-card .tv-flap-char {
+    min-width: 64px;
+    height: 84px;
+    font-size: 44px;
+  }
+
+  .tv-counter-card__label {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 760px) {
+  .tv-counters-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .tv-counter-card {
+    width: 100%;
+    max-width: 380px;
+    min-width: 0;
+    padding: 26px 22px 30px;
+    gap: 18px;
+  }
+
+  .tv-counter-card .tv-flap-char {
+    min-width: 68px;
+    height: 88px;
+    font-size: 46px;
+  }
 }
 
 .tv-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 500px;
+  max-width: 560px;
 }
 
 .tv-empty__icon {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.09);
+  margin-bottom: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 28px;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .tv-empty__title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .tv-empty__subtitle {
-  margin-top: 9px;
-  font-size: 13px;
+  margin-top: 10px;
+  font-size: 14px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.55);
 }
+
+/* ---------- FOOTER (dirapikan, tidak lagi tabrakan dgn marquee) ---------- */
 
 .tv-footer {
   position: absolute;
@@ -3163,24 +3292,24 @@ table.data-table {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 58px;
+  height: 62px;
   display: flex;
   align-items: center;
-  background: rgba(6, 30, 24, 0.76);
+  background: rgba(4, 20, 16, 0.8);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
 }
 
 .tv-footer__icon {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(111, 224, 184, 0.14);
   color: #6fe0b8;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
 }
 
@@ -3189,21 +3318,21 @@ table.data-table {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding-right: 20px;
+  gap: 20px;
+  padding: 0 22px;
 }
 
 .tv-footer__label {
   flex-shrink: 0;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.16em;
   color: #6fe0b8;
 }
 
 .tv-footer marquee {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* =========================================================
@@ -3329,7 +3458,6 @@ table.data-table {
   .loket-counter-card,
   .ambil-selection {
     padding: px;
-    /* border-radius: 14px; */
   }
 
   .stat-grid {
@@ -3392,10 +3520,6 @@ table.data-table {
     right: 18px;
     bottom: 18px;
     min-width: 0;
-  }
-
-  .ambil-page {
-    min-height: auto;
   }
 
   .ambil-hero {
@@ -3471,10 +3595,10 @@ table.data-table {
     font-size: 42px;
   }
 
-  .tv-number-wrap {
+  /* .tv-number-wrap {
     padding: 12px 16px;
     border-radius: 18px;
-  }
+  } */
 
   .tv-counter__name {
     font-size: 18px;
