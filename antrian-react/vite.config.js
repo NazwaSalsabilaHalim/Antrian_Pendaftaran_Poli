@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: 'KP/antrian_pendaftaran/',
   plugins: [
     react(),
 
@@ -23,7 +24,7 @@ export default defineConfig({
         theme_color: '#268e67',
         background_color: '#eef3f1',
         display: 'standalone',
-        start_url: '/',
+        start_url: '/KP/antrian_pendaftaran/',
 
         icons: [
           {
