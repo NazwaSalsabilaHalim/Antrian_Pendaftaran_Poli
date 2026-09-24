@@ -18,6 +18,8 @@ const get = (path) => req(path)
 
 export const api = {
   base: BASE,
+
+  // ===== Sistem antrian pendaftaran (sudah ada sebelumnya) =====
   getTombol: () => get('tombol.php'),
   getCounter: () => get('counter.php'),
   ambilNomor: (tombolId) => post('ambil_nomor.php', { tombol_id: tombolId }),
@@ -31,4 +33,21 @@ export const api = {
   // struk cetak masih pakai file lama karena berisi logika format printer thermal (ESC/POS)
   cetakStrukUrl: (tid, tombolNama, nomor, prefix) =>
     `${BASE}/index_btn.php?exe=cetak_struk&tid=${encodeURIComponent(tid)}&tombol=${encodeURIComponent(tombolNama)}&no=${encodeURIComponent(nomor)}&prefix=${encodeURIComponent(prefix)}`,
+
+  // ===== Panel Admin IT =====
+  getRingkasanIT: () => get('ringkasan_it.php'),
+
+  getPetugas: () => get('petugas.php'),
+  savePetugas: (payload) => post('petugas.php', payload),
+
+  getLoketIT: () => get('kelola_loket.php'),
+  saveLoketIT: (payload) => post('kelola_loket.php', payload),
+
+  getJenisPendaftaran: () => get('jenis_pendaftaran.php'),
+  saveJenisPendaftaran: (payload) => post('jenis_pendaftaran.php', payload),
+
+  getKonfigurasi: () => get('konfigurasi.php'),
+  saveKonfigurasi: (payload) => post('konfigurasi.php', payload),
+
+  getAktivitas: (limit) => get(`aktivitas.php${limit ? `?limit=${limit}` : ''}`),
 }
