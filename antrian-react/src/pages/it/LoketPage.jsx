@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Building2, User, ToggleLeft } from 'lucide-react'
 import { api } from '../../api/client'
-import { StatusBadge, Modal } from '../../components/it/ITComponents'
+import { StatusBadge, Modal, FieldWrap } from '../../components/it/ITComponents'
 
 export default function LoketPage() {
   const [loket, setLoket] = useState([])
@@ -69,7 +70,7 @@ export default function LoketPage() {
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             Daftar Loket
           </p>
         </div>
@@ -77,7 +78,7 @@ export default function LoketPage() {
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
                 <tr>
@@ -99,14 +100,7 @@ export default function LoketPage() {
                     <td>
                       <button
                         onClick={() => openEdit(item)}
-                        style={{
-                          border: 'none',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: 'var(--secondary)',
-                        }}
+                        className="it-row-actions__edit"
                       >
                         Edit
                       </button>
@@ -123,57 +117,90 @@ export default function LoketPage() {
         )}
       </div>
 
-      <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>
+      <p className="muted it-form-hint-normal">
         Loket fisik (mesin & printer) dikonfigurasi lewat sistem lama — halaman ini hanya mengatur petugas yang bertugas dan status aktif loket.
       </p>
 
       {editItem && (
-        <Modal title={`Edit Loket — ${editItem.nama}`} onClose={closeModal}>
+        <Modal
+          title={`Edit Loket — ${editItem.nama}`}
+          subtitle="Atur petugas yang bertugas dan status loket"
+          icon={Building2}
+          onClose={closeModal}
+        >
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Petugas
               </label>
-              <select
-                value={form.petugas_nama}
-                onChange={(e) => setForm({ ...form, petugas_nama: e.target.value })}
-                style={{ width: '100%' }}
-              >
-                <option value="">Belum ada petugas</option>
-                {petugasList.map((p) => (
-                  <option key={p.id} value={p.nama}>
-                    {p.nama}
+
+              <FieldWrap icon={User}>
+                <select
+                  value={form.petugas_nama}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      petugas_nama: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                >
+                  <option value="">
+                    Belum ada petugas
                   </option>
-                ))}
-              </select>
+
+                  {petugasList.map((p) => (
+                    <option key={p.id} value={p.nama}>
+                      {p.nama}
+                    </option>
+                  ))}
+                </select>
+              </FieldWrap>
 
               {petugasList.length === 0 && (
-                <span className="muted" style={{ fontSize: 11 }}>
+                <span className="muted it-form-hint">
                   Belum ada data petugas — tambahkan dulu di halaman Kelola Petugas.
                 </span>
               )}
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group it-form-group--last">
+              <label className="it-form-label">
                 Status
               </label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                style={{ width: '100%' }}
-              >
-                <option value="Aktif">Aktif</option>
-                <option value="Tidak Aktif">Tidak Aktif</option>
-              </select>
+
+              <FieldWrap icon={ToggleLeft}>
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      status: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                >
+                  <option value="Aktif">Aktif</option>
+                  <option value="Tidak Aktif">
+                    Tidak Aktif
+                  </option>
+                </select>
+              </FieldWrap>
             </div>
 
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="submit" className="btn" style={{ flex: 1 }}>
+            <div className="it-form-actions">
+              <button
+                type="submit"
+                className="btn it-form-actions__submit"
+              >
                 Simpan Perubahan
               </button>
 
-              <button type="button" className="btn btn-outline" onClick={closeModal}>
+              <button
+                type="button"
+                className="btn btn-outline it-form-actions__cancel"
+                onClick={closeModal}
+              >
                 Batal
               </button>
             </div>

@@ -23,31 +23,17 @@ export default function ITDashboardOverview() {
 
   return (
     <>
-      {/* WELCOME BANNER — reuse .card, aksen warna dari token brand yang sama */}
-      <div
-        className="card"
-        style={{
-          background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)',
-          color: '#ffffff',
-          marginBottom: 24,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 11,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            opacity: 0.85,
-          }}
-        >
+      {/* WELCOME BANNER */}
+      <div className="card it-dashboard-welcome">
+        <div className="it-dashboard-welcome__label">
           SISTEM INFORMASI ANTRIAN
         </div>
 
-        <h2 style={{ margin: '10px 0 6px', fontSize: 22, fontWeight: 800 }}>
+        <h2 className="it-dashboard-welcome__title">
           Selamat Datang, Administrator
         </h2>
 
-        <p style={{ margin: 0, fontSize: 13, opacity: 0.9 }}>
+        <p className="it-dashboard-welcome__description">
           Pantau dan kelola sistem antrian pendaftaran dari satu halaman.
         </p>
       </div>
@@ -60,10 +46,29 @@ export default function ITDashboardOverview() {
         <>
           {/* STAT GRID */}
           <div className="grid stat-grid">
-            <StatCard label="Antrian Menunggu" value={stat.menunggu ?? 0} description="Hari ini" />
-            <StatCard label="Sedang Dilayani" value={stat.dilayani ?? 0} description="Loket aktif melayani" />
-            <StatCard label="Petugas Aktif" value={stat.petugas_aktif ?? 0} description="Petugas" />
-            <StatCard label="Loket Aktif" value={stat.loket_aktif ?? 0} description="Loket" />
+            <StatCard
+              label="Antrian Menunggu"
+              value={stat.menunggu ?? 0}
+              description="Hari ini"
+            />
+
+            <StatCard
+              label="Sedang Dilayani"
+              value={stat.dilayani ?? 0}
+              description="Loket aktif melayani"
+            />
+
+            <StatCard
+              label="Petugas Aktif"
+              value={stat.petugas_aktif ?? 0}
+              description="Petugas"
+            />
+
+            <StatCard
+              label="Loket Aktif"
+              value={stat.loket_aktif ?? 0}
+              description="Loket"
+            />
           </div>
 
           <div className="dashboard-2col">
@@ -72,12 +77,12 @@ export default function ITDashboardOverview() {
             <div className="dashboard-2col__column">
               <div className="card">
                 <div className="section-header">
-                  <p className="section-title" style={{ margin: 0 }}>
+                  <p className="section-title it-dashboard-section-title">
                     Status Loket
                   </p>
                 </div>
 
-                <div style={{ overflowX: 'auto' }}>
+                <div className="it-dashboard-table-wrapper">
                   <table className="data-table">
                     <thead>
                       <tr>
@@ -93,13 +98,19 @@ export default function ITDashboardOverview() {
                         <tr key={index}>
                           <td><strong>{item.loket}</strong></td>
                           <td>{item.petugas}</td>
-                          <td><StatusBadge status={item.status} /></td>
+                          <td>
+                            <StatusBadge status={item.status} />
+                          </td>
                           <td>{item.antrian}</td>
                         </tr>
                       ))}
 
                       {statusLoket.length === 0 && (
-                        <tr><td colSpan={4} className="empty-state">Belum ada panggilan hari ini.</td></tr>
+                        <tr>
+                          <td colSpan={4} className="empty-state">
+                            Belum ada panggilan hari ini.
+                          </td>
+                        </tr>
                       )}
                     </tbody>
                   </table>
@@ -111,19 +122,25 @@ export default function ITDashboardOverview() {
             <div className="dashboard-2col__column">
               <div className="card">
                 <div className="section-header">
-                  <p className="section-title" style={{ margin: 0 }}>
+                  <p className="section-title it-dashboard-section-title">
                     Aktivitas Terbaru
                   </p>
                 </div>
 
                 {aktivitas.map((item, index) => (
                   <div className="waiting-row" key={index}>
-                    <span className="waiting-row__index">{index + 1}</span>
+                    <span className="waiting-row__index">
+                      {index + 1}
+                    </span>
+
                     <span>{item.text}</span>
-                    <span className="waiting-row__tag" style={{ textAlign: 'right', lineHeight: 1.4 }}>
+
+                    <span className="waiting-row__tag it-dashboard-activity-time">
                       {item.time}
+
                       <br />
-                      <span style={{ fontWeight: 400, fontSize: 10, color: 'var(--muted)' }}>
+
+                      <span className="it-dashboard-activity-date">
                         {item.date}
                       </span>
                     </span>
@@ -131,7 +148,9 @@ export default function ITDashboardOverview() {
                 ))}
 
                 {aktivitas.length === 0 && (
-                  <div className="empty-state">Belum ada aktivitas.</div>
+                  <div className="empty-state">
+                    Belum ada aktivitas.
+                  </div>
                 )}
               </div>
             </div>

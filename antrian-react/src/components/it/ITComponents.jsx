@@ -1,8 +1,6 @@
 /*
   Kumpulan komponen kecil yang dipakai berulang di halaman-halaman
-  Panel Admin IT. Semua memakai class CSS yang SUDAH ADA di desain
-  sistem antrian pendaftaran (card, stat-card, data-table, badge-*),
-  jadi tidak ada style baru yang perlu ditambahkan.
+  Panel Admin IT.
 */
 
 export function StatCard({ label, value, description }) {
@@ -12,7 +10,7 @@ export function StatCard({ label, value, description }) {
       <div className="stat-card__value">{value}</div>
 
       {description && (
-        <div className="muted" style={{ fontSize: 12 }}>
+        <div className="muted stat-card__description">
           {description}
         </div>
       )}
@@ -36,94 +34,97 @@ export function StatusBadge({ status }) {
   return <span className={className}>{status}</span>
 }
 
-/*
-  Modal generik untuk formulir Tambah/Edit — overlay gelap + blur di
-  belakang, card di tengah (pakai class .card yang sama dengan komponen
-  lain). Klik area luar atau tombol × untuk menutup.
-*/
-export function Modal({ title, onClose, children }) {
+export function Modal({
+  title,
+  subtitle,
+  icon: Icon,
+  onClose,
+  children,
+}) {
   return (
     <div
+      className="it-modal-overlay"
       onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(22, 45, 38, 0.35)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-        zIndex: 200,
-      }}
     >
       <div
-        className="card"
+        className="card it-modal-card"
         onClick={(e) => e.stopPropagation()}
-        style={{ width: '100%', maxWidth: 440, maxHeight: '90vh', overflowY: 'auto' }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 18,
-          }}
-        >
-          <p className="section-title" style={{ margin: 0 }}>
-            {title}
-          </p>
+        {/* HEADER */}
+        <div className="it-modal-header">
+          <div className="it-modal-header__decoration" />
+
+          {Icon && (
+            <div className="it-modal-header__icon">
+              <Icon size={20} strokeWidth={2} />
+            </div>
+          )}
+
+          <div className="it-modal-header__content">
+            <p className="it-modal-header__title">
+              {title}
+            </p>
+
+            {subtitle && (
+              <p className="it-modal-header__subtitle">
+                {subtitle}
+              </p>
+            )}
+          </div>
 
           <button
             onClick={onClose}
             aria-label="Tutup"
-            style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              fontSize: 20,
-              lineHeight: 1,
-              color: 'var(--muted)',
-            }}
+            className="it-modal-close"
           >
             ×
           </button>
         </div>
 
-        {children}
+        {/* BODY */}
+        <div className="it-modal-body">
+          {children}
+        </div>
       </div>
     </div>
   )
 }
 
+export function FieldWrap({ icon: Icon, children }) {
+  return (
+    <div className="field-wrap">
+      {Icon && (
+        <span className="field-wrap__icon">
+          <Icon size={16} strokeWidth={2} />
+        </span>
+      )}
+
+      {children}
+    </div>
+  )
+}
+
+export function fieldStyle(hasIcon = false) {
+  return {
+    // Untuk sementara tetap return object agar tidak merusak
+    // pemanggilan lama.
+    // Akan kita hapus setelah semua JSX diganti ke className.
+  }
+}
+
 export function RowActions({ onEdit, onDelete }) {
   return (
-    <div style={{ display: 'flex', gap: 12 }}>
+    <div className="row-actions">
       <button
         onClick={onEdit}
-        style={{
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          fontSize: 12,
-          fontWeight: 600,
-          color: 'var(--secondary)',
-        }}
+        className="row-actions__edit"
       >
         Edit
       </button>
 
       <button
         onClick={onDelete}
-        style={{
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          fontSize: 12,
-          fontWeight: 600,
-          color: 'var(--danger)',
-        }}
+        className="row-actions__delete"
       >
         Hapus
       </button>
@@ -131,11 +132,6 @@ export function RowActions({ onEdit, onDelete }) {
   )
 }
 
-/*
-  Layout standar untuk halaman "kelola data" (Petugas, Loket, Jenis
-  Pendaftaran, Data Antrian) — page-intro di atas + satu card berisi
-  tabel, sama seperti pola di Dashboard.jsx / Loket.jsx.
-*/
 export function ManagementPage({
   eyebrow,
   title,
@@ -148,30 +144,43 @@ export function ManagementPage({
     <>
       <div className="page-intro">
         <div>
-          {eyebrow && <div className="page-intro__eyebrow">{eyebrow}</div>}
+          {eyebrow && (
+            <div className="page-intro__eyebrow">
+              {eyebrow}
+            </div>
+          )}
 
-          <h1 className="page-intro__title">{title}</h1>
+          <h1 className="page-intro__title">
+            {title}
+          </h1>
 
           {description && (
-            <p className="page-intro__subtitle">{description}</p>
+            <p className="page-intro__subtitle">
+              {description}
+            </p>
           )}
         </div>
       </div>
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             {title}
           </p>
 
           {button && (
-            <button className="btn" onClick={onButtonClick}>
+            <button
+              className="btn"
+              onClick={onButtonClick}
+            >
               {button}
             </button>
           )}
         </div>
 
-        <div style={{ overflowX: 'auto' }}>{children}</div>
+        <div className="management-table-wrapper">
+          {children}
+        </div>
       </div>
     </>
   )

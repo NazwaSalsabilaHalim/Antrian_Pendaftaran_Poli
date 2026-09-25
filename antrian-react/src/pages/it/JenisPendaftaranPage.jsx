@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Tag, Hash, FileText, ToggleLeft } from 'lucide-react'
 import { api } from '../../api/client'
-import { StatusBadge, RowActions, Modal } from '../../components/it/ITComponents'
+import { StatusBadge, RowActions, Modal, FieldWrap } from '../../components/it/ITComponents'
 
 const EMPTY_FORM = { tombol_id: '', nama: '', prefix: '', status: 'Aktif' }
 
@@ -79,7 +80,7 @@ export default function JenisPendaftaranPage() {
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             Daftar Jenis Pendaftaran
           </p>
 
@@ -91,7 +92,7 @@ export default function JenisPendaftaranPage() {
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
                 <tr>
@@ -128,67 +129,116 @@ export default function JenisPendaftaranPage() {
       </div>
 
       {modalMode && (
-        <Modal title={modalMode === 'create' ? 'Tambah Jenis Pendaftaran' : 'Edit Jenis Pendaftaran'} onClose={closeModal}>
+        <Modal
+          title={modalMode === 'create' ? 'Tambah Jenis Pendaftaran' : 'Edit Jenis Pendaftaran'}
+          subtitle={modalMode === 'create' ? 'Tambahkan kategori pendaftaran baru' : 'Perbarui kategori pendaftaran'}
+          icon={Tag}
+          onClose={closeModal}
+        >
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Kode
               </label>
-              <input
-                value={form.tombol_id}
-                disabled={modalMode === 'edit'}
-                onChange={(e) => setForm({ ...form, tombol_id: e.target.value.toUpperCase() })}
-                placeholder="Mis. B5"
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={Hash}>
+                <input
+                  value={form.tombol_id}
+                  disabled={modalMode === 'edit'}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      tombol_id: e.target.value.toUpperCase()
+                    })
+                  }
+                  placeholder="Mis. B5"
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
+
               {modalMode === 'edit' && (
-                <span className="muted" style={{ fontSize: 11 }}>Kode tidak bisa diubah setelah dibuat.</span>
+                <span className="muted it-form-hint">
+                  Kode tidak bisa diubah setelah dibuat.
+                </span>
               )}
             </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Nama Jenis Pendaftaran
               </label>
-              <input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={FileText}>
+                <input
+                  value={form.nama}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      nama: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
             </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Prefix Nomor
               </label>
-              <input
-                value={form.prefix}
-                onChange={(e) => setForm({ ...form, prefix: e.target.value })}
-                placeholder="Mis. A (boleh kosong)"
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={Tag}>
+                <input
+                  value={form.prefix}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      prefix: e.target.value
+                    })
+                  }
+                  placeholder="Mis. A (boleh kosong)"
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group it-form-group--last">
+              <label className="it-form-label">
                 Status
               </label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                style={{ width: '100%' }}
-              >
-                <option value="Aktif">Aktif</option>
-                <option value="Tidak Aktif">Tidak Aktif</option>
-              </select>
+
+              <FieldWrap icon={ToggleLeft}>
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      status: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                >
+                  <option value="Aktif">Aktif</option>
+                  <option value="Tidak Aktif">Tidak Aktif</option>
+                </select>
+              </FieldWrap>
             </div>
 
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="submit" className="btn" style={{ flex: 1 }}>
-                {modalMode === 'create' ? 'Tambah Jenis' : 'Simpan Perubahan'}
+            <div className="it-form-actions">
+              <button
+                type="submit"
+                className="btn it-form-actions__submit"
+              >
+                {modalMode === 'create'
+                  ? 'Tambah Jenis'
+                  : 'Simpan Perubahan'}
               </button>
 
-              <button type="button" className="btn btn-outline" onClick={closeModal}>
+              <button
+                type="button"
+                className="btn btn-outline it-form-actions__cancel"
+                onClick={closeModal}
+              >
                 Batal
               </button>
             </div>

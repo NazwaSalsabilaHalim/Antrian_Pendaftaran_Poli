@@ -3628,3 +3628,541 @@ table.data-table {
     animation: none;
   }
 }
+
+/* =========================================================
+   IT ADMIN COMPONENTS
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   STAT CARD
+   --------------------------------------------------------- */
+
+.stat-card__description {
+  font-size: 12px;
+}
+
+
+/* ---------------------------------------------------------
+   MODAL
+   --------------------------------------------------------- */
+
+.it-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 45, 38, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  z-index: 200;
+}
+
+.it-modal-card {
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+
+  overflow: hidden;
+
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ---------------------------------------------------------
+   MODAL HEADER
+   --------------------------------------------------------- */
+
+.it-modal-header {
+  position: relative;
+  overflow: hidden;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 22px 26px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary-dark) 0%,
+      var(--secondary) 100%
+    );
+
+  color: #ffffff;
+}
+
+.it-modal-header__decoration {
+  position: absolute;
+
+  width: 140px;
+  height: 140px;
+
+  right: -55px;
+  top: -65px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  pointer-events: none;
+}
+
+.it-modal-header__icon {
+  position: relative;
+  z-index: 1;
+
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.it-modal-header__content {
+  position: relative;
+  z-index: 1;
+
+  min-width: 0;
+  flex: 1;
+}
+
+.it-modal-header__title {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.it-modal-header__subtitle {
+  margin: 4px 0 0;
+
+  font-size: 12px;
+
+  opacity: 0.85;
+}
+
+.it-modal-close {
+  position: relative;
+  z-index: 1;
+
+  flex-shrink: 0;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  font-size: 16px;
+  line-height: 1;
+}
+
+.it-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+
+/* ---------------------------------------------------------
+   MODAL BODY
+   --------------------------------------------------------- */
+
+.it-modal-body {
+  padding: 24px 26px;
+
+  overflow-y: auto;
+}
+
+
+/* ---------------------------------------------------------
+   FIELD WRAP
+   --------------------------------------------------------- */
+
+.field-wrap {
+  position: relative;
+}
+
+.field-wrap__icon {
+  position: absolute;
+
+  left: 13px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  display: flex;
+
+  color: var(--muted);
+
+  pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------
+   FORM FIELD
+   --------------------------------------------------------- */
+
+.it-form-field {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 14px;
+
+  border-radius: 10px;
+
+  border: 1px solid var(--border);
+
+  background: var(--surface-soft);
+
+  font-size: 14px;
+
+  color: var(--text);
+
+  outline: none;
+
+  box-sizing: border-box;
+}
+
+.it-form-field--icon {
+  padding-left: 38px;
+}
+
+.it-form-field:focus {
+  border-color: var(--secondary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(22, 119, 94, 0.08);
+}
+
+.it-form-field:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
+/* ---------------------------------------------------------
+   ROW ACTIONS
+   --------------------------------------------------------- */
+
+.row-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.row-actions__edit,
+.row-actions__delete {
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.row-actions__edit {
+  color: var(--secondary);
+}
+
+.row-actions__delete {
+  color: var(--danger);
+}
+
+.row-actions__edit:hover,
+.row-actions__delete:hover {
+  text-decoration: underline;
+}
+
+
+/* ---------------------------------------------------------
+   MANAGEMENT PAGE
+   --------------------------------------------------------- */
+
+.management-section-title {
+  margin: 0;
+}
+
+.management-table-wrapper {
+  overflow-x: auto;
+}
+
+
+/* ---------------------------------------------------------
+   FORM GROUP
+   --------------------------------------------------------- */
+
+.it-form-group {
+  margin-bottom: 16px;
+}
+
+.it-form-group--last {
+  margin-bottom: 20px;
+}
+
+.it-form-label {
+  display: block;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  margin-bottom: 7px;
+
+  color: var(--text-soft);
+}
+
+.it-form-hint {
+  font-size: 11px;
+}
+
+
+/* ---------------------------------------------------------
+   FORM ACTIONS
+   --------------------------------------------------------- */
+
+.it-form-actions {
+  display: flex;
+  gap: 10px;
+
+  margin-top: 4px;
+}
+
+.it-form-actions__submit {
+  flex: 1;
+  height: 44px;
+}
+
+.it-form-actions__cancel {
+  height: 44px;
+}
+
+
+/* ---------------------------------------------------------
+   CONFIGURATION PAGE
+   --------------------------------------------------------- */
+
+.config-grid {
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  margin-bottom: 22px;
+}
+
+.config-field-label {
+  display: block;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  margin-bottom: 7px;
+}
+
+.config-input {
+  width: 100%;
+}
+
+
+/* ---------------------------------------------------------
+   ALERT
+   --------------------------------------------------------- */
+
+.config-success {
+  margin-bottom: 18px;
+}
+
+
+/* ---------------------------------------------------------
+   LOKET INFORMATION
+   --------------------------------------------------------- */
+
+.loket-note {
+  font-size: 12px;
+  margin-top: 12px;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE MODAL
+   --------------------------------------------------------- */
+
+@media (max-width: 600px) {
+  .it-modal-overlay {
+    padding: 12px;
+  }
+
+  .it-modal-card {
+    max-width: 100%;
+  }
+
+  .it-modal-header {
+    padding: 18px 20px;
+  }
+
+  .it-modal-body {
+    padding: 20px;
+  }
+
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.it-form-hint-normal {
+  font-weight: 400;
+}
+
+.management-section-title {
+  margin: 0;
+}
+
+.card_loket-header--date {
+  margin-bottom: 20px;
+}
+
+/* =========================================
+   IT DASHBOARD OVERVIEW
+   ========================================= */
+
+.it-dashboard-welcome {
+  background: linear-gradient(
+    135deg,
+    var(--primary) 0%,
+    var(--secondary) 100%
+  );
+  color: #ffffff;
+  margin-bottom: 24px;
+}
+
+.it-dashboard-welcome__label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.it-dashboard-welcome__title {
+  margin: 10px 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.it-dashboard-welcome__description {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.it-dashboard-section-title {
+  margin: 0;
+}
+
+.it-dashboard-table-wrapper {
+  overflow-x: auto;
+}
+
+.it-dashboard-activity-time {
+  text-align: right;
+  line-height: 1.4;
+}
+
+.it-dashboard-activity-date {
+  font-weight: 400;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* =========================================
+   IT LOGIN
+   ========================================= */
+
+.it-login {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 24px;
+}
+
+.it-login__card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.it-login__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.it-login__icon {
+  margin-bottom: 14px;
+}
+
+.it-login__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.it-login__description {
+  font-size: 13px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.it-login__field {
+  margin-bottom: 14px;
+}
+
+.it-login__field--password {
+  margin-bottom: 20px;
+}
+
+.it-login__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-soft);
+}
+
+.it-login__input {
+  width: 100%;
+}
+
+.it-login__submit {
+  width: 100%;
+}

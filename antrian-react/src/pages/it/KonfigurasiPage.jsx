@@ -54,7 +54,7 @@ export default function KonfigurasiPage() {
       </div>
 
       {error && <div className="error-banner">{error}</div>}
-      {saved && <div className="alert-success" style={{ marginBottom: 18 }}>Konfigurasi berhasil disimpan.</div>}
+      {saved && <div className="alert-success config-success">Konfigurasi berhasil disimpan.</div>}
 
       {loading ? (
         <div className="card">
@@ -63,55 +63,83 @@ export default function KonfigurasiPage() {
       ) : (
         <form className="card" onSubmit={handleSubmit}>
           <div
-            className="grid"
-            style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginBottom: 22 }}
+            className="grid config-grid"
           >
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 7 }}>
+              <label className="config-field-label">
                 Nomor Awal
               </label>
+
               <input
                 type="number"
                 value={form.nomor_awal}
-                onChange={(e) => handleChange('nomor_awal', Number(e.target.value))}
-                style={{ width: '100%' }}
+                onChange={(e) =>
+                  handleChange(
+                    'nomor_awal',
+                    Number(e.target.value)
+                  )
+                }
+                className="config-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 7 }}>
+              <label className="config-field-label">
                 Nomor Maksimal
               </label>
+
               <input
                 type="number"
                 value={form.nomor_maksimal}
-                onChange={(e) => handleChange('nomor_maksimal', Number(e.target.value))}
-                style={{ width: '100%' }}
+                onChange={(e) =>
+                  handleChange(
+                    'nomor_maksimal',
+                    Number(e.target.value)
+                  )
+                }
+                className="config-input"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 7 }}>
+              <label className="config-field-label">
                 Reset Nomor
               </label>
+
               <select
                 value={form.reset_nomor}
-                onChange={(e) => handleChange('reset_nomor', e.target.value)}
-                style={{ width: '100%' }}
+                onChange={(e) =>
+                  handleChange(
+                    'reset_nomor',
+                    e.target.value
+                  )
+                }
+                className="config-input"
               >
-                <option value="daily">Setiap Hari</option>
-                <option value="manual">Manual</option>
+                <option value="daily">
+                  Setiap Hari
+                </option>
+
+                <option value="manual">
+                  Manual
+                </option>
               </select>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 7 }}>
+              <label className="config-field-label">
                 Aktif
               </label>
+
               <select
                 value={form.aktif}
-                onChange={(e) => handleChange('aktif', e.target.value)}
-                style={{ width: '100%' }}
+                onChange={(e) =>
+                  handleChange(
+                    'aktif',
+                    e.target.value
+                  )
+                }
+                className="config-input"
               >
                 <option value="yes">Ya</option>
                 <option value="no">Tidak</option>

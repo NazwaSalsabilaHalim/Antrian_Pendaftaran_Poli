@@ -38,8 +38,8 @@ export default function AntrianPage() {
 
       {error && <div className="error-banner">{error}</div>}
 
-      <div className="card_loket-header" style={{ marginBottom: 20 }}>
-        <label htmlFor="tanggal" className="muted">Tanggal:</label>
+      <div className="card_loket-header card_loket-header--date">
+  <label htmlFor="tanggal" className="muted">Tanggal:</label>
 
         <input
           id="tanggal"
@@ -55,7 +55,7 @@ export default function AntrianPage() {
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             Daftar Antrian
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function AntrianPage() {
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
                 <tr>

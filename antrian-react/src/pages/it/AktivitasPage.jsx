@@ -32,7 +32,7 @@ export default function AktivitasPage() {
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             Riwayat Aktivitas
           </p>
         </div>
@@ -40,7 +40,7 @@ export default function AktivitasPage() {
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
                 <tr>

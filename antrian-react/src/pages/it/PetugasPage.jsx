@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { UserPlus, UserCog, User, AtSign, Lock, ToggleLeft } from 'lucide-react'
 import { api } from '../../api/client'
-import { StatusBadge, RowActions, Modal } from '../../components/it/ITComponents'
+import { StatusBadge, RowActions, Modal, FieldWrap } from '../../components/it/ITComponents'
 
 const EMPTY_FORM = { nama: '', username: '', password: '', status: 'Aktif' }
 
@@ -87,7 +88,7 @@ export default function PetugasPage() {
 
       <div className="card">
         <div className="section-header">
-          <p className="section-title" style={{ margin: 0 }}>
+          <p className="section-title management-section-title">
             Daftar Petugas
           </p>
 
@@ -99,7 +100,7 @@ export default function PetugasPage() {
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
+          <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
                 <tr>
@@ -134,62 +135,113 @@ export default function PetugasPage() {
       </div>
 
       {modalMode && (
-        <Modal title={modalMode === 'create' ? 'Tambah Petugas' : 'Edit Petugas'} onClose={closeModal}>
+        <Modal
+          title={modalMode === 'create' ? 'Tambah Petugas' : 'Edit Petugas'}
+          subtitle={modalMode === 'create' ? 'Isi data akun petugas baru' : 'Perbarui data akun petugas'}
+          icon={modalMode === 'create' ? UserPlus : UserCog}
+          onClose={closeModal}
+        >
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Nama Petugas
               </label>
-              <input
-                value={form.nama}
-                onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={User}>
+                <input
+                  value={form.nama}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      nama: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
             </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group">
+              <label className="it-form-label">
                 Username
               </label>
-              <input
-                value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={AtSign}>
+                <input
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      username: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
             </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
-                Password {modalMode === 'edit' && <span className="muted">(kosongkan jika tidak diubah)</span>}
+            <div className="it-form-group">
+              <label className="it-form-label">
+                Password{' '}
+                {modalMode === 'edit' && (
+                  <span className="muted it-form-hint-normal">
+                    (kosongkan jika tidak diubah)
+                  </span>
+                )}
               </label>
-              <input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                style={{ width: '100%' }}
-              />
+
+              <FieldWrap icon={Lock}>
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      password: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                />
+              </FieldWrap>
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>
+            <div className="it-form-group it-form-group--last">
+              <label className="it-form-label">
                 Status
               </label>
-              <select
-                value={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.value })}
-                style={{ width: '100%' }}
-              >
-                <option value="Aktif">Aktif</option>
-                <option value="Tidak Aktif">Tidak Aktif</option>
-              </select>
+
+              <FieldWrap icon={ToggleLeft}>
+                <select
+                  value={form.status}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      status: e.target.value
+                    })
+                  }
+                  className="it-form-field it-form-field--icon"
+                >
+                  <option value="Aktif">Aktif</option>
+                  <option value="Tidak Aktif">Tidak Aktif</option>
+                </select>
+              </FieldWrap>
             </div>
 
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button type="submit" className="btn" style={{ flex: 1 }}>
-                {modalMode === 'create' ? 'Tambah Petugas' : 'Simpan Perubahan'}
+            <div className="it-form-actions">
+              <button
+                type="submit"
+                className="btn it-form-actions__submit"
+              >
+                {modalMode === 'create'
+                  ? 'Tambah Petugas'
+                  : 'Simpan Perubahan'}
               </button>
 
-              <button type="button" className="btn btn-outline" onClick={closeModal}>
+              <button
+                type="button"
+                className="btn btn-outline it-form-actions__cancel"
+                onClick={closeModal}
+              >
                 Batal
               </button>
             </div>

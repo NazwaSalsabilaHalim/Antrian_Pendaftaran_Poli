@@ -23,46 +23,19 @@ export default function ITLogin() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        padding: 24,
-      }}
-    >
-      <div className="card" style={{ width: '100%', maxWidth: 380 }}>
+    <div className="it-login">
+      <div className="card it-login__card">
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginBottom: 22,
-          }}
-        >
-          <div className="sidebar__brand-icon" style={{ marginBottom: 14 }}>
+        <div className="it-login__header">
+          <div className="sidebar__brand-icon it-login__icon">
             <ShieldCheck size={20} strokeWidth={2} />
           </div>
 
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 20,
-              fontWeight: 800,
-              color: 'var(--text)',
-            }}
-          >
+          <h1 className="it-login__title">
             Panel Admin IT
           </h1>
 
-          <p
-            className="muted"
-            style={{ fontSize: 13, marginTop: 6, textAlign: 'center' }}
-          >
+          <p className="muted it-login__description">
             Masuk untuk mengelola sistem antrian pendaftaran
           </p>
         </div>
@@ -70,16 +43,8 @@ export default function ITLogin() {
         {error && <div className="error-banner">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 14 }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 12,
-                fontWeight: 600,
-                marginBottom: 6,
-                color: 'var(--text-soft)',
-              }}
-            >
+          <div className="it-login__field">
+            <label className="it-login__label">
               Username
             </label>
 
@@ -88,20 +53,12 @@ export default function ITLogin() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Masukkan username"
-              style={{ width: '100%' }}
+              className="it-login__input"
             />
           </div>
 
-          <div style={{ marginBottom: 20 }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 12,
-                fontWeight: 600,
-                marginBottom: 6,
-                color: 'var(--text-soft)',
-              }}
-            >
+          <div className="it-login__field it-login__field--password">
+            <label className="it-login__label">
               Password
             </label>
 
@@ -110,14 +67,15 @@ export default function ITLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Masukkan password"
-              style={{ width: '100%' }}
+              className="it-login__input"
             />
           </div>
 
-          <button type="submit" className="btn" style={{ width: '100%' }}>
+          <button type="submit" className="btn it-login__submit">
             Masuk
           </button>
         </form>
+
       </div>
     </div>
   )
