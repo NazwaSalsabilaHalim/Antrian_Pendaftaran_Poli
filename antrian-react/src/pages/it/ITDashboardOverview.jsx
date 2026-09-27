@@ -1,20 +1,30 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
-import { StatCard, StatusBadge } from '../../components/it/ITComponents'
+import {
+  StatCard,
+  StatusBadge,
+} from '../../components/it/ITComponents'
 
 export default function ITDashboardOverview() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
+  // =========================
+  // Load Dashboard Data
+  // =========================
   useEffect(() => {
     api.getRingkasanIT()
       .then((res) => {
         setData(res)
         setError('')
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch((e) => {
+        setError(e.message)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   const stat = data?.stat || {}
@@ -23,7 +33,7 @@ export default function ITDashboardOverview() {
 
   return (
     <>
-      {/* WELCOME BANNER */}
+      {/* Welcome Banner */}
       <div className="card it-dashboard-welcome">
         <div className="it-dashboard-welcome__label">
           SISTEM INFORMASI ANTRIAN
@@ -34,17 +44,26 @@ export default function ITDashboardOverview() {
         </h2>
 
         <p className="it-dashboard-welcome__description">
-          Pantau dan kelola sistem antrian pendaftaran dari satu halaman.
+          Pantau dan kelola sistem antrian pendaftaran
+          dari satu halaman.
         </p>
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
+      {/* Error */}
+      {error && (
+        <div className="error-banner">
+          {error}
+        </div>
+      )}
 
+      {/* Loading / Dashboard */}
       {loading ? (
-        <div className="empty-state">Memuat data...</div>
+        <div className="empty-state">
+          Memuat data...
+        </div>
       ) : (
         <>
-          {/* STAT GRID */}
+          {/* Stat Grid */}
           <div className="grid stat-grid">
             <StatCard
               label="Antrian Menunggu"
@@ -71,9 +90,10 @@ export default function ITDashboardOverview() {
             />
           </div>
 
+          {/* Dashboard Columns */}
           <div className="dashboard-2col">
 
-            {/* STATUS LOKET */}
+            {/* Status Loket */}
             <div className="dashboard-2col__column">
               <div className="card">
                 <div className="section-header">
@@ -96,18 +116,32 @@ export default function ITDashboardOverview() {
                     <tbody>
                       {statusLoket.map((item, index) => (
                         <tr key={index}>
-                          <td><strong>{item.loket}</strong></td>
-                          <td>{item.petugas}</td>
                           <td>
-                            <StatusBadge status={item.status} />
+                            <strong>{item.loket}</strong>
                           </td>
-                          <td>{item.antrian}</td>
+
+                          <td>
+                            {item.petugas}
+                          </td>
+
+                          <td>
+                            <StatusBadge
+                              status={item.status}
+                            />
+                          </td>
+
+                          <td>
+                            {item.antrian}
+                          </td>
                         </tr>
                       ))}
 
                       {statusLoket.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="empty-state">
+                          <td
+                            colSpan={4}
+                            className="empty-state"
+                          >
                             Belum ada panggilan hari ini.
                           </td>
                         </tr>
@@ -118,7 +152,7 @@ export default function ITDashboardOverview() {
               </div>
             </div>
 
-            {/* AKTIVITAS TERBARU */}
+            {/* Aktivitas Terbaru */}
             <div className="dashboard-2col__column">
               <div className="card">
                 <div className="section-header">
@@ -128,12 +162,17 @@ export default function ITDashboardOverview() {
                 </div>
 
                 {aktivitas.map((item, index) => (
-                  <div className="waiting-row" key={index}>
+                  <div
+                    className="waiting-row"
+                    key={index}
+                  >
                     <span className="waiting-row__index">
                       {index + 1}
                     </span>
 
-                    <span>{item.text}</span>
+                    <span>
+                      {item.text}
+                    </span>
 
                     <span className="waiting-row__tag it-dashboard-activity-time">
                       {item.time}

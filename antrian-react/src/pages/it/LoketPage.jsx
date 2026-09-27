@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Building2, User, ToggleLeft } from 'lucide-react'
 import { api } from '../../api/client'
-import { StatusBadge, Modal, FieldWrap } from '../../components/it/ITComponents'
+import {
+  StatusBadge,
+  RowActions,
+  Modal,
+  FieldWrap,
+} from '../../components/it/ITComponents'
 
 export default function LoketPage() {
   const [loket, setLoket] = useState([])
@@ -10,27 +15,50 @@ export default function LoketPage() {
   const [error, setError] = useState('')
 
   const [editItem, setEditItem] = useState(null)
-  const [form, setForm] = useState({ petugas_nama: '', status: 'Aktif' })
+  const [form, setForm] = useState({
+    petugas_nama: '',
+    status: 'Aktif',
+  })
 
+  // =========================
+  // Load Data
+  // =========================
   function load() {
     setLoading(true)
-    Promise.all([api.getLoketIT(), api.getPetugas()])
-      .then(([l, p]) => {
-        setLoket(l.loket || [])
-        setPetugasList(p.petugas || [])
+
+    Promise.all([
+      api.getLoketIT(),
+      api.getPetugas(),
+    ])
+      .then(([loketResponse, petugasResponse]) => {
+        setLoket(loketResponse.loket || [])
+        setPetugasList(petugasResponse.petugas || [])
         setError('')
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch((e) => {
+        setError(e.message)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
+  // =========================
+  // Modal
+  // =========================
   function openEdit(item) {
     setForm({
-      petugas_nama: item.petugas_nama === '-' ? '' : item.petugas_nama,
+      petugas_nama:
+        item.petugas_nama === '-'
+          ? ''
+          : item.petugas_nama,
       status: item.status,
     })
+
     setEditItem(item)
   }
 
@@ -38,6 +66,9 @@ export default function LoketPage() {
     setEditItem(null)
   }
 
+  // =========================
+  // Submit
+  // =========================
   function handleSubmit(e) {
     e.preventDefault()
 
@@ -51,23 +82,38 @@ export default function LoketPage() {
         closeModal()
         load()
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => {
+        setError(e.message)
+      })
   }
 
   return (
     <>
+      {/* Page Header */}
       <div className="page-intro">
         <div>
-          <div className="page-intro__eyebrow">MANAJEMEN LOKET</div>
-          <h1 className="page-intro__title">Kelola Loket</h1>
+          <div className="page-intro__eyebrow">
+            MANAJEMEN LOKET
+          </div>
+
+          <h1 className="page-intro__title">
+            Kelola Loket
+          </h1>
+
           <p className="page-intro__subtitle">
             Mengelola loket pelayanan pendaftaran
           </p>
         </div>
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
+      {/* Error */}
+      {error && (
+        <div className="error-banner">
+          {error}
+        </div>
+      )}
 
+      {/* Table */}
       <div className="card">
         <div className="section-header">
           <p className="section-title management-section-title">
@@ -76,7 +122,9 @@ export default function LoketPage() {
         </div>
 
         {loading ? (
-          <div className="empty-state">Memuat data...</div>
+          <div className="empty-state">
+            Memuat data...
+          </div>
         ) : (
           <div className="management-table-wrapper">
             <table className="data-table">
@@ -94,22 +142,36 @@ export default function LoketPage() {
                 {loket.map((item, index) => (
                   <tr key={item.counter_id}>
                     <td>{index + 1}</td>
-                    <td><strong>{item.nama}</strong></td>
-                    <td>{item.petugas_nama}</td>
-                    <td><StatusBadge status={item.status} /></td>
+
                     <td>
-                      <button
-                        onClick={() => openEdit(item)}
-                        className="it-row-actions__edit"
-                      >
-                        Edit
-                      </button>
+                      <strong>{item.nama}</strong>
+                    </td>
+
+                    <td>
+                      {item.petugas_nama}
+                    </td>
+
+                    <td>
+                      <StatusBadge status={item.status} />
+                    </td>
+
+                    <td>
+                      <RowActions
+                        onEdit={() => openEdit(item)}
+                      />
                     </td>
                   </tr>
                 ))}
 
                 {loket.length === 0 && (
-                  <tr><td colSpan={5} className="empty-state">Belum ada data loket.</td></tr>
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="empty-state"
+                    >
+                      Belum ada data loket.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -117,10 +179,7 @@ export default function LoketPage() {
         )}
       </div>
 
-      <p className="muted it-form-hint-normal">
-        Loket fisik (mesin & printer) dikonfigurasi lewat sistem lama — halaman ini hanya mengatur petugas yang bertugas dan status aktif loket.
-      </p>
-
+      {/* Edit Modal */}
       {editItem && (
         <Modal
           title={`Edit Loket — ${editItem.nama}`}
@@ -129,6 +188,7 @@ export default function LoketPage() {
           onClose={closeModal}
         >
           <form onSubmit={handleSubmit}>
+            {/* Petugas */}
             <div className="it-form-group">
               <label className="it-form-label">
                 Petugas
@@ -140,7 +200,7 @@ export default function LoketPage() {
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      petugas_nama: e.target.value
+                      petugas_nama: e.target.value,
                     })
                   }
                   className="it-form-field it-form-field--icon"
@@ -150,7 +210,10 @@ export default function LoketPage() {
                   </option>
 
                   {petugasList.map((p) => (
-                    <option key={p.id} value={p.nama}>
+                    <option
+                      key={p.id}
+                      value={p.nama}
+                    >
                       {p.nama}
                     </option>
                   ))}
@@ -159,11 +222,13 @@ export default function LoketPage() {
 
               {petugasList.length === 0 && (
                 <span className="muted it-form-hint">
-                  Belum ada data petugas — tambahkan dulu di halaman Kelola Petugas.
+                  Belum ada data petugas — tambahkan
+                  dulu di halaman Kelola Petugas.
                 </span>
               )}
             </div>
 
+            {/* Status */}
             <div className="it-form-group it-form-group--last">
               <label className="it-form-label">
                 Status
@@ -175,12 +240,15 @@ export default function LoketPage() {
                   onChange={(e) =>
                     setForm({
                       ...form,
-                      status: e.target.value
+                      status: e.target.value,
                     })
                   }
                   className="it-form-field it-form-field--icon"
                 >
-                  <option value="Aktif">Aktif</option>
+                  <option value="Aktif">
+                    Aktif
+                  </option>
+
                   <option value="Tidak Aktif">
                     Tidak Aktif
                   </option>
@@ -188,6 +256,7 @@ export default function LoketPage() {
               </FieldWrap>
             </div>
 
+            {/* Form Actions */}
             <div className="it-form-actions">
               <button
                 type="submit"

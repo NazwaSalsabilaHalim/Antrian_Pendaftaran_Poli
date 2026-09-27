@@ -35,6 +35,7 @@ export default function Loket() {
     return () => clearTimeout(id)
   }, [toast])
 
+
   async function handlePanggil(tombol) {
     if (!counterId) {
       setError('Pilih loket terlebih dahulu.')
@@ -45,21 +46,32 @@ export default function Loket() {
     setBusyId(tombol.TombolID)
 
     try {
+      // 1. Ambil nomor antrean berikutnya
       const hasil = await api.tekanCounter(
         counterId,
         tombol.TombolID
       )
 
+      // Jika tidak ada nomor baru yang bisa dipanggil
+      if (!hasil.panggil_id) {
+        setToast(hasil.text || 'Tidak ada antrean berikutnya.')
+        return
+      }
+
+      // 2. Konfirmasi panggilan agar Panggil menjadi Y
+      await api.panggilKonfirmasi(hasil.panggil_id)
+
+      // 3. Simpan ID panggilan terakhir untuk tombol Ulangi
+      setLastPanggil((prev) => ({
+        ...prev,
+        [tombol.TombolID]: hasil.panggil_id,
+      }))
+
+      // 4. Tampilkan notifikasi berhasil
       setToast(hasil.text)
 
-      if (hasil.panggil_id) {
-        setLastPanggil((prev) => ({
-          ...prev,
-          [tombol.TombolID]: hasil.panggil_id,
-        }))
-      }
     } catch (e) {
-      setError(e.message)
+      setError(e.message || 'Gagal memanggil nomor antrean.')
     } finally {
       setBusyId(null)
     }

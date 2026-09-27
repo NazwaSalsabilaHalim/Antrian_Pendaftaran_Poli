@@ -8,20 +8,19 @@
    ========================================================= */
 
 :root {
-  /* Brand */
+
   --primary: #268e67;
   --primary-dark: #155a44;
   --primary-soft: #e6f3ee;
 
   --secondary: #36669c;
-  /* biru — aksen kedua, bukan cuma info */
+
   --secondary-soft: #e8f1f7;
 
   --tertiary: #4aa9a0;
-  /* teal — variasi ketiga, jembatan hijau-biru */
+
   --tertiary-soft: #eaf6f4;
 
-  /* Netral / permukaan */
   --bg: #eef3f1;
   --surface: #ffffff;
   --surface-soft: #f7faf9;
@@ -32,7 +31,6 @@
   --text-soft: #4c635c;
   --muted: #2a312e;
 
-  /* Semantik — dipakai KHUSUS untuk status/alert, jangan untuk dekorasi umum */
   --success: #2f9b6c;
   --success-bg: #e8f7f0;
 
@@ -48,7 +46,6 @@
   --font-body: 'Inter', sans-serif;
   --sidebar-width: 250px;
 
-  /* Kartu — satu sistem dipakai di semua halaman */
   --card-radius: 18px;
   --card-radius-lg: 22px;
   --card-shadow: 0 6px 18px rgba(22, 45, 38, 0.06);
@@ -603,7 +600,6 @@ input[type='email'],
 input[type='password'] {
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 9px 12px;
   font-size: 14px;
   background: var(--surface);
   color: var(--text);
@@ -790,8 +786,7 @@ input:focus {
   padding: 20px 22px;
   min-width: 0;
   overflow: hidden;
-  /* border-top: 4px solid var(--primary);
-  border-radius: var(--card-radius-lg); */
+
 }
 
 .serving-card::after {
@@ -805,23 +800,6 @@ input:focus {
   border: 30px solid rgba(47, 111, 158, 0.08);
   pointer-events: none;
 }
-
-/* Aksen dicampur: hijau, biru, teal
-.serving-card.accent-a {
-  border-top-color: var(--secondary);
-}
-
-.serving-card.accent-b {
-  border-top-color: var(--primary);
-}
-
-.serving-card.accent-c {
-  border-top-color: var(--tertiary);
-}
-
-.serving-card.accent-d {
-  border-top-color: var(--warning);
-} */
 
 .serving-card__top {
   display: flex;
@@ -1092,11 +1070,11 @@ input:focus {
       var(--primary) 45%,
       var(--secondary) 100%);
   display: flex;
-  /* tambahan */
+
   flex-direction: column;
-  /* tambahan */
+
   height: 100%;
-  /* tambahan */
+
 }
 
 /* Isi card */
@@ -1271,11 +1249,6 @@ input:focus {
   transform: scale(1.25);
 }
 
-/* .stat-card:hover {
-  transform: translateY(-3px);
-} */
-
-
 /* ---------- Warna aksen tiap kartu ---------- */
 
 .stat-grid .stat-card:nth-child(1) {
@@ -1294,7 +1267,6 @@ input:focus {
   border-top: 4px solid var(--secondary);
 }
 
-
 /* ---------- Label ---------- */
 
 .stat-card__label {
@@ -1310,7 +1282,6 @@ input:focus {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-
 
 /* ---------- Angka ---------- */
 
@@ -1341,7 +1312,6 @@ input:focus {
   font-weight: 850;
   letter-spacing: -1.2px;
 }
-
 
 /* ---------- Progress ---------- */
 
@@ -1495,7 +1465,6 @@ input:focus {
   font-weight: 800;
 }
 
-
 /* =========================================================
    DATA TABLE
    ========================================================= */
@@ -1515,7 +1484,6 @@ table.data-table {
 
   box-shadow: var(--card-shadow);
 }
-
 
 /* ---------- Header table ---------- */
 
@@ -1543,7 +1511,6 @@ table.data-table {
   white-space: nowrap;
 }
 
-
 /* ---------- Isi table ---------- */
 
 .data-table td {
@@ -1569,14 +1536,12 @@ table.data-table {
   border-bottom: none;
 }
 
-
 /* ---------- Nomor antrian ---------- */
 
 .data-table td strong {
   color: var(--primary-dark);
   font-weight: 800;
 }
-
 
 /* =========================================================
    RESPONSIVE
@@ -1606,7 +1571,6 @@ table.data-table {
   width: 100%;
   max-width: 1400px;
 }
-
 
 /* =========================================================
    ERROR
@@ -1643,7 +1607,6 @@ table.data-table {
 
   font-weight: 800;
 }
-
 
 /* =========================================================
    COUNTER SELECTOR
@@ -1743,7 +1706,6 @@ table.data-table {
   box-shadow: 0 0 0 3px rgba(31, 122, 92, 0.10);
 }
 
-
 /* =========================================================
    SECTION HEADING
    ========================================================= */
@@ -1785,7 +1747,6 @@ table.data-table {
   font-weight: 700;
 }
 
-
 /* =========================================================
    QUEUE GRID
    ========================================================= */
@@ -1796,7 +1757,6 @@ table.data-table {
   gap: 20px;
 }
 
-
 /* =========================================================
    QUEUE CARD
    ========================================================= */
@@ -1804,13 +1764,11 @@ table.data-table {
 .loket-queue-card {
   position: relative;
   overflow: hidden;
-  /* Lengkungan bagian atas */
+
   border-radius: 38px 38px 22px 22px;
 
-  /* Garis hijau mengikuti lengkungan */
   border-top: 5px solid var(--primary);
 
-  /* Jangan ada efek hover */
   transition: none !important;
   transform: none !important;
 }
@@ -1894,7 +1852,6 @@ table.data-table {
   color: #8fa099;
 }
 
-
 /* =========================================================
    CARD BODY
    ========================================================= */
@@ -1922,7 +1879,6 @@ table.data-table {
   font-size: 11px;
   color: var(--muted);
 }
-
 
 /* =========================================================
    CURRENT STATUS
@@ -1976,7 +1932,6 @@ table.data-table {
   color: var(--text-soft);
 }
 
-
 /* ---------- Active status ---------- */
 
 .loket-current-status--active {
@@ -1992,7 +1947,6 @@ table.data-table {
 .loket-current-status--active strong {
   color: #1c7a52;
 }
-
 
 /* =========================================================
    ACTION BUTTONS
@@ -2036,7 +1990,6 @@ table.data-table {
   box-shadow: none;
 }
 
-
 /* ---------- Primary button ---------- */
 
 .loket-btn--primary {
@@ -2057,7 +2010,6 @@ table.data-table {
   box-shadow: 0 9px 18px rgba(31, 122, 92, 0.26);
 }
 
-
 /* ---------- Blue button for second queue ---------- */
 
 .loket-queue-card--1 .loket-btn--primary {
@@ -2071,7 +2023,6 @@ table.data-table {
 .loket-queue-card--1 .loket-btn--primary:not(:disabled):hover {
   box-shadow: 0 9px 18px rgba(47, 111, 158, 0.26);
 }
-
 
 /* ---------- Secondary button ---------- */
 
@@ -2088,7 +2039,6 @@ table.data-table {
   background: var(--border-soft);
   color: var(--primary);
 }
-
 
 /* =========================================================
    EMPTY STATE
@@ -2555,9 +2505,8 @@ table.data-table {
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   border: 1.5px solid var(--border);
 
-  /* Garis hijau mengikuti lengkungan */
   border-top: 5px solid var(--primary);
-  /* Lengkungan bagian atas */
+
   border-radius: 38px 38px 22px 22px;
 }
 
@@ -2575,10 +2524,6 @@ table.data-table {
   transform: translateY(-4px);
   box-shadow: var(--card-shadow-hover);
 }
-
-/* .ambil-option:active:not(:disabled) {
-  transform: translateY(-1px);
-} */
 
 .ambil-option:disabled {
   cursor: wait;
@@ -3019,16 +2964,6 @@ table.data-table {
   letter-spacing: 0.3em;
   color: rgba(255, 255, 255, 0.85);
 }
-
-/* .tv-number-wrap {
-  padding: 26px 56px;
-  border-radius: 32px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 30px 80px rgba(4, 20, 16, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(12px);
-  animation: tv-number-in 0.45s ease;
-} */
 
 @keyframes tv-number-in {
   from {
@@ -3595,11 +3530,6 @@ table.data-table {
     font-size: 42px;
   }
 
-  /* .tv-number-wrap {
-    padding: 12px 16px;
-    border-radius: 18px;
-  } */
-
   .tv-counter__name {
     font-size: 18px;
   }
@@ -3633,7 +3563,6 @@ table.data-table {
    IT ADMIN COMPONENTS
    ========================================================= */
 
-
 /* ---------------------------------------------------------
    STAT CARD
    --------------------------------------------------------- */
@@ -3641,7 +3570,6 @@ table.data-table {
 .stat-card__description {
   font-size: 12px;
 }
-
 
 /* ---------------------------------------------------------
    MODAL
@@ -3675,7 +3603,6 @@ table.data-table {
   flex-direction: column;
 }
 
-
 /* ---------------------------------------------------------
    MODAL HEADER
    --------------------------------------------------------- */
@@ -3694,11 +3621,9 @@ table.data-table {
   padding: 22px 26px;
 
   background:
-    linear-gradient(
-      135deg,
+    linear-gradient(135deg,
       var(--primary-dark) 0%,
-      var(--secondary) 100%
-    );
+      var(--secondary) 100%);
 
   color: #ffffff;
 }
@@ -3791,7 +3716,6 @@ table.data-table {
   background: rgba(255, 255, 255, 0.25);
 }
 
-
 /* ---------------------------------------------------------
    MODAL BODY
    --------------------------------------------------------- */
@@ -3801,7 +3725,6 @@ table.data-table {
 
   overflow-y: auto;
 }
-
 
 /* ---------------------------------------------------------
    FIELD WRAP
@@ -3825,7 +3748,6 @@ table.data-table {
 
   pointer-events: none;
 }
-
 
 /* ---------------------------------------------------------
    FORM FIELD
@@ -3860,15 +3782,13 @@ table.data-table {
   border-color: var(--secondary);
 
   box-shadow:
-    0 0 0 3px
-    rgba(22, 119, 94, 0.08);
+    0 0 0 3px rgba(22, 119, 94, 0.08);
 }
 
 .it-form-field:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
-
 
 /* ---------------------------------------------------------
    ROW ACTIONS
@@ -3903,7 +3823,6 @@ table.data-table {
   text-decoration: underline;
 }
 
-
 /* ---------------------------------------------------------
    MANAGEMENT PAGE
    --------------------------------------------------------- */
@@ -3915,7 +3834,6 @@ table.data-table {
 .management-table-wrapper {
   overflow-x: auto;
 }
-
 
 /* ---------------------------------------------------------
    FORM GROUP
@@ -3944,7 +3862,6 @@ table.data-table {
   font-size: 11px;
 }
 
-
 /* ---------------------------------------------------------
    FORM ACTIONS
    --------------------------------------------------------- */
@@ -3964,7 +3881,6 @@ table.data-table {
 .it-form-actions__cancel {
   height: 44px;
 }
-
 
 /* ---------------------------------------------------------
    CONFIGURATION PAGE
@@ -3990,7 +3906,6 @@ table.data-table {
   width: 100%;
 }
 
-
 /* ---------------------------------------------------------
    ALERT
    --------------------------------------------------------- */
@@ -3998,7 +3913,6 @@ table.data-table {
 .config-success {
   margin-bottom: 18px;
 }
-
 
 /* ---------------------------------------------------------
    LOKET INFORMATION
@@ -4008,7 +3922,6 @@ table.data-table {
   font-size: 12px;
   margin-top: 12px;
 }
-
 
 /* ---------------------------------------------------------
    RESPONSIVE MODAL
@@ -4052,12 +3965,10 @@ table.data-table {
    IT DASHBOARD OVERVIEW
    ========================================= */
 
-.it-dashboard-welcome {
-  background: linear-gradient(
-    135deg,
-    var(--primary) 0%,
-    var(--secondary) 100%
-  );
+.shell__content .it-dashboard-welcome {
+  background: linear-gradient(135deg,
+      var(--primary) 0%,
+      var(--secondary) 100%);
   color: #ffffff;
   margin-bottom: 24px;
 }

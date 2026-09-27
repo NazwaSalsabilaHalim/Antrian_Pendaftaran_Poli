@@ -8,26 +8,44 @@ export default function KonfigurasiPage() {
     reset_nomor: 'daily',
     aktif: 'yes',
   })
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
 
+  // =========================
+  // Load Configuration
+  // =========================
   useEffect(() => {
     api.getKonfigurasi()
       .then((res) => {
         setForm(res.konfigurasi)
         setError('')
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
+      .catch((e) => {
+        setError(e.message)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
+  // =========================
+  // Form Change
+  // =========================
   function handleChange(key, value) {
-    setForm((prev) => ({ ...prev, [key]: value }))
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }))
+
     setSaved(false)
   }
 
+  // =========================
+  // Submit
+  // =========================
   function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
@@ -37,34 +55,60 @@ export default function KonfigurasiPage() {
         setError('')
         setSaved(true)
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setSaving(false))
+      .catch((e) => {
+        setError(e.message)
+      })
+      .finally(() => {
+        setSaving(false)
+      })
   }
 
   return (
     <>
+      {/* Page Header */}
       <div className="page-intro">
         <div>
-          <div className="page-intro__eyebrow">KONFIGURASI</div>
-          <h1 className="page-intro__title">Konfigurasi Antrian</h1>
+          <div className="page-intro__eyebrow">
+            KONFIGURASI
+          </div>
+
+          <h1 className="page-intro__title">
+            Konfigurasi Antrian
+          </h1>
+
           <p className="page-intro__subtitle">
             Atur aturan pembentukan nomor antrian
           </p>
         </div>
       </div>
 
-      {error && <div className="error-banner">{error}</div>}
-      {saved && <div className="alert-success config-success">Konfigurasi berhasil disimpan.</div>}
+      {/* Notification */}
+      {error && (
+        <div className="error-banner">
+          {error}
+        </div>
+      )}
 
+      {saved && (
+        <div className="alert-success config-success">
+          Konfigurasi berhasil disimpan.
+        </div>
+      )}
+
+      {/* Configuration Form */}
       {loading ? (
         <div className="card">
-          <div className="empty-state">Memuat data...</div>
+          <div className="empty-state">
+            Memuat data...
+          </div>
         </div>
       ) : (
-        <form className="card" onSubmit={handleSubmit}>
-          <div
-            className="grid config-grid"
-          >
+        <form
+          className="card"
+          onSubmit={handleSubmit}
+        >
+          <div className="grid config-grid">
+            {/* Nomor Awal */}
             <div>
               <label className="config-field-label">
                 Nomor Awal
@@ -83,6 +127,7 @@ export default function KonfigurasiPage() {
               />
             </div>
 
+            {/* Nomor Maksimal */}
             <div>
               <label className="config-field-label">
                 Nomor Maksimal
@@ -101,6 +146,7 @@ export default function KonfigurasiPage() {
               />
             </div>
 
+            {/* Reset Nomor */}
             <div>
               <label className="config-field-label">
                 Reset Nomor
@@ -126,6 +172,7 @@ export default function KonfigurasiPage() {
               </select>
             </div>
 
+            {/* Status Aktif */}
             <div>
               <label className="config-field-label">
                 Aktif
@@ -141,14 +188,26 @@ export default function KonfigurasiPage() {
                 }
                 className="config-input"
               >
-                <option value="yes">Ya</option>
-                <option value="no">Tidak</option>
+                <option value="yes">
+                  Ya
+                </option>
+
+                <option value="no">
+                  Tidak
+                </option>
               </select>
             </div>
           </div>
 
-          <button type="submit" className="btn" disabled={saving}>
-            {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+          {/* Submit */}
+          <button
+            type="submit"
+            className="btn"
+            disabled={saving}
+          >
+            {saving
+              ? 'Menyimpan...'
+              : 'Simpan Konfigurasi'}
           </button>
         </form>
       )}
