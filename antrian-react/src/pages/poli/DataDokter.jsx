@@ -31,7 +31,7 @@ const EMPTY_FORM = {
 
 const IZIN_PENUH = { tambah: true, edit: true, hapus: true, kosongkan: true }
 
-export default function DataDokter({ izin = IZIN_PENUH }) {
+export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [doctors, setDoctors] = useState([])
   const [statuses, setStatuses] = useState([])
   const [search, setSearch] = useState('')
@@ -268,9 +268,13 @@ export default function DataDokter({ izin = IZIN_PENUH }) {
           </p>
         </div>
 
-        <div className="page-intro__status">
-          <span />
-          {doctors.length} Dokter Terdaftar
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {aksiTambahan}
+
+          <div className="page-intro__status">
+            <span />
+            {doctors.length} Dokter Terdaftar
+          </div>
         </div>
       </div>
 

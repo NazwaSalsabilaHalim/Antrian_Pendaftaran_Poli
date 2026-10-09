@@ -1,12 +1,10 @@
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
 import RequireRole from './components/RequireRole'
 import {
   isAdminLoggedIn,
   isPetugasLoggedIn,
   isNurseLoggedIn,
-  getNurseIzin,
-  logoutNurse,
   PETUGAS_KEY,
   NURSE_KEY,
 } from './utils/auth'
@@ -36,6 +34,7 @@ import Dashboard from './pages/pendaftaran/Dashboard'
 import DataDokter from './pages/poli/DataDokter'
 import KelolaAntrean from './pages/poli/dokter/KelolaAntrean'
 import NursePage from './pages/it/NursePage'
+import NurseLayout from './pages/poli/nurse/NurseLayout'
 
 // ================= ADMIN / IT =================
 import ITDashboardOverview from './pages/it/ITDashboardOverview'
@@ -54,35 +53,6 @@ const PENDAFTARAN_INFO = {
   '/pendaftaran/overview': ['Overview Pendaftaran', 'Status seluruh loket pendaftaran secara real-time'],
   '/pendaftaran/loket': ['Loket Pendaftaran', 'Panggil nomor antrian dari loket pendaftaran'],
   '/pendaftaran/dashboard': ['Riwayat & Statistik', 'Rekap dan grafik antrian harian'],
-}
-
-// Ini NurseLayout yang bikin pusing tapi fix
-function NurseLayout() {
-  const navigate = useNavigate()
-  const izin = getNurseIzin()
-
-  return (
-    <div style={{ padding: 24 }}>
-      <button
-        className="btn btn-outline"
-        onClick={() => {
-          logoutNurse()
-          navigate('/login-nurse', { replace: true })
-        }}
-      >
-        Logout
-      </button>
-
-      <DataDokter
-        izin={{
-          tambah: !!izin.dokter_tambah,
-          edit: !!izin.dokter_edit,
-          hapus: !!izin.dokter_hapus,
-          kosongkan: !!izin.antrean_kosongkan,
-        }}
-      />
-    </div>
-  )
 }
 
 // Buka localhost:5173 -> arahkan sesuai sesi yang masih tersimpan
