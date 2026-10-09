@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '../api/client'
-import { useInterval } from '../hooks/useInterval'
+import { api } from '../../api/client'
+import { useInterval } from '../../hooks/useInterval'
 import { MonitorPlay } from 'lucide-react'
 
 const POLL_MS = 5000

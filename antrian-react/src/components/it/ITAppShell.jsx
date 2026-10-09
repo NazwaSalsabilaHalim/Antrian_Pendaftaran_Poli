@@ -11,6 +11,8 @@ import {
   Clock3,
   ShieldCheck,
   LogOut,
+  UserCog,
+  KeyRound,
 } from 'lucide-react'
 
 const NAV = [
@@ -25,6 +27,18 @@ const NAV = [
     label: 'Kelola Petugas',
     description: 'Akun petugas',
     icon: Users,
+  },
+  {
+    to: 'nurse',
+    label: 'Kelola Nurse',
+    description: 'Akun nurse',
+    icon: UserCog,
+  },
+  {
+    to: 'hak-akses',
+    label: 'Hak Akses',
+    description: 'Izin fitur nurse',
+    icon: KeyRound,
   },
   {
     to: 'loket',
@@ -66,6 +80,8 @@ const PAGE_INFO = {
   konfigurasi: ['Konfigurasi Antrian', 'Atur aturan pembentukan nomor antrian'],
   antrian: ['Data Antrian', 'Melihat seluruh data antrian'],
   aktivitas: ['Aktivitas Sistem', 'Riwayat aktivitas pengguna pada sistem'],
+  nurse: ['Kelola Nurse', 'Mengelola akun dan status nurse'],
+  'hak-akses': ['Hak Akses', 'Atur fitur yang boleh dipakai nurse'],
 }
 
 function useClock() {
@@ -88,7 +104,7 @@ export default function ITAppShell() {
   const [title, subtitle] = PAGE_INFO[segment] || ['Panel Admin IT', '']
 
   function handleLogout() {
-    localStorage.removeItem('it_auth')
+    localStorage.removeItem('admin_auth_user')
     navigate('/it-login', { replace: true })
   }
 

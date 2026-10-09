@@ -1,14 +1,43 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import AppShell from './components/AppShell'
-import Overview from './pages/Overview'
-import AmbilNomor from './pages/AmbilNomor'
-import Loket from './pages/Loket'
-import TVDisplay from './pages/TVDisplay'
-import Dashboard from './pages/Dashboard'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 
+import RequireRole from './components/RequireRole'
+import {
+  isAdminLoggedIn,
+  isPetugasLoggedIn,
+  isNurseLoggedIn,
+  getNurseIzin,
+  logoutNurse,
+  PETUGAS_KEY,
+  NURSE_KEY,
+} from './utils/auth'
+
+// ================= SHELL & SIDEBAR =================
+import AppShell from './components/AppShell'
+import PendaftaranSidebar from './components/pendaftaran/PendaftaranSidebar'
 import ITAppShell from './components/it/ITAppShell'
-import RequireITAuth from './components/it/RequireITAuth'
-import ITLogin from './pages/it/ITLogin'
+
+// ================= LOGIN =================
+import Login from './pages/Login'
+import RegisterAdmin from './pages/RegisterAdmin'
+import LoginPetugas from './pages/LoginPetugas'
+import LoginNurse from './pages/LoginNurse'
+
+// ================= PASIEN (PUBLIK) =================
+import AmbilNomor from './pages/AmbilNomor'
+import TVDisplay from './pages/TVDisplay'
+import DisplayAntrean from './pages/poli/DisplayAntrean'
+
+// ================= PENDAFTARAN =================
+import Overview from './pages/pendaftaran/Overview'
+import Loket from './pages/pendaftaran/Loket'
+import Dashboard from './pages/pendaftaran/Dashboard'
+
+// ================= POLIKLINIK =================
+import DataDokter from './pages/poli/DataDokter'
+import KelolaAntrean from './pages/poli/dokter/KelolaAntrean'
+import NursePage from './pages/it/NursePage'
+
+// ================= ADMIN / IT =================
 import ITDashboardOverview from './pages/it/ITDashboardOverview'
 import PetugasPage from './pages/it/PetugasPage'
 import LoketITPage from './pages/it/LoketPage'
@@ -17,44 +46,156 @@ import KonfigurasiPage from './pages/it/KonfigurasiPage'
 import AntrianPage from './pages/it/AntrianPage'
 import AktivitasPage from './pages/it/AktivitasPage'
 
+// ================= INI UNTUK HAK AKSES =================
+import HakAksesPage from './pages/it/HakAksesPage'
+
+// Judul topbar untuk halaman pendaftaran (petugas)
+const PENDAFTARAN_INFO = {
+  '/pendaftaran/overview': ['Overview Pendaftaran', 'Status seluruh loket pendaftaran secara real-time'],
+  '/pendaftaran/loket': ['Loket Pendaftaran', 'Panggil nomor antrian dari loket pendaftaran'],
+  '/pendaftaran/dashboard': ['Riwayat & Statistik', 'Rekap dan grafik antrian harian'],
+}
+
+// Ini NurseLayout yang bikin pusing tapi fix
+function NurseLayout() {
+  const navigate = useNavigate()
+  const izin = getNurseIzin()
+
+  return (
+    <div style={{ padding: 24 }}>
+      <button
+        className="btn btn-outline"
+        onClick={() => {
+          logoutNurse()
+          navigate('/login-nurse', { replace: true })
+        }}
+      >
+        Logout
+      </button>
+
+      <DataDokter
+        izin={{
+          tambah: !!izin.dokter_tambah,
+          edit: !!izin.dokter_edit,
+          hapus: !!izin.dokter_hapus,
+          kosongkan: !!izin.antrean_kosongkan,
+        }}
+      />
+    </div>
+  )
+}
+
+// Buka localhost:5173 -> arahkan sesuai sesi yang masih tersimpan
+function HomeRedirect() {
+  if (isAdminLoggedIn()) return <Navigate to="/it-dashboard" replace />
+  if (isPetugasLoggedIn()) return <Navigate to="/pendaftaran" replace />
+  if (isNurseLoggedIn()) return <Navigate to="/poli/nurse/dokter" replace />
+  return <Navigate to="/it-login" replace />
+}
+
+// /it-login: kalau admin masih login, langsung masuk dashboard
+function ITLoginGate() {
+  return isAdminLoggedIn()
+    ? <Navigate to="/it-dashboard" replace />
+    : <Login />
+}
+
 export default function App() {
   return (
-
     <Routes>
-      {/* Halaman login IT, berdiri sendiri tanpa shell */}
-      <Route path="/it-login" element={<ITLogin />} />
 
-      {/* Panel Admin IT — dilindungi login, pakai shell terpisah (ITAppShell) */}
+      {/* =====================================================
+          PUBLIK / LOGIN
+          ===================================================== */}
+      <Route path="/" element={<HomeRedirect />} />
+      <Route path="/it-login" element={<ITLoginGate />} />
+      <Route path="/login" element={<Navigate to="/it-login" replace />} />
+      <Route path="/register-admin" element={<RegisterAdmin />} />
+      <Route path="/login-petugas" element={<LoginPetugas />} />
+      <Route path="/login-nurse" element={<LoginNurse />} />
+
+      {/* =====================================================
+          PUBLIK - PASIEN (tanpa login)
+          ===================================================== */}
+      <Route path="/ambil-nomor" element={<AmbilNomor />} />
+      <Route path="/display" element={<TVDisplay />} />
+      <Route path="/poli/display" element={<DisplayAntrean />} />
+
+      {/* =====================================================
+          1) ADMIN / IT  ->  localhost:5173/it-dashboard
+          ===================================================== */}
       <Route
         path="/it-dashboard"
         element={
-          <RequireITAuth>
+          <RequireRole
+            allowedRoles={['admin']}
+            loginPath="/it-login"
+            storageKey="admin_auth_user"
+          >
             <ITAppShell />
-          </RequireITAuth>
+          </RequireRole>
         }
       >
         <Route index element={<Navigate to="overview" replace />} />
         <Route path="overview" element={<ITDashboardOverview />} />
         <Route path="petugas" element={<PetugasPage />} />
+        <Route path="nurse" element={<NursePage />} />
         <Route path="loket" element={<LoketITPage />} />
         <Route path="jenis" element={<JenisPendaftaranPage />} />
         <Route path="konfigurasi" element={<KonfigurasiPage />} />
         <Route path="antrian" element={<AntrianPage />} />
         <Route path="aktivitas" element={<AktivitasPage />} />
+        <Route path="hak-akses" element={<HakAksesPage />} />
+
+        {/* Pendaftaran (dilihat dari admin) */}
+        <Route path="pendaftaran/overview" element={<Overview />} />
+        <Route path="pendaftaran/loket" element={<Loket />} />
+        <Route path="pendaftaran/dashboard" element={<Dashboard />} />
+
+        {/* Poliklinik (dilihat dari admin) */}
+        <Route path="poli/antrean" element={<KelolaAntrean />} />
+        <Route path="poli/dokter" element={<DataDokter />} />
       </Route>
 
-      <Route element={<AppShell />}>
-        <Route index element={<Navigate to="/overview" replace />} />
-        <Route path="/overview" element={<Overview />} />
-        <Route path="/loket" element={<Loket />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+      {/* =====================================================
+          2) PENDAFTARAN (PETUGAS)  ->  localhost:5173/pendaftaran
+          ===================================================== */}
+      <Route
+        path="/pendaftaran"
+        element={
+          <RequireRole
+            allowedRoles={['petugas']}
+            loginPath="/login-petugas"
+            storageKey={PETUGAS_KEY}
+          >
+            <AppShell
+              sidebar={<PendaftaranSidebar />}
+              pageInfo={PENDAFTARAN_INFO}
+            />
+          </RequireRole>
+        }
+      >
+        <Route index element={<Navigate to="overview" replace />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="loket" element={<Loket />} />
+        <Route path="dashboard" element={<Dashboard />} />
       </Route>
 
-      {/* Halaman Ambil Nomor, layar penuh, tanpa sidebar - dibuka di tab/monitor terpisah */}
-      <Route path="/ambil-nomor" element={<AmbilNomor />} />
-
-      {/* TV Display berdiri sendiri, layar penuh, tanpa sidebar - dibuka di tab/monitor terpisah */}
-      <Route path="/display" element={<TVDisplay />} />
+      {/* =====================================================
+          3) POLIKLINIK (NURSE)  ->  localhost:5173/poli/nurse
+          ===================================================== */}
+      <Route
+        path="/poli/nurse/*"
+        element={
+          <RequireRole
+            allowedRoles={['nurse']}
+            loginPath="/login-nurse"
+            storageKey={NURSE_KEY}
+          >
+            <NurseLayout />
+          </RequireRole>
+        }
+      />
     </Routes>
   )
 }

@@ -5,6 +5,20 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   base: '/',
 
+  server: {
+    port: 5173,
+    proxy: {
+      '/react-api': {
+        target: 'http://localhost/KP/antrian_pendaftaran',
+        changeOrigin: true,
+      },
+      '/foto': {
+        target: 'http://localhost/KP/antrian_pendaftaran',
+        changeOrigin: true,
+      },
+    },
+  },
+
   plugins: [
     react(),
 
@@ -15,7 +29,8 @@ export default defineConfig({
         'favicon.ico',
         'apple-touch-icon.png',
         'icons/*.png',
-        'sounds_jelék/*.mp3',
+        'sounds_jelek/*.mp3',
+        'Bells.mp3',
       ],
 
       manifest: {

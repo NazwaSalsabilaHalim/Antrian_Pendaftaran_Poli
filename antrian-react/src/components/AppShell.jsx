@@ -1,48 +1,6 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import {
-  LayoutGrid,
-  // Ticket,
-  Users,
-  History,
-  Tv,
-  Activity,
-  Clock3,
-} from 'lucide-react'
-
-const NAV = [
-  {
-    to: '/overview',
-    label: 'Overview',
-    description: 'Monitoring',
-    icon: LayoutGrid,
-  },
-  // {
-  //   to: '/ambil-nomor',
-  //   label: 'Ambil Nomor',
-  //   description: 'Pendaftaran',
-  //   icon: Ticket,
-  // },
-  {
-    to: '/loket',
-    label: 'Loket',
-    description: 'Pelayanan',
-    icon: Users,
-  },
-  {
-    to: '/dashboard',
-    label: 'Riwayat',
-    description: 'Statistik',
-    icon: History,
-  },
-]
-
-const PAGE_INFO = {
-  '/overview': ['Overview', 'Status seluruh loket secara real-time'],
-  // '/ambil-nomor': ['Ambil Nomor', 'Pengambilan nomor antrian pasien'],
-  '/loket': ['Loket', 'Panggil nomor antrian dari loket'],
-  '/dashboard': ['Riwayat & Statistik', 'Rekap antrian harian'],
-}
+import { Outlet, useLocation } from 'react-router-dom'
+import { Activity, Clock3 } from 'lucide-react'
 
 function useClock() {
   const [now, setNow] = useState(new Date())
@@ -58,97 +16,28 @@ function useClock() {
   return now
 }
 
-export default function AppShell() {
+/**
+ * Layout bersama (topbar + area konten).
+ * Sidebar TIDAK ada di sini. Sidebar dikirim lewat props `sidebar`,
+ * jadi tiap bagian punya sidebar sendiri:
+ *   - Pendaftaran -> components/pendaftaran/PendaftaranSidebar.jsx
+ *   - Poliklinik  -> components/poli/...
+ *   - IT          -> components/it/ITAppShell.jsx (shell sendiri)
+ *
+ * `pageInfo` = judul & subjudul topbar per path.
+ */
+export default function AppShell({ sidebar, pageInfo = {} }) {
   const location = useLocation()
   const now = useClock()
 
   const [title, subtitle] =
-    PAGE_INFO[location.pathname] || ['Antrian Pendaftaran', '']
+    pageInfo[location.pathname] || ['Antrian Rumah Sakit', 'Sistem Informasi Antrian']
 
   return (
     <div className="shell">
 
-      {/* SIDEBAR */}
-      <aside className="sidebar">
-
-        {/* BRAND */}
-        <div className="sidebar__brand">
-          <div className="sidebar__brand-icon">
-            <span>AP</span>
-          </div>
-
-          <div className="sidebar__brand-text">
-            <strong>Antrian</strong>
-            <span>Pendaftaran</span>
-          </div>
-        </div>
-
-        {/* LIVE STATUS */}
-        <div className="sidebar__status">
-          <span className="sidebar__status-dot">
-            <span />
-          </span>
-
-          <div>
-            <strong>Sistem Aktif</strong>
-            <span>Monitoring real-time</span>
-          </div>
-        </div>
-
-        {/* MENU */}
-        <div className="sidebar__section">
-          <div className="sidebar__section-label">
-            MENU UTAMA
-          </div>
-
-          <nav className="sidebar__nav">
-            {NAV.map(({ to, label, description, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  'sidebar__link' + (isActive ? ' is-active' : '')
-                }
-              >
-                <span className="sidebar__link-icon">
-                  <Icon size={19} strokeWidth={2} />
-                </span>
-
-                <span className="sidebar__link-content">
-                  <strong>{label}</strong>
-                  <small>{description}</small>
-                </span>
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-
-        {/* SIDEBAR FOOTER */}
-        <div className="sidebar__footer">
-
-          <a
-            href="/display"
-            target="_blank"
-            rel="noreferrer"
-            className="sidebar__display-link"
-          >
-            <span className="sidebar__display-icon">
-              <Tv size={18} strokeWidth={2} />
-            </span>
-
-            <span>
-              <strong>TV Display</strong>
-              <small>Buka layar antrian</small>
-            </span>
-
-            <span className="sidebar__display-arrow">↗</span>
-          </a>
-
-          <div className="sidebar__copyright">
-            Sistem Antrian Pendaftaran
-          </div>
-        </div>
-      </aside>
+      {/* SIDEBAR (dari props) */}
+      {sidebar}
 
       {/* MAIN */}
       <div className="shell__main">

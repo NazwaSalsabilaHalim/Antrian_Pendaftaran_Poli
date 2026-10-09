@@ -7,12 +7,16 @@ import {
   ArrowRight,
   CheckCircle2,
 } from 'lucide-react'
-import { api } from '../api/client'
+import { api } from '../../api/client'
+import { COUNTER_KEY } from '../../utils/auth'
 
 export default function Loket() {
   const [counterList, setCounterList] = useState([])
   const [tombolList, setTombolList] = useState([])
-  const [counterId, setCounterId] = useState('')
+  // loket yang dipilih disimpan, jadi tidak hilang saat refresh
+  const [counterId, setCounterId] = useState(
+    () => localStorage.getItem(COUNTER_KEY) || ''
+  )
   const [error, setError] = useState('')
   const [toast, setToast] = useState('')
   const [lastPanggil, setLastPanggil] = useState({})
@@ -23,6 +27,13 @@ export default function Loket() {
       .then(([c, t]) => {
         setCounterList(c.counter)
         setTombolList(t.tombol)
+
+        // kalau loket tersimpan sudah tidak ada di daftar, reset
+        const saved = localStorage.getItem(COUNTER_KEY)
+        if (saved && !c.counter.some((x) => String(x.CounterID) === saved)) {
+          localStorage.removeItem(COUNTER_KEY)
+          setCounterId('')
+        }
       })
       .catch((e) => setError(e.message))
   }, [])
@@ -98,7 +109,6 @@ export default function Loket() {
 
   return (
     <div className="loket-page">
-
       {/* PAGE INTRO — sama dengan halaman Dashboard & Overview */}
       <div className="page-intro">
         <div>
@@ -161,8 +171,12 @@ export default function Loket() {
             id="counter"
             value={counterId}
             onChange={(e) => {
-              setCounterId(e.target.value)
+              const value = e.target.value
+              setCounterId(value)
               setError('')
+
+              if (value) localStorage.setItem(COUNTER_KEY, value)
+              else localStorage.removeItem(COUNTER_KEY)
             }}
           >
             <option value="">
