@@ -13,6 +13,7 @@ import {
   LogOut,
   UserCog,
   KeyRound,
+  Stethoscope,
 } from 'lucide-react'
 
 const NAV = [
@@ -70,6 +71,12 @@ const NAV = [
     description: 'Log aktivitas',
     icon: Activity,
   },
+  {
+    to: 'poli/antrean',
+    label: 'Kelola Antrean',
+    description: 'Antrean poli dokter',
+    icon: Stethoscope,
+  },
 ]
 
 const PAGE_INFO = {
@@ -82,6 +89,7 @@ const PAGE_INFO = {
   aktivitas: ['Aktivitas Sistem', 'Riwayat aktivitas pengguna pada sistem'],
   nurse: ['Kelola Nurse', 'Mengelola akun dan status nurse'],
   'hak-akses': ['Hak Akses', 'Atur fitur yang boleh dipakai nurse'],
+  antrean: ['Kelola Antrean', 'Atur nomor antrean poli dokter'],
 }
 
 function useClock() {

@@ -166,6 +166,20 @@ export default function App() {
           </RequireRole>
         }
       />
+
+      {/* =====================================================
+          4) POLIKLINIK (DOKTER)  ->  localhost:5173/poli/dokter/antrean
+          Login memakai AID + password dokter di dalam halamannya.
+          ===================================================== */}
+      <Route
+        path="/poli/dokter/antrean"
+        element={
+          <div style={{ padding: 24 }}>
+            <KelolaAntrean />
+          </div>
+        }
+      />
+
     </Routes>
   )
 }
