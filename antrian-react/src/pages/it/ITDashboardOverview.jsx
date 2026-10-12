@@ -5,6 +5,7 @@ import {
   StatusBadge,
 } from '../../components/it/ITComponents'
 import { Tv, Stethoscope } from 'lucide-react'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 export default function ITDashboardOverview() {
   const [data, setData] = useState(null)
@@ -31,6 +32,13 @@ export default function ITDashboardOverview() {
   const stat = data?.stat || {}
   const statusLoket = data?.status_loket || []
   const aktivitas = data?.aktivitas || []
+
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedItems: paginatedStatusLoket,
+  } = usePagination(statusLoket, 10)
 
   return (
     <>
@@ -141,7 +149,7 @@ export default function ITDashboardOverview() {
                     </thead>
 
                     <tbody>
-                      {statusLoket.map((item, index) => (
+                      {paginatedStatusLoket.map((item, index) => (
                         <tr key={index}>
                           <td>
                             <strong>{item.loket}</strong>
@@ -176,6 +184,15 @@ export default function ITDashboardOverview() {
                     </tbody>
                   </table>
                 </div>
+
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={statusLoket.length}
+                  pageSize={10}
+                  onPageChange={setCurrentPage}
+                  itemName="loket"
+                />
               </div>
             </div>
 

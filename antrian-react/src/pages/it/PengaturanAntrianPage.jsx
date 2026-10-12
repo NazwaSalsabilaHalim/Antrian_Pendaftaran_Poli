@@ -17,6 +17,7 @@ import {
   Tabs,
   Toast,
 } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 // =========================
 // Konfigurasi
@@ -66,6 +67,14 @@ function LoketTab() {
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems: paginatedLoket,
+  } = usePagination(loket, 10)
+
   const [editItem, setEditItem] = useState(null)
   const [form, setForm] = useState({
     petugas_nama: '',
@@ -86,6 +95,7 @@ function LoketTab() {
       .then(([loketResponse, petugasResponse]) => {
         setLoket(loketResponse.loket || [])
         setPetugasList(petugasResponse.petugas || [])
+        setCurrentPage(1)
       })
       .catch((e) => notify('error', e.message))
       .finally(() => setLoading(false))
@@ -149,9 +159,9 @@ function LoketTab() {
               </thead>
 
               <tbody>
-                {loket.map((item, index) => (
+                {paginatedLoket.map((item, index) => (
                   <tr key={item.counter_id}>
-                    <td>{index + 1}</td>
+                    <td>{startIndex + index + 1}</td>
                     <td><strong>{item.nama}</strong></td>
                     <td>{item.petugas_nama}</td>
                     <td><StatusBadge status={item.status} /></td>
@@ -171,6 +181,17 @@ function LoketTab() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={loket.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="loket"
+          />
         )}
       </div>
 
@@ -252,6 +273,14 @@ function JenisTab() {
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems: paginatedJenis,
+  } = usePagination(jenis, 10)
+
   const [modalMode, setModalMode] = useState(null) // null | create | edit
   const [form, setForm] = useState(EMPTY_JENIS)
 
@@ -265,6 +294,7 @@ function JenisTab() {
     api.getJenisPendaftaran()
       .then((res) => {
         setJenis(res.jenis || [])
+        setCurrentPage(1)
       })
       .catch((e) => notify('error', e.message))
       .finally(() => setLoading(false))
@@ -367,9 +397,9 @@ function JenisTab() {
               </thead>
 
               <tbody>
-                {jenis.map((item, index) => (
+                {paginatedJenis.map((item, index) => (
                   <tr key={item.tombol_id}>
-                    <td>{index + 1}</td>
+                    <td>{startIndex + index + 1}</td>
                     <td><strong>{item.tombol_id}</strong></td>
                     <td>{item.nama}</td>
                     <td>{item.prefix || '-'}</td>
@@ -393,6 +423,17 @@ function JenisTab() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={jenis.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="jenis pendaftaran"
+          />
         )}
       </div>
 

@@ -1,15 +1,26 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import { Toast } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 export default function AktivitasPage() {
   const [aktivitas, setAktivitas] = useState([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedItems: paginatedAktivitas,
+  } = usePagination(aktivitas, 10)
+
   useEffect(() => {
     api.getAktivitas(50)
-      .then((res) => setAktivitas(res.aktivitas || []))
+      .then((res) => {
+        setAktivitas(res.aktivitas || [])
+        setCurrentPage(1)
+      })
       .catch((e) => setToast({ type: 'error', text: e.message }))
       .finally(() => setLoading(false))
   }, [])
@@ -38,7 +49,7 @@ export default function AktivitasPage() {
               </thead>
 
               <tbody>
-                {aktivitas.map((item, index) => (
+                {paginatedAktivitas.map((item, index) => (
                   <tr key={index}>
                     <td>{item.tanggal}</td>
                     <td>{item.waktu}</td>
@@ -57,6 +68,17 @@ export default function AktivitasPage() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={aktivitas.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="aktivitas"
+          />
         )}
       </div>
     </>

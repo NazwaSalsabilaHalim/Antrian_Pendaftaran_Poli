@@ -17,6 +17,7 @@ import {
   Tabs,
   Toast,
 } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 // =========================
 // Konfigurasi
@@ -92,6 +93,14 @@ function AkunTab({ role }) {
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems,
+  } = usePagination(items, 10)
+
   const [modalMode, setModalMode] = useState(null) // null | create | edit
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState(EMPTY_FORM)
@@ -106,6 +115,7 @@ function AkunTab({ role }) {
     cfg.load()
       .then((res) => {
         setItems(res.petugas || [])
+        setCurrentPage(1)
       })
       .catch((e) => notify('error', e.message))
       .finally(() => setLoading(false))
@@ -207,9 +217,9 @@ function AkunTab({ role }) {
               </thead>
 
               <tbody>
-                {items.map((item, index) => (
+                {paginatedItems.map((item, index) => (
                   <tr key={item.id}>
-                    <td>{index + 1}</td>
+                    <td>{startIndex + index + 1}</td>
                     <td><strong>{item.nama}</strong></td>
                     <td>{item.username}</td>
                     <td><StatusBadge status={item.status} /></td>
@@ -232,6 +242,17 @@ function AkunTab({ role }) {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={items.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName={`akun ${label}`}
+          />
         )}
       </div>
 
@@ -330,6 +351,13 @@ function HakAksesTab() {
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedItems: paginatedNurses,
+  } = usePagination(nurses, 10)
+
   function notify(type, text) {
     setToast({ type, text })
   }
@@ -345,6 +373,7 @@ function HakAksesTab() {
             hak_akses: n.hak_akses || {},
           }))
         )
+        setCurrentPage(1)
       })
       .catch((e) => notify('error', e.message))
       .finally(() => setLoading(false))
@@ -396,7 +425,7 @@ function HakAksesTab() {
               </thead>
 
               <tbody>
-                {nurses.map((n) => (
+                {paginatedNurses.map((n) => (
                   <tr key={n.id}>
                     <td>
                       <strong>{n.nama}</strong>
@@ -431,6 +460,17 @@ function HakAksesTab() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={nurses.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="nurse"
+          />
         )}
       </div>
     </>

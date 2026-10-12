@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import { Toast } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -12,11 +13,22 @@ export default function AntrianPage() {
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState(null)
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems: paginatedRiwayat,
+  } = usePagination(riwayat, 10)
+
   function load() {
     setLoading(true)
 
     api.getRiwayat(`tanggal=${tanggal}`)
-      .then((res) => setRiwayat(res.riwayat || []))
+      .then((res) => {
+        setRiwayat(res.riwayat || [])
+        setCurrentPage(1)
+      })
       .catch((e) => setToast({ type: 'error', text: e.message }))
       .finally(() => setLoading(false))
   }
@@ -65,9 +77,9 @@ export default function AntrianPage() {
               </thead>
 
               <tbody>
-                {riwayat.map((item, index) => (
+                {paginatedRiwayat.map((item, index) => (
                   <tr key={item.id}>
-                    <td>{index + 1}</td>
+                    <td>{startIndex + index + 1}</td>
                     <td><strong>{item.nomor}</strong></td>
                     <td>{item.jenis_pasien}</td>
                     <td>{item.counter_nama || '-'}</td>
@@ -85,6 +97,17 @@ export default function AntrianPage() {
               </tbody>
             </table>
           </div>
+        )}
+
+        {!loading && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={riwayat.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="antrian"
+          />
         )}
       </div>
     </>

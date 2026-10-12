@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { api } from '../../api/client'
 import { Toast } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 const EMPTY_FORM = {
   AID: '',
@@ -38,6 +39,14 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [display, setDisplay] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems: paginatedDoctors,
+  } = usePagination(doctors, 10)
 
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -64,6 +73,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
       const result = await api.getDoctors(params.toString())
       setDoctors(Array.isArray(result.data) ? result.data : [])
+      setCurrentPage(1)
     } catch (err) {
       setError(err.message || 'Gagal memuat data dokter.')
     } finally {
@@ -276,11 +286,6 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
         <div className="doctor-page-actions">
           {aksiTambahan}
-
-          <div className="page-intro__status">
-            <span />
-            {doctors.length} Dokter Terdaftar
-          </div>
         </div>
       </div>
 
@@ -417,9 +422,9 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                   </td>
                 </tr>
               ) : (
-                doctors.map((doctor, index) => (
+                paginatedDoctors.map((doctor, index) => (
                   <tr key={doctor.AID}>
-                    <td>{index + 1}</td>
+                    <td>{startIndex + index + 1}</td>
                     <td>
                       <div className="doctor-name-cell">
                         {doctor.foto ? (
@@ -489,9 +494,18 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
           </table>
         </div>
 
-        <div className="doctor-table-footer">
-          {loading ? 'Memuat data...' : `Menampilkan total ${doctors.length} dokter`}
-        </div>
+        {loading ? (
+          <div className="doctor-table-footer">Memuat data...</div>
+        ) : (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={doctors.length}
+            pageSize={10}
+            onPageChange={setCurrentPage}
+            itemName="dokter"
+          />
+        )}
       </div>
 
       {/* MODAL TAMBAH / EDIT DOKTER */}

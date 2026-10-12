@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    DAFTAR ISI
 
     1. DESIGN TOKENS
@@ -4437,31 +4437,6 @@ table.data-table {
    IT DASHBOARD OVERVIEW
    ========================================================= */
 
-/* .shell__content .it-dashboard-welcome {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: #ffffff;
-  margin-bottom: 24px;
-}
-
-.it-dashboard-welcome__label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  opacity: 0.85;
-}
-
-.it-dashboard-welcome__title {
-  margin: 10px 0 6px;
-  font-size: 22px;
-  font-weight: 800;
-}
-
-.it-dashboard-welcome__description {
-  margin: 0;
-  font-size: 13px;
-  opacity: 0.9;
-} */
-
 .shell__content .it-dashboard-welcome {
   display: flex;
   align-items: center;
@@ -5854,3 +5829,120 @@ table.data-table {
   font-size: 13px;
   font-weight: 600;
 }
+
+/* =========================================================
+   PAGINATION TABLE COMPONENT
+   ========================================================= */
+
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-soft);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.card > .table-pagination {
+  margin: 16px -22px -22px -22px;
+  padding: 16px 22px;
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+}
+
+.table-pagination__info {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.table-pagination__info strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.table-pagination__controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.table-pagination__pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.table-pagination__btn--icon {
+  padding: 0 8px;
+}
+
+.table-pagination__btn:hover:not(:disabled) {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.table-pagination__btn.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(38, 142, 103, 0.28);
+}
+
+.table-pagination__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--border-soft);
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.table-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 34px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  user-select: none;
+}
+
+@media (max-width: 680px) {
+  .table-pagination {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .table-pagination__btn-label {
+    display: none;
+  }
+}

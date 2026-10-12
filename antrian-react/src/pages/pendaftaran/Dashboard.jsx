@@ -16,6 +16,7 @@ import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 import { StatCard } from '../../components/it/ITComponents'
+import Pagination, { usePagination } from '../../components/Pagination'
 
 const REFRESH_MS = 15000
 
@@ -46,6 +47,14 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState(null)
   const [riwayat, setRiwayat] = useState([])
 
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    startIndex,
+    paginatedItems: paginatedRiwayat,
+  } = usePagination(riwayat, 10)
+
   const load = useCallback(() => {
     Promise.all([
       api.getStatistik(tanggal),
@@ -54,6 +63,7 @@ export default function Dashboard() {
       .then(([statistik, riwayatData]) => {
         setData(statistik)
         setRiwayat(riwayatData.riwayat || [])
+        setCurrentPage(1)
         setError('')
         setLastUpdate(new Date())
       })
@@ -599,9 +609,9 @@ export default function Dashboard() {
                 </thead>
 
                 <tbody>
-                  {riwayat.map((r, index) => (
+                  {paginatedRiwayat.map((r, index) => (
                     <tr key={r.id}>
-                      <td>{index + 1}</td>
+                      <td>{startIndex + index + 1}</td>
 
                       <td>
                         <strong>{r.nomor}</strong>
@@ -625,6 +635,15 @@ export default function Dashboard() {
                 </tbody>
               </table>
             </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={riwayat.length}
+              pageSize={10}
+              onPageChange={setCurrentPage}
+              itemName="antrian"
+            />
           </div>
         </>
       )}
