@@ -268,7 +268,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div className="doctor-page-actions">
           {aksiTambahan}
 
           <div className="page-intro__status">
@@ -309,7 +309,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
           className={`doctor-feedback ${error ? 'is-error' : 'is-success'}`}
           role={error ? 'alert' : 'status'}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="doctor-feedback__body">
             {error ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
             <span>{error || message}</span>
           </div>
@@ -475,7 +475,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                     </td>
 
                     <td>
-                      <strong style={{ color: 'var(--primary)', fontFamily: 'monospace', fontSize: '15px' }}>
+                      <strong className="doctor-queue-number">
                         {String(doctor.Antrian ?? 0).padStart(3, '0')}
                       </strong>
                     </td>

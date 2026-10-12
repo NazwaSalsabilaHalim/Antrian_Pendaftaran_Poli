@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import { Activity, Clock3 } from 'lucide-react'
+import { Users, Clock3 } from 'lucide-react'
 
 function useClock() {
   const [now, setNow] = useState(new Date())
@@ -48,8 +48,8 @@ export default function AppShell({ sidebar, pageInfo = {} }) {
           <div className="topbar__left">
 
             <div className="topbar__eyebrow">
-              <Activity size={14} strokeWidth={2.5} />
-              LIVE MONITOR
+              <Users size={14} strokeWidth={2.5} />
+              PANEL PETUGAS
             </div>
 
             <h1 className="topbar__title">

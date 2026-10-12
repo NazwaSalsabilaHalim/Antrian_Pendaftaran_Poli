@@ -33,26 +33,20 @@ import Dashboard from './pages/pendaftaran/Dashboard'
 // ================= POLIKLINIK =================
 import DataDokter from './pages/poli/DataDokter'
 import KelolaAntrean from './pages/poli/dokter/KelolaAntrean'
-import NursePage from './pages/it/NursePage'
 import NurseLayout from './pages/poli/nurse/NurseLayout'
 
 // ================= ADMIN / IT =================
 import ITDashboardOverview from './pages/it/ITDashboardOverview'
-import PetugasPage from './pages/it/PetugasPage'
-import LoketITPage from './pages/it/LoketPage'
-import JenisPendaftaranPage from './pages/it/JenisPendaftaranPage'
-import KonfigurasiPage from './pages/it/KonfigurasiPage'
+import AkunPenggunaPage from './pages/it/AkunPenggunaPage'
+import PengaturanAntrianPage from './pages/it/PengaturanAntrianPage'
 import AntrianPage from './pages/it/AntrianPage'
 import AktivitasPage from './pages/it/AktivitasPage'
-
-// ================= INI UNTUK HAK AKSES =================
-import HakAksesPage from './pages/it/HakAksesPage'
 
 // Judul topbar untuk halaman pendaftaran (petugas)
 const PENDAFTARAN_INFO = {
   '/pendaftaran/overview': ['Overview Pendaftaran', 'Status seluruh loket pendaftaran secara real-time'],
   '/pendaftaran/loket': ['Loket Pendaftaran', 'Panggil nomor antrian dari loket pendaftaran'],
-  '/pendaftaran/dashboard': ['Riwayat & Statistik', 'Rekap dan grafik antrian harian'],
+  '/pendaftaran/dashboard': ['Dashboard Petugas', 'Rekap dan grafik antrian harian'],
 }
 
 // Buka localhost:5173 -> arahkan sesuai sesi yang masih tersimpan
@@ -108,14 +102,25 @@ export default function App() {
       >
         <Route index element={<Navigate to="overview" replace />} />
         <Route path="overview" element={<ITDashboardOverview />} />
-        <Route path="petugas" element={<PetugasPage />} />
-        <Route path="nurse" element={<NursePage />} />
-        <Route path="loket" element={<LoketITPage />} />
-        <Route path="jenis" element={<JenisPendaftaranPage />} />
-        <Route path="konfigurasi" element={<KonfigurasiPage />} />
+
+        {/* Akun Pengguna (tab: petugas, nurse, hak-akses) */}
+        <Route path="akun" element={<AkunPenggunaPage />} />
+
+        {/* URL lama -> diarahkan ke halaman Akun Pengguna */}
+        <Route path="petugas" element={<Navigate to="/it-dashboard/akun?tab=petugas" replace />} />
+        <Route path="nurse" element={<Navigate to="/it-dashboard/akun?tab=nurse" replace />} />
+        <Route path="hak-akses" element={<Navigate to="/it-dashboard/akun?tab=hak-akses" replace />} />
+
+        {/* Pengaturan Antrian (tab: loket, jenis) */}
+        <Route path="pengaturan" element={<PengaturanAntrianPage />} />
+
+        {/* URL lama -> diarahkan ke halaman Pengaturan Antrian */}
+        <Route path="loket" element={<Navigate to="/it-dashboard/pengaturan?tab=loket" replace />} />
+        <Route path="jenis" element={<Navigate to="/it-dashboard/pengaturan?tab=jenis" replace />} />
+        <Route path="konfigurasi" element={<Navigate to="/it-dashboard/pengaturan" replace />} />
+
         <Route path="antrian" element={<AntrianPage />} />
         <Route path="aktivitas" element={<AktivitasPage />} />
-        <Route path="hak-akses" element={<HakAksesPage />} />
 
         {/* Pendaftaran (dilihat dari admin) */}
         <Route path="pendaftaran/overview" element={<Overview />} />
@@ -174,7 +179,7 @@ export default function App() {
       <Route
         path="/poli/dokter/antrean"
         element={
-          <div style={{ padding: 24 }}>
+          <div className="poli-page-wrapper">
             <KelolaAntrean />
           </div>
         }

@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutGrid,
-  Users,
-  Building2,
-  Tag,
   Settings,
   History,
   Activity,
@@ -12,84 +9,78 @@ import {
   ShieldCheck,
   LogOut,
   UserCog,
-  KeyRound,
   Stethoscope,
 } from 'lucide-react'
+import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
-const NAV = [
+// Menu dikelompokkan: ringkasan, monitoring (pendaftaran & poli),
+// dan fitur khusus Admin IT.
+const NAV_GROUPS = [
   {
-    to: 'overview',
-    label: 'Dashboard',
-    description: 'Ringkasan sistem',
-    icon: LayoutGrid,
+    label: 'UTAMA',
+    items: [
+      {
+        to: 'overview',
+        label: 'Dashboard',
+        description: 'Ringkasan sistem',
+        icon: LayoutGrid,
+      },
+    ],
   },
   {
-    to: 'petugas',
-    label: 'Kelola Petugas',
-    description: 'Akun petugas',
-    icon: Users,
+    label: 'MONITORING PENDAFTARAN',
+    items: [
+      {
+        to: 'antrian',
+        label: 'Data Antrian',
+        description: 'Seluruh antrian',
+        icon: History,
+      },
+      {
+        to: 'pengaturan',
+        label: 'Pengaturan Antrian',
+        description: 'Loket & jenis pendaftaran',
+        icon: Settings,
+      },
+    ],
   },
   {
-    to: 'nurse',
-    label: 'Kelola Nurse',
-    description: 'Akun nurse',
-    icon: UserCog,
+    label: 'MONITORING POLIKLINIK',
+    items: [
+      {
+        to: 'poli/antrean',
+        label: 'Antrean Poli',
+        description: 'Antrean poli dokter',
+        icon: Stethoscope,
+      },
+    ],
   },
   {
-    to: 'hak-akses',
-    label: 'Hak Akses',
-    description: 'Izin fitur nurse',
-    icon: KeyRound,
-  },
-  {
-    to: 'loket',
-    label: 'Kelola Loket',
-    description: 'Loket pelayanan',
-    icon: Building2,
-  },
-  {
-    to: 'jenis',
-    label: 'Jenis Pendaftaran',
-    description: 'Kategori & prefix',
-    icon: Tag,
-  },
-  {
-    to: 'konfigurasi',
-    label: 'Konfigurasi Antrian',
-    description: 'Aturan nomor',
-    icon: Settings,
-  },
-  {
-    to: 'antrian',
-    label: 'Data Antrian',
-    description: 'Seluruh antrian',
-    icon: History,
-  },
-  {
-    to: 'aktivitas',
-    label: 'Aktivitas Sistem',
-    description: 'Log aktivitas',
-    icon: Activity,
-  },
-  {
-    to: 'poli/antrean',
-    label: 'Kelola Antrean',
-    description: 'Antrean poli dokter',
-    icon: Stethoscope,
+    label: 'ADMIN IT',
+    items: [
+      {
+        to: 'akun',
+        label: 'Akun Pengguna',
+        description: 'Petugas, nurse & hak akses',
+        icon: UserCog,
+      },
+      {
+        to: 'aktivitas',
+        label: 'Aktivitas Sistem',
+        description: 'Log aktivitas',
+        icon: Activity,
+      },
+    ],
   },
 ]
 
 const PAGE_INFO = {
   overview: ['Dashboard', 'Ringkasan dan monitoring sistem antrian'],
-  petugas: ['Kelola Petugas', 'Mengelola akun dan status petugas'],
-  loket: ['Kelola Loket', 'Mengelola loket pelayanan pendaftaran'],
-  jenis: ['Jenis Pendaftaran', 'Mengelola jenis pendaftaran dan prefix antrian'],
-  konfigurasi: ['Konfigurasi Antrian', 'Atur aturan pembentukan nomor antrian'],
   antrian: ['Data Antrian', 'Melihat seluruh data antrian'],
+  antrean: ['Antrean Poli', 'Atur nomor antrean poli dokter'],
+  akun: ['Akun Pengguna', 'Kelola akun petugas, nurse, dan hak akses nurse'],
+  pengaturan: ['Pengaturan Antrian', 'Kelola loket pelayanan dan jenis pendaftaran'],
   aktivitas: ['Aktivitas Sistem', 'Riwayat aktivitas pengguna pada sistem'],
-  nurse: ['Kelola Nurse', 'Mengelola akun dan status nurse'],
-  'hak-akses': ['Hak Akses', 'Atur fitur yang boleh dipakai nurse'],
-  antrean: ['Kelola Antrean', 'Atur nomor antrean poli dokter'],
 }
 
 function useClock() {
@@ -123,16 +114,11 @@ export default function ITAppShell() {
       <aside className="sidebar">
 
         {/* BRAND */}
-        <div className="sidebar__brand">
-          <div className="sidebar__brand-icon">
-            <ShieldCheck size={19} strokeWidth={2} />
+          <div className="sidebar__brand">
+            <div className="tv-brand">
+              <img src={logoAwalBros} alt="Logo" />
+            </div>
           </div>
-
-          <div className="sidebar__brand-text">
-            <strong>Antrian</strong>
-            <span>Panel Admin IT</span>
-          </div>
-        </div>
 
         {/* STATUS LOGIN */}
         <div className="sidebar__status">
@@ -146,50 +132,48 @@ export default function ITAppShell() {
           </div>
         </div>
 
-        {/* MENU */}
+        {/* MENU (per grup) */}
         <div className="sidebar__section">
-          <div className="sidebar__section-label">
-            MENU UTAMA
-          </div>
+          {NAV_GROUPS.map(({ label, items }) => (
+            <div className="sidebar__group" key={label}>
+              <div className="sidebar__section-label">
+                {label}
+              </div>
 
-          <nav className="sidebar__nav">
-            {NAV.map(({ to, label, description, icon: Icon }) => (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  'sidebar__link' + (isActive ? ' is-active' : '')
-                }
-              >
-                <span className="sidebar__link-icon">
-                  <Icon size={19} strokeWidth={2} />
-                </span>
+              <nav className="sidebar__nav">
+                {items.map(({ to, label: itemLabel, description, icon: Icon }) => (
+                  <NavLink
+                    key={to}
+                    to={to}
+                    className={({ isActive }) =>
+                      'sidebar__link' + (isActive ? ' is-active' : '')
+                    }
+                  >
+                    <span className="sidebar__link-icon">
+                      <Icon size={19} strokeWidth={2} />
+                    </span>
 
-                <span className="sidebar__link-content">
-                  <strong>{label}</strong>
-                  <small>{description}</small>
-                </span>
-              </NavLink>
-            ))}
-          </nav>
+                    <span className="sidebar__link-content">
+                      <strong>{itemLabel}</strong>
+                      <small>{description}</small>
+                    </span>
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+          ))}
         </div>
 
         {/* SIDEBAR FOOTER */}
         <div className="sidebar__footer">
 
           <button
+            type="button"
             onClick={handleLogout}
-            className="sidebar__display-link"
-            style={{ width: '100%', border: 'none' }}
+            className="btn btn-danger-outline sidebar__logout"
           >
-            <span className="sidebar__display-icon">
-              <LogOut size={18} strokeWidth={2} />
-            </span>
-
-            <span>
-              <strong>Logout</strong>
-              <small>Keluar dari panel IT</small>
-            </span>
+            <LogOut size={16} strokeWidth={2} />
+            Logout
           </button>
 
           <div className="sidebar__copyright">

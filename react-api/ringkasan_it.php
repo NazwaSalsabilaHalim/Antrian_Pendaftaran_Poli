@@ -26,7 +26,7 @@ mysqli_stmt_execute($stmt);
 $dilayani = (int) mysqli_fetch_assoc(mysqli_stmt_get_result($stmt))['total'];
 
 // Petugas aktif
-$petugasAktif = (int) mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM petugas WHERE status = 'Aktif'"))['total'];
+$petugasAktif = (int) mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'petugas' AND status = 'aktif'"))['total'];
 
 // Loket aktif
 $loketAktif = (int) mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM counter WHERE NA = 'N'"))['total'];

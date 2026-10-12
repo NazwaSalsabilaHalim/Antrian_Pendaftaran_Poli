@@ -28,6 +28,7 @@ const NAV_PENDAFTARAN = [
     icon: History,
   },
 ]
+import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
 export default function PendaftaranSidebar() {
   const navigate = useNavigate()
@@ -43,13 +44,8 @@ export default function PendaftaranSidebar() {
 
       {/* BRAND */}
       <div className="sidebar__brand">
-        <div className="sidebar__brand-icon">
-          <span>RS</span>
-        </div>
-
-        <div className="sidebar__brand-text">
-          <strong>Antrian RS</strong>
-          <span>Pendaftaran & Poli</span>
+        <div className="tv-brand">
+          <img src={logoAwalBros} alt="Logo" />
         </div>
       </div>
 
@@ -60,7 +56,9 @@ export default function PendaftaranSidebar() {
         </span>
 
         <div>
-          <strong>Sistem Aktif</strong>
+          <strong className="sidebar__user-name">
+            {user?.nama || user?.username || 'Petugas'}
+          </strong>
           <span>Monitoring real-time</span>
         </div>
       </div>
@@ -115,40 +113,18 @@ export default function PendaftaranSidebar() {
         </a>
 
         {/* USER + LOGOUT */}
-        <div
-          style={{
-            marginTop: '14px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            fontSize: '13px',
-          }}
-        >
-          <span>{user?.nama || user?.username || 'Petugas'}</span>
-
+        <div className="sidebar__user-box">
           <button
             type="button"
             onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '8px 12px',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              background: 'transparent',
-              color: '#dc2626',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
+            className="btn btn-danger-outline sidebar__logout"
           >
             <LogOut size={16} strokeWidth={2} />
             Logout
           </button>
         </div>
 
-        <div className="sidebar__copyright" style={{ marginTop: '14px' }}>
+        <div className="sidebar__copyright">
           Sistem Antrian RS Awal Bros
         </div>
       </div>

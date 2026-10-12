@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import { useInterval } from '../../hooks/useInterval'
@@ -9,12 +10,12 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { BarChart3 } from 'lucide-react'
 import * as XLSX from 'xlsx'
+import { StatCard } from '../../components/it/ITComponents'
 
 const REFRESH_MS = 15000
 
@@ -34,7 +35,7 @@ function formatTanggalWaktu(value) {
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -48,7 +49,7 @@ export default function Dashboard() {
   const load = useCallback(() => {
     Promise.all([
       api.getStatistik(tanggal),
-      api.getRiwayat(`tanggal=${tanggal}`)
+      api.getRiwayat(`tanggal=${tanggal}`),
     ])
       .then(([statistik, riwayatData]) => {
         setData(statistik)
@@ -59,42 +60,44 @@ export default function Dashboard() {
       .catch((e) => setError(e.message))
   }, [tanggal])
 
-  // Membaca file Excel yang diupload user
+  // Export Excel
   const exportExcel = () => {
     if (riwayat.length === 0) return
-    // Mapping data ke format yang lebih rapi untuk ditampilkan
+
     const dataForExcel = riwayat.map((row) => ({
       'No. Antrian': row.nomor,
-      'Prefix': row.prefix || '-',
+      Prefix: row.prefix || '-',
       'Jenis Pasien': row.jenis_pasien,
-      'Counter': row.counter_nama,
-      'Status': row.status,
-      'Dipanggil': row.panggil === 'Y' ? 'Ya' : 'Tidak',
-      'Panggil Ulang': row.panggil_ulang === 'Y' ? 'Ya' : 'Tidak',
-      'Tanggal': row.tanggal,
+      Counter: row.counter_nama,
+      Status: row.status,
+      Dipanggil: row.panggil === 'Y' ? 'Ya' : 'Tidak',
+      'Panggil Ulang':
+        row.panggil_ulang === 'Y' ? 'Ya' : 'Tidak',
+      Tanggal: row.tanggal,
       'Waktu Ambil Nomor': row.tanggal_insert,
       'Waktu Dipanggil': row.tanggal_panggil,
     }))
+
     const ws = XLSX.utils.json_to_sheet(dataForExcel)
 
-    // Atur lebar tiap kolom (dalam karakter)
     ws['!cols'] = [
-      { wch: 12 }, // No. Antrian
-      { wch: 8 },  // Prefix
-      { wch: 26 }, // Jenis Pasien
-      { wch: 14 }, // Counter
-      { wch: 12 }, // Status
-      { wch: 10 }, // Dipanggil
-      { wch: 14 }, // Panggil Ulang
-      { wch: 12 }, // Tanggal
-      { wch: 20 }, // Waktu Ambil Nomor
-      { wch: 20 }, // Waktu Dipanggil
+      { wch: 12 },
+      { wch: 8 },
+      { wch: 26 },
+      { wch: 14 },
+      { wch: 12 },
+      { wch: 10 },
+      { wch: 14 },
+      { wch: 12 },
+      { wch: 20 },
+      { wch: 20 },
     ]
 
-    // Bikin header row bold (opsional, tampilan lebih rapi)
     const range = XLSX.utils.decode_range(ws['!ref'])
+
     for (let col = range.s.c; col <= range.e.c; col++) {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: col })
+
       if (ws[cellRef]) {
         ws[cellRef].s = {
           font: { bold: true },
@@ -106,21 +109,33 @@ export default function Dashboard() {
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Antrian')
 
-    const today = new Date().toISOString().slice(0, 10)
-    XLSX.writeFile(wb, `riwayat-antrian-${today}.xlsx`)
+    XLSX.writeFile(
+      wb,
+      `riwayat-antrian-${new Date().toISOString().slice(0, 10)}.xlsx`
+    )
   }
 
+  // Export PDF
   function exportPDF() {
     const doc = new jsPDF()
 
     doc.setFontSize(14)
     doc.text('Riwayat & Statistik Antrian', 14, 16)
+
     doc.setFontSize(10)
     doc.text(`Tanggal: ${tanggal}`, 14, 23)
 
     autoTable(doc, {
       startY: 28,
-      head: [['No', 'Nomor Antrian', 'Jenis Pasien', 'Loket', 'Status', 'Waktu Diambil', 'Waktu Dipanggil']],
+      head: [[
+        'No',
+        'Nomor Antrian',
+        'Jenis Pasien',
+        'Loket',
+        'Status',
+        'Waktu Diambil',
+        'Waktu Dipanggil',
+      ]],
       body: riwayat.map((r, index) => [
         index + 1,
         r.nomor,
@@ -128,32 +143,36 @@ export default function Dashboard() {
         r.counter_nama,
         r.status,
         formatTanggalWaktu(r.tanggal_insert),
-        formatTanggalWaktu(r.tanggal_panggil)
+        formatTanggalWaktu(r.tanggal_panggil),
       ]),
       styles: { fontSize: 8 },
-      headStyles: { fillColor: [38, 142, 103] } // warna primary kamu, RGB dari #268e67
+      headStyles: { fillColor: [38, 142, 103] },
     })
 
     doc.save(`riwayat-antrian-${tanggal}.pdf`)
   }
-  // muat ulang tiap kali tanggal berubah
+
+  // Muat ulang saat tanggal berubah
   useEffect(() => {
     load()
   }, [load])
 
-  // auto-refresh berkala, hanya untuk tanggal hari ini (data historis tidak berubah)
+  // Auto-refresh setiap 15 detik untuk tanggal hari ini
   useInterval(() => {
     if (tanggal === todayStr()) load()
   }, REFRESH_MS)
 
-  const persenSelesai = data && data.total_dicetak > 0
-    ? Math.round((data.total_dipanggil / data.total_dicetak) * 100)
-    : 0
+  const persenSelesai =
+    data && data.total_dicetak > 0
+      ? Math.round(
+          (data.total_dipanggil / data.total_dicetak) * 100
+        )
+      : 0
 
   // Data loket
   const loketData = data?.per_counter || []
 
-  // Data ringkasan jenis pasien
+  // Ringkasan jenis pasien
   const jenisPasien = data?.per_tombol || []
 
   // ================= STATISTIK PELAYANAN =================
@@ -164,27 +183,33 @@ export default function Dashboard() {
       const masuk = new Date(r.tanggal_insert.replace(' ', 'T'))
       const dipanggil = new Date(r.tanggal_panggil.replace(' ', 'T'))
 
-      return Math.max(0, Math.round((dipanggil - masuk) / 60000))
+      return Math.max(
+        0,
+        Math.round((dipanggil - masuk) / 60000)
+      )
     })
 
-  const rataRataTunggu = waktuTunggu.length > 0
-    ? Math.round(
-      waktuTunggu.reduce((total, waktu) => total + waktu, 0) /
-      waktuTunggu.length
-    )
-    : 0
+  const rataRataTunggu =
+    waktuTunggu.length > 0
+      ? Math.round(
+          waktuTunggu.reduce((total, waktu) => total + waktu, 0) /
+            waktuTunggu.length
+        )
+      : 0
 
-  const waktuTungguTerlama = waktuTunggu.length > 0
-    ? Math.max(...waktuTunggu)
-    : 0
+  const waktuTungguTerlama =
+    waktuTunggu.length > 0
+      ? Math.max(...waktuTunggu)
+      : 0
 
-  const loketTeraktif = loketData.length > 0
-    ? [...loketData].sort(
-      (a, b) =>
-        Number(b.total_dilayani || 0) -
-        Number(a.total_dilayani || 0)
-    )[0]
-    : null
+  const loketTeraktif =
+    loketData.length > 0
+      ? [...loketData].sort(
+          (a, b) =>
+            Number(b.total_dilayani || 0) -
+            Number(a.total_dilayani || 0)
+        )[0]
+      : null
 
   const jumlahPerJam = {}
 
@@ -196,7 +221,6 @@ export default function Dashboard() {
     if (Number.isNaN(waktu.getTime())) return
 
     const jam = waktu.getHours()
-
     jumlahPerJam[jam] = (jumlahPerJam[jam] || 0) + 1
   })
 
@@ -211,68 +235,69 @@ export default function Dashboard() {
     ? jamTerpadatData[1]
     : 0
 
-  // Chart per jam (jam operasional 07:00–20:00, sesuaikan kalau perlu)
-  const jamOperasional = Array.from({ length: 14 }, (_, i) => i + 7)
+  // Chart per jam: 07:00–20:00
+  const jamOperasional = Array.from(
+    { length: 14 },
+    (_, i) => i + 7
+  )
 
   const chartData = jamOperasional.map((jam) => ({
     jam: `${String(jam).padStart(2, '0')}:00`,
-    jumlah: jumlahPerJam[jam] || 0
+    jumlah: jumlahPerJam[jam] || 0,
   }))
 
-  const maxJumlahPerJam = Math.max(1, ...chartData.map((d) => d.jumlah))
+  const maxJumlahPerJam = Math.max(
+    1,
+    ...chartData.map((d) => d.jumlah)
+  )
 
-  const jamPuncakIndex = maxJumlahPerJam > 0
-    ? chartData.reduce((maxIdx, d, i, arr) => (d.jumlah > arr[maxIdx].jumlah ? i : maxIdx), 0)
-    : -1
+  const jamPuncakIndex =
+    maxJumlahPerJam > 0
+      ? chartData.reduce(
+          (maxIdx, d, i, arr) =>
+            d.jumlah > arr[maxIdx].jumlah ? i : maxIdx,
+          0
+        )
+      : -1
 
   // Rata-rata waktu tunggu per loket
   const waktuTungguPerLoket = {}
 
   riwayat
-    .filter((r) => r.tanggal_insert && r.tanggal_panggil && r.counter_nama)
+    .filter(
+      (r) =>
+        r.tanggal_insert &&
+        r.tanggal_panggil &&
+        r.counter_nama
+    )
     .forEach((r) => {
       const masuk = new Date(r.tanggal_insert.replace(' ', 'T'))
       const dipanggil = new Date(r.tanggal_panggil.replace(' ', 'T'))
-      const menit = Math.max(0, Math.round((dipanggil - masuk) / 60000))
+
+      const menit = Math.max(
+        0,
+        Math.round((dipanggil - masuk) / 60000)
+      )
 
       if (!waktuTungguPerLoket[r.counter_nama]) {
         waktuTungguPerLoket[r.counter_nama] = []
       }
+
       waktuTungguPerLoket[r.counter_nama].push(menit)
     })
 
   function rataRataPerLoket(namaLoket) {
     const list = waktuTungguPerLoket[namaLoket]
+
     if (!list || list.length === 0) return null
-    return Math.round(list.reduce((a, b) => a + b, 0) / list.length)
+
+    return Math.round(
+      list.reduce((a, b) => a + b, 0) / list.length
+    )
   }
 
   return (
     <div>
-
-      {/* PAGE INTRO — sama dengan halaman Loket & Overview */}
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">
-            <BarChart3 size={15} />
-            PANEL PETUGAS
-          </div>
-
-          <h1 className="page-intro__title">
-            Dashboard Antrian
-          </h1>
-
-          <p className="page-intro__subtitle">
-            Pantau statistik, riwayat, dan performa pelayanan antrian pasien secara real-time.
-          </p>
-        </div>
-
-        <div className="page-intro__status">
-          <span />
-          Data diperbarui otomatis
-        </div>
-      </div>
-
       {error && (
         <div className="error-banner">
           {error}
@@ -315,11 +340,13 @@ export default function Dashboard() {
           Export PDF
         </button>
 
+        <div className="page-intro__status">
+          <span />
+          Data diperbarui otomatis
+        </div>
+
         {lastUpdate && (
-          <span
-            className="muted"
-            style={{ fontSize: 12 }}
-          >
+          <span className="muted muted--sm">
             Diperbarui {lastUpdate.toLocaleTimeString('id-ID')}
           </span>
         )}
@@ -327,98 +354,58 @@ export default function Dashboard() {
 
       {data && (
         <>
-          {/* ================= STATISTIK PELAYANAN ================= */}
+          {/* STATISTIK PELAYANAN */}
           <div className="grid stat-grid">
-            {/* RATA-RATA WAKTU TUNGGU */}
-            <div className="stat-card">
-              <div className="stat-card__label">
-                Rata-rata Waktu Tunggu
-              </div>
+            <StatCard
+              label="Rata-rata Waktu Tunggu"
+              value={`${rataRataTunggu} menit`}
+              description={`${waktuTunggu.length} data pemanggilan`}
+            />
 
-              <div className="stat-card__value">
-                {rataRataTunggu}
-                <span style={{ fontSize: 16, marginLeft: 5 }}>
-                  menit
-                </span>
-              </div>
+            <StatCard
+              label="Waktu Tunggu Terlama"
+              value={`${waktuTungguTerlama} menit`}
+              description="Waktu tunggu sebelum dipanggil"
+            />
 
-              <div className="muted" style={{ fontSize: 12 }}>
-                Dari ambil nomor sampai dipanggil
-              </div>
-            </div>
+            <StatCard
+              label="Loket Teraktif"
+              value={loketTeraktif?.nama || '-'}
+              description={`${Number(
+                loketTeraktif?.total_dilayani || 0
+              )} pasien dilayani`}
+            />
 
-            {/* WAKTU TUNGGU TERLAMA */}
-            <div className="stat-card">
-              <div className="stat-card__label">
-                Waktu Tunggu Terlama
-              </div>
-
-              <div className="stat-card__value">
-                {waktuTungguTerlama}
-                <span style={{ fontSize: 16, marginLeft: 5 }}>
-                  menit
-                </span>
-              </div>
-
-              <div className="muted" style={{ fontSize: 12 }}>
-                Waktu tunggu paling lama
-              </div>
-            </div>
-
-            {/* LOKET TERAKTIF */}
-            <div className="stat-card">
-              <div className="stat-card__label">
-                Loket Teraktif
-              </div>
-
-              <div className="stat-card__value">
-                {loketTeraktif?.nama || '-'}
-              </div>
-
-              <div className="muted" style={{ fontSize: 12 }}>
-                {loketTeraktif
-                  ? `${loketTeraktif.total_dilayani} pasien dilayani`
-                  : 'Belum ada pelayanan'}
-              </div>
-            </div>
-
-            {/* JAM TERPADAT */}
-            <div className="stat-card">
-              <div className="stat-card__label">
-                Jam Terpadat
-              </div>
-
-              <div className="stat-card__value">
-                {jamTerpadat}
-              </div>
-
-              <div className="muted" style={{ fontSize: 12 }}>
-                {jumlahJamTerpadat > 0
-                  ? `${jumlahJamTerpadat} pasien dipanggil`
-                  : 'Belum ada pemanggilan'}
-              </div>
-            </div>
+            <StatCard
+              label="Jam Terpadat"
+              value={jamTerpadat}
+              description={`${jumlahJamTerpadat} pasien dipanggil`}
+            />
           </div>
 
           <div className="dashboard-2col">
             {/* KOLOM KIRI */}
             <div className="dashboard-2col__column">
-
               {/* PERSENTASE SELESAI */}
-              <div className="stat-card stat-card">
-                <div className="stat-card__label">Persentase Selesai</div>
-                <div className="stat-card__pct">{persenSelesai}%</div>
-                <div className="progress-bar">
-                  <div className="progress-bar__fill" style={{ width: `${persenSelesai}%` }} />
+              <div className="stat-card">
+                <div className="stat-card__label">
+                  Persentase Selesai
                 </div>
-                <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-                  {data.total_dipanggil} dari {data.total_dicetak} nomor dipanggil
+
+                <div className="stat-card__pct">
+                  {persenSelesai}%
+                </div>
+
+                <div className="progress-bar">
+                  <div
+                    className="progress-bar__fill"
+                    style={{ width: `${persenSelesai}%` }}
+                  />
                 </div>
               </div>
 
-              {/* ================= RINGKASAN JENIS PASIEN ================= */}
+              {/* RINGKASAN JENIS PASIEN */}
               <div className="card jenis-pasien-card">
-
                 <p className="jenis-pasien-title">
                   Ringkasan Jenis Pasien
                 </p>
@@ -434,44 +421,34 @@ export default function Dashboard() {
                       </div>
 
                       <div className="jenis-pasien-stats">
-
                         <div>
                           <div className="jenis-pasien-label">
                             Diambil
                           </div>
-                          <strong>
-                            {t.total_dicetak}
-                          </strong>
+                          <strong>{t.total_dicetak}</strong>
                         </div>
 
                         <div>
                           <div className="jenis-pasien-label">
                             Dipanggil
                           </div>
-                          <strong>
-                            {t.total_dipanggil}
-                          </strong>
+                          <strong>{t.total_dipanggil}</strong>
                         </div>
 
                         <div>
                           <div className="jenis-pasien-label">
                             Sisa
                           </div>
-                          <strong>
-                            {t.sisa}
-                          </strong>
+                          <strong>{t.sisa}</strong>
                         </div>
-
                       </div>
                     </div>
                   ))}
                 </div>
-
               </div>
 
-              {/* ================= PER LOKET ================= */}
+              {/* PER LOKET */}
               <div className="card loket-card">
-
                 <div className="loket-header">
                   <div>
                     <p className="loket-title">
@@ -485,51 +462,111 @@ export default function Dashboard() {
                     const rataRata = rataRataPerLoket(c.nama)
 
                     return (
-                      <div key={c.counter_id} className="loket-item">
+                      <div
+                        key={c.counter_id}
+                        className="loket-item"
+                      >
                         <div className="loket-item__content">
                           <div>
-                            <div className="loket-item__label">LOKET</div>
-                            <strong className="loket-item__name">{c.nama}</strong>
+                            <div className="loket-item__label">
+                              LOKET
+                            </div>
+                            <strong className="loket-item__name">
+                              {c.nama}
+                            </strong>
                           </div>
 
                           <div className="loket-item__total">
-                            <div className="loket-item__label">DILAYANI</div>
-                            <strong className="loket-item__number">{c.total_dilayani}</strong>
+                            <div className="loket-item__label">
+                              DILAYANI
+                            </div>
+                            <strong className="loket-item__number">
+                              {c.total_dilayani}
+                            </strong>
                           </div>
                         </div>
 
                         <div className="loket-item__wait">
-                          <span className="loket-item__wait-label">Rata-rata tunggu</span>
+                          <span className="loket-item__wait-label">
+                            Rata-rata tunggu
+                          </span>
                           <span className="loket-item__wait-value">
-                            {rataRata !== null ? `${rataRata} menit` : '-'}
+                            {rataRata !== null
+                              ? `${rataRata} menit`
+                              : '-'}
                           </span>
                         </div>
                       </div>
                     )
                   })}
                 </div>
-
               </div>
             </div>
 
+            {/* KOLOM KANAN */}
             <div className="dashboard-2col__column">
-              {/* ================= DISTRIBUSI PER JAM ================= */}
+              {/* DISTRIBUSI PER JAM */}
               <div className="card jam-chart-card">
-                <p className="jam-chart-title">Distribusi Pemanggilan per Jam</p>
+                <p className="jam-chart-title">
+                  Distribusi Pemanggilan per Jam
+                </p>
+
                 <span className="jam-chart-subtitle">
                   Jumlah pasien dipanggil tiap jam pada tanggal ini
                 </span>
 
-                <div style={{ marginTop: 16, width: '100%', flex: 1, minHeight: 220 }}>
+                <div className="jam-chart-body">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-soft)" />
-                      <XAxis dataKey="jam" tick={{ fontSize: 10, fill: 'var(--muted)' }} axisLine={{ stroke: 'var(--border-soft)' }} tickLine={false} />
-                      <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: 'var(--muted)' }} axisLine={false} tickLine={false} />
-                      <Tooltip formatter={(value) => [`${value} pasien`, 'Dipanggil']} labelFormatter={(label) => `Jam ${label}`} />
-                      <Bar dataKey="jumlah" radius={[6, 6, 0, 0]}>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="var(--border-soft)"
+                      />
+
+                      <XAxis
+                        dataKey="jam"
+                        tick={{
+                          fontSize: 10,
+                          fill: 'var(--muted)',
+                        }}
+                        axisLine={{
+                          stroke: 'var(--border-soft)',
+                        }}
+                        tickLine={false}
+                      />
+
+                      <YAxis
+                        allowDecimals={false}
+                        tick={{
+                          fontSize: 10,
+                          fill: 'var(--muted)',
+                        }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+
+                      <Tooltip
+                        formatter={(value) => [
+                          `${value} pasien`,
+                          'Dipanggil',
+                        ]}
+                        labelFormatter={(label) => `Jam ${label}`}
+                      />
+
+                      <Bar
+                        dataKey="jumlah"
+                        radius={[6, 6, 0, 0]}
+                      >
                         {chartData.map((entry, index) => (
-                          <Cell key={index} fill={index === jamPuncakIndex ? 'var(--warning)' : 'var(--primary)'} />
+                          <Cell
+                            key={index}
+                            fill={
+                              index === jamPuncakIndex
+                                ? 'var(--warning)'
+                                : 'var(--primary)'
+                            }
+                          />
                         ))}
                       </Bar>
                     </BarChart>
@@ -539,22 +576,15 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ================= RIWAYAT ================= */}
-          <div
-            className="card"
-            style={{ marginTop: 24 }}
-          >
-            <div style={{ marginBottom: 16 }}>
-              <p className="section-title" style={{ marginBottom: 4 }}>
+          {/* RIWAYAT */}
+          <div className="card dashboard-history-card">
+            <div className="dashboard-history-header">
+              <p className="section-title dashboard-history-title">
                 Riwayat Pemanggilan
               </p>
-
-              <span className="muted" style={{ fontSize: 12 }}>
-                Daftar nomor yang sudah dipanggil pada tanggal ini
-              </span>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            <div className="data-table-scroll">
               <table className="data-table">
                 <thead>
                   <tr>
@@ -574,39 +604,20 @@ export default function Dashboard() {
                       <td>{index + 1}</td>
 
                       <td>
-                        <strong>
-                          {r.nomor}
-                        </strong>
+                        <strong>{r.nomor}</strong>
                       </td>
 
-                      <td>
-                        {r.jenis_pasien}
-                      </td>
-
-                      <td>
-                        {r.counter_nama}
-                      </td>
-
-                      <td>
-                        {r.status}
-                      </td>
-
-                      <td>
-                        {formatTanggalWaktu(r.tanggal_insert)}
-                      </td>
-
-                      <td>
-                        {formatTanggalWaktu(r.tanggal_panggil)}
-                      </td>
+                      <td>{r.jenis_pasien}</td>
+                      <td>{r.counter_nama}</td>
+                      <td>{r.status}</td>
+                      <td>{formatTanggalWaktu(r.tanggal_insert)}</td>
+                      <td>{formatTanggalWaktu(r.tanggal_panggil)}</td>
                     </tr>
                   ))}
 
                   {riwayat.length === 0 && (
                     <tr>
-                      <td
-                        colSpan={7}
-                        className="muted"
-                      >
+                      <td colSpan={7} className="muted">
                         Belum ada riwayat pemanggilan pada tanggal ini.
                       </td>
                     </tr>

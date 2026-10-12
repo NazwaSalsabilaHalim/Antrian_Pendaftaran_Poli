@@ -3,6 +3,9 @@
   Panel Admin IT.
 */
 
+import { useEffect } from 'react'
+import { AlertCircle, CheckCircle2 } from 'lucide-react'
+
 export function StatCard({ label, value, description }) {
   return (
     <div className="stat-card">
@@ -32,6 +35,60 @@ export function StatusBadge({ status }) {
   }
 
   return <span className={className}>{status}</span>
+}
+
+// [BARU] Notifikasi kecil (berhasil / gagal), hilang sendiri.
+// toast = { type: 'success' | 'error', text } atau null
+export function Toast({ toast, onClose, duration = 4000 }) {
+  useEffect(() => {
+    if (!toast) return
+    const id = setTimeout(onClose, duration)
+    return () => clearTimeout(id)
+  }, [toast])
+
+  if (!toast) return null
+
+  const Icon = toast.type === 'error' ? AlertCircle : CheckCircle2
+
+  return (
+    <div
+      className={`it-toast it-toast--${toast.type}`}
+      role={toast.type === 'error' ? 'alert' : 'status'}
+    >
+      <Icon size={18} strokeWidth={2} />
+      <span>{toast.text}</span>
+
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Tutup"
+        className="it-toast__close"
+      >
+        ×
+      </button>
+    </div>
+  )
+}
+
+// [BARU] Tab untuk halaman gabungan.
+// tabs = [{ key, label }], active = key tab aktif, onChange(key)
+export function Tabs({ tabs, active, onChange }) {
+  return (
+    <div className="it-tabs" role="tablist">
+      {tabs.map(({ key, label }) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          aria-selected={active === key}
+          className={'it-tabs__tab' + (active === key ? ' is-active' : '')}
+          onClick={() => onChange(key)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export function Modal({
@@ -102,14 +159,6 @@ export function FieldWrap({ icon: Icon, children }) {
       {children}
     </div>
   )
-}
-
-export function fieldStyle(hasIcon = false) {
-  return {
-    // Untuk sementara tetap return object agar tidak merusak
-    // pemanggilan lama.
-    // Akan kita hapus setelah semua JSX diganti ke className.
-  }
 }
 
 export function RowActions({ onEdit, onDelete }) {

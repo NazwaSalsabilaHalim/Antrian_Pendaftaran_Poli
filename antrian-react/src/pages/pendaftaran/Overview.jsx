@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import { useInterval } from '../../hooks/useInterval'
-import { MonitorPlay } from 'lucide-react'
+import { Users } from 'lucide-react'
 
 const POLL_MS = 5000
 const ACCENTS = ['accent-a', 'accent-b', 'accent-c', 'accent-d']
@@ -22,25 +22,6 @@ export default function Overview() {
 
   return (
     <div>
-
-      {/* PAGE INTRO — sama dengan halaman Loket & Dashboard */}
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">
-            <MonitorPlay size={15} />
-            PANEL PETUGAS
-          </div>
-
-          <h1 className="page-intro__title">
-            Monitor Antrian
-          </h1>
-
-          <p className="page-intro__subtitle">
-            Pantau nomor yang sedang dilayani dan daftar tunggu tiap loket secara langsung.
-          </p>
-        </div>
-
-      </div>
 
       {error && <div className="error-banner">{error}</div>}
 
@@ -68,7 +49,7 @@ export default function Overview() {
         ))}
       </div>
 
-      <h2 className="section-title" style={{ marginTop: 32 }}>Menunggu</h2>
+      <h2 className="section-title section-title--spaced">Menunggu</h2>
       <div className="waiting-grid">
         {data?.waiting.map((w) => (
           <div key={w.tombol_id} className="waiting-col">

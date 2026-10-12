@@ -7,7 +7,7 @@ export default function NurseLayout() {
   const izin = getNurseIzin()
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="nurse-layout-shell">
       <DataDokter
         izin={{
           tambah: !!izin.dokter_tambah,
@@ -22,7 +22,6 @@ export default function NurseLayout() {
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline"
-              style={{ textDecoration: 'none' }}
             >
               Layar TV Poli ↗
             </a>

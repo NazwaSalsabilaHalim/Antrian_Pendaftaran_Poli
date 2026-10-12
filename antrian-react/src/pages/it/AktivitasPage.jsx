@@ -1,45 +1,31 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
+import { Toast } from '../../components/it/ITComponents'
 
 export default function AktivitasPage() {
   const [aktivitas, setAktivitas] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [toast, setToast] = useState(null)
 
   useEffect(() => {
     api.getAktivitas(50)
-      .then((res) => {
-        setAktivitas(res.aktivitas || [])
-        setError('')
-      })
-      .catch((e) => setError(e.message))
+      .then((res) => setAktivitas(res.aktivitas || []))
+      .catch((e) => setToast({ type: 'error', text: e.message }))
       .finally(() => setLoading(false))
   }, [])
 
   return (
     <>
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">LOG SISTEM</div>
-          <h1 className="page-intro__title">Aktivitas Sistem</h1>
-          <p className="page-intro__subtitle">
-            Riwayat aktivitas pengguna pada sistem
-          </p>
-        </div>
-      </div>
-
-      {error && <div className="error-banner">{error}</div>}
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card">
         <div className="section-header">
           <p className="section-title management-section-title">
-            Riwayat Aktivitas
+            {loading ? 'Memuat data...' : `${aktivitas.length} aktivitas terakhir`}
           </p>
         </div>
 
-        {loading ? (
-          <div className="empty-state">Memuat data...</div>
-        ) : (
+        {!loading && (
           <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
@@ -62,7 +48,11 @@ export default function AktivitasPage() {
                 ))}
 
                 {aktivitas.length === 0 && (
-                  <tr><td colSpan={4} className="empty-state">Belum ada aktivitas tercatat.</td></tr>
+                  <tr>
+                    <td colSpan={4} className="empty-state">
+                      Belum ada aktivitas tercatat.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

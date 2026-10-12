@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
+import { Toast } from '../../components/it/ITComponents'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -9,37 +10,27 @@ export default function AntrianPage() {
   const [tanggal, setTanggal] = useState(todayStr())
   const [riwayat, setRiwayat] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [toast, setToast] = useState(null)
 
   function load() {
     setLoading(true)
+
     api.getRiwayat(`tanggal=${tanggal}`)
-      .then((res) => {
-        setRiwayat(res.riwayat || [])
-        setError('')
-      })
-      .catch((e) => setError(e.message))
+      .then((res) => setRiwayat(res.riwayat || []))
+      .catch((e) => setToast({ type: 'error', text: e.message }))
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [tanggal])
+  useEffect(() => {
+    load()
+  }, [tanggal])
 
   return (
     <>
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">DATA ANTRIAN</div>
-          <h1 className="page-intro__title">Data Antrian</h1>
-          <p className="page-intro__subtitle">
-            Melihat seluruh data antrian berdasarkan tanggal
-          </p>
-        </div>
-      </div>
-
-      {error && <div className="error-banner">{error}</div>}
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card_loket-header card_loket-header--date">
-  <label htmlFor="tanggal" className="muted">Tanggal:</label>
+        <label htmlFor="tanggal" className="muted">Tanggal:</label>
 
         <input
           id="tanggal"
@@ -56,13 +47,11 @@ export default function AntrianPage() {
       <div className="card">
         <div className="section-header">
           <p className="section-title management-section-title">
-            Daftar Antrian
+            {loading ? 'Memuat data...' : `${riwayat.length} antrian`}
           </p>
         </div>
 
-        {loading ? (
-          <div className="empty-state">Memuat data...</div>
-        ) : (
+        {!loading && (
           <div className="management-table-wrapper">
             <table className="data-table">
               <thead>
@@ -87,7 +76,11 @@ export default function AntrianPage() {
                 ))}
 
                 {riwayat.length === 0 && (
-                  <tr><td colSpan={5} className="empty-state">Belum ada antrian pada tanggal ini.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="empty-state">
+                      Belum ada antrian pada tanggal ini.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
