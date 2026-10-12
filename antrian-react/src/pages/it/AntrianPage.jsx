@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import { Toast } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
+import { RefreshCw } from 'lucide-react'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -21,16 +22,29 @@ export default function AntrianPage() {
     paginatedItems: paginatedRiwayat,
   } = usePagination(riwayat, 10)
 
-  function load() {
+  function load(tgl = tanggal, withToast = false) {
     setLoading(true)
 
-    api.getRiwayat(`tanggal=${tanggal}`)
+    api.getRiwayat(`tanggal=${tgl}`)
       .then((res) => {
         setRiwayat(res.riwayat || [])
         setCurrentPage(1)
+        if (withToast) {
+          setToast({ type: 'success', text: 'Data antrian diperbarui.'})
+        }
       })
       .catch((e) => setToast({ type: 'error', text: e.message }))
       .finally(() => setLoading(false))
+  }
+
+  function handleRefresh() {
+    const today = todayStr()
+
+    if (tanggal !== today) {
+      setTanggal(today)
+    } else {
+      load(today, true)
+    }
   }
 
   useEffect(() => {
@@ -52,8 +66,14 @@ export default function AntrianPage() {
             onChange={(e) => setTanggal(e.target.value)}
           />
 
-          <button className="btn btn-outline" onClick={load}>
-            Refresh
+          <button
+            type="button"
+            className="doctor-refresh-button"
+            onClick={handleRefresh}
+            disabled={loading}
+          >
+            <RefreshCw size={16} className={loading ? 'loading-spin' : ''} />
+            <span>Refresh</span>
           </button>
 
           {!loading && (

@@ -30,6 +30,14 @@ const EMPTY_FORM = {
   Status: '',
 }
 
+function isDokterNonaktif(doctor) {
+  const label = String(doctor.NamaStatus ?? doctor.Status ?? '')
+    .trim()
+    .toLowerCase()
+
+  return label !== '' && label !== 'aktif'
+}
+
 const IZIN_PENUH = { tambah: true, edit: true, hapus: true, kosongkan: true }
 
 export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
@@ -74,11 +82,19 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       const result = await api.getDoctors(params.toString())
       setDoctors(Array.isArray(result.data) ? result.data : [])
       setCurrentPage(1)
+      return true
     } catch (err) {
       setError(err.message || 'Gagal memuat data dokter.')
+      return false
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleRefresh() {
+    setSearch('')
+    setDisplay('')
+    const ok = await fetchDoctors('', '')
   }
 
   async function fetchStatuses() {
@@ -328,7 +344,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
             <button
               type="button"
               className="doctor-refresh-button"
-              onClick={() => fetchDoctors(search, display)}
+              onClick={handleRefresh}
               disabled={loading}
             >
               <RefreshCw size={16} className={loading ? 'loading-spin' : ''} />
@@ -458,7 +474,10 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                     </td>
 
                     <td>
-                      <span className="doctor-status-badge">
+                      <span
+                        className={`doctor-status-badge${isDokterNonaktif(doctor) ? ' doctor-status-badge--off' : ''
+                          }`}
+                      >
                         {doctor.NamaStatus || doctor.Status || '—'}
                       </span>
                     </td>

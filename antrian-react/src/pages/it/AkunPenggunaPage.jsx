@@ -368,7 +368,9 @@ function HakAksesTab() {
     api.getNurse()
       .then((res) => {
         setNurses(
-          (res.petugas || []).map((n) => ({
+          (res.petugas || [])
+          .filter((n) => n.status === 'Aktif')
+          .map((n) => ({
             ...n,
             hak_akses: n.hak_akses || {},
           }))
@@ -453,7 +455,7 @@ function HakAksesTab() {
                 {nurses.length === 0 && (
                   <tr>
                     <td colSpan={IZIN.length + 2} className="empty-state">
-                      Belum ada akun nurse.
+                      Belum ada akun nurse aktif.
                     </td>
                   </tr>
                 )}

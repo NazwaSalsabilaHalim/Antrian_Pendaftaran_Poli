@@ -77,7 +77,7 @@ export default function ITDashboardOverview() {
             rel="noreferrer"
             className="it-welcome-btn"
           >
-            <Stethoscope size={16} />
+            <Tv size={16} />
             <span>Layar TV Poli</span>
             <span aria-hidden="true">↗</span>
           </a>

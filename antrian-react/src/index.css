@@ -614,7 +614,9 @@ button {
 }
 
 /* Tab Antrean Dokter: ringkas supaya muat satu layar */
-.poli-tab-embed .antrean-page .page-intro { display: none; }
+.poli-tab-embed .antrean-page .page-intro {
+  display: none;
+}
 
 .poli-tab-embed .antrean-profile-col {
   display: flex;
@@ -622,7 +624,9 @@ button {
   gap: 16px;
 }
 
-.poli-tab-embed .antrean-number-box { padding: 18px 24px; }
+.poli-tab-embed .antrean-number-box {
+  padding: 18px 24px;
+}
 
 .poli-tab-embed .antrean-number-digit {
   font-size: 72px;
@@ -1068,9 +1072,11 @@ input:focus {
 }
 
 .antrean-manual-submit {
-  padding: 11px 22px;
-  font-size: 14px;
+  padding: 8px 16px;
+  font-size: 13px;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .antrean-tv-link,
@@ -4863,6 +4869,11 @@ table.data-table {
   font-size: 10px;
 }
 
+.doctor-status-badge--off {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
 /* ---------- Empty, error, footer & loading ---------- */
 
 .doctor-empty-icon {
@@ -5672,21 +5683,21 @@ table.data-table {
 .antrean-manual-box {
   background: var(--surface-soft);
   border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 14px 16px;
 }
 
 .antrean-manual-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .antrean-manual-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: var(--primary-soft);
   color: var(--primary);
   display: flex;
@@ -5697,13 +5708,13 @@ table.data-table {
 
 .antrean-manual-title {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text);
 }
 
 .antrean-manual-sub {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-soft);
 }
 
@@ -5714,13 +5725,14 @@ table.data-table {
 
 .antrean-manual-input {
   flex: 1;
-  padding: 11px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text);
   outline: none;
+  min-width: 0;
 }
 
 .antrean-manual-input:focus {
@@ -5862,7 +5874,7 @@ table.data-table {
   border-bottom-right-radius: inherit;
 }
 
-.card > .table-pagination {
+.card>.table-pagination {
   margin: 16px -22px -22px -22px;
   padding: 16px 22px;
   border-radius: 0 0 var(--card-radius) var(--card-radius);
