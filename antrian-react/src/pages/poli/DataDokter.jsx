@@ -11,11 +11,11 @@ import {
   Save,
   ImagePlus,
   CheckCircle2,
-  AlertCircle,
   UserCog,
   RotateCcw,
 } from 'lucide-react'
 import { api } from '../../api/client'
+import { Toast } from '../../components/it/ITComponents'
 
 const EMPTY_FORM = {
   AID: '',
@@ -249,6 +249,12 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     }
   }
 
+  const toast = error
+    ? { type: 'error', text: error }
+    : message
+      ? { type: 'success', text: message }
+      : null
+
   return (
     <div className="doctors-page">
       {/* PAGE INTRO — Selaras dengan Pendaftaran */}
@@ -303,29 +309,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
         </div>
       </div>
 
-      {/* FEEDBACK NOTIFICATIONS */}
-      {(error || message) && (
-        <div
-          className={`doctor-feedback ${error ? 'is-error' : 'is-success'}`}
-          role={error ? 'alert' : 'status'}
-        >
-          <div className="doctor-feedback__body">
-            {error ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
-            <span>{error || message}</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setError('')
-              setMessage('')
-            }}
-            aria-label="Tutup pesan"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
+      <Toast toast={toast} onClose={() => { setError(''); setMessage('') }} />
 
       {/* TABLE PANEL */}
       <div className="doctor-table-panel">

@@ -4,6 +4,7 @@ import {
   StatCard,
   StatusBadge,
 } from '../../components/it/ITComponents'
+import { Tv, Stethoscope } from 'lucide-react'
 
 export default function ITDashboardOverview() {
   const [data, setData] = useState(null)
@@ -35,18 +36,44 @@ export default function ITDashboardOverview() {
     <>
       {/* Welcome Banner */}
       <div className="card it-dashboard-welcome">
-        <div className="it-dashboard-welcome__label">
-          SISTEM INFORMASI ANTRIAN
+        <div className="it-dashboard-welcome__text">
+          <div className="it-dashboard-welcome__label">
+            SISTEM INFORMASI ANTRIAN
+          </div>
+
+          <h2 className="it-dashboard-welcome__title">
+            Selamat Datang, Administrator
+          </h2>
+
+          <p className="it-dashboard-welcome__description">
+            Pantau dan kelola sistem antrian pendaftaran
+            dari satu halaman.
+          </p>
         </div>
 
-        <h2 className="it-dashboard-welcome__title">
-          Selamat Datang, Administrator
-        </h2>
+        <div className="it-dashboard-welcome__actions">
+          <a
+            href="/display"
+            target="_blank"
+            rel="noreferrer"
+            className="it-welcome-btn"
+          >
+            <Tv size={16} />
+            <span>Layar TV Pendaftaran</span>
+            <span aria-hidden="true">↗</span>
+          </a>
 
-        <p className="it-dashboard-welcome__description">
-          Pantau dan kelola sistem antrian pendaftaran
-          dari satu halaman.
-        </p>
+          <a
+            href="/poli/display"
+            target="_blank"
+            rel="noreferrer"
+            className="it-welcome-btn"
+          >
+            <Stethoscope size={16} />
+            <span>Layar TV Poli</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </div>
 
       {/* Error */}

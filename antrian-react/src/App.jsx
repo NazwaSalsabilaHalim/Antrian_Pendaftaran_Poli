@@ -41,6 +41,7 @@ import AkunPenggunaPage from './pages/it/AkunPenggunaPage'
 import PengaturanAntrianPage from './pages/it/PengaturanAntrianPage'
 import AntrianPage from './pages/it/AntrianPage'
 import AktivitasPage from './pages/it/AktivitasPage'
+import AntreanPoliPage from './pages/it/AntreanPoliPage'
 
 // Judul topbar untuk halaman pendaftaran (petugas)
 const PENDAFTARAN_INFO = {
@@ -127,9 +128,11 @@ export default function App() {
         <Route path="pendaftaran/loket" element={<Loket />} />
         <Route path="pendaftaran/dashboard" element={<Dashboard />} />
 
-        {/* Poliklinik (dilihat dari admin) */}
-        <Route path="poli/antrean" element={<KelolaAntrean />} />
-        <Route path="poli/dokter" element={<DataDokter />} />
+        {/* Poliklinik (dilihat dari admin) - tab: antrean, dokter */}
+        <Route path="poli/antrean" element={<AntreanPoliPage />} />
+
+        {/* URL lama -> diarahkan ke tab Data Dokter */}
+        <Route path="poli/dokter" element={<Navigate to="/it-dashboard/poli/antrean?tab=dokter" replace />} />
       </Route>
 
       {/* =====================================================

@@ -606,6 +606,40 @@ button {
   box-sizing: border-box;
 }
 
+.poli-tab-embed .loket-page,
+.poli-tab-embed .doctors-page {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
+/* Tab Antrean Dokter: ringkas supaya muat satu layar */
+.poli-tab-embed .antrean-page .page-intro { display: none; }
+
+.poli-tab-embed .antrean-profile-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.poli-tab-embed .antrean-number-box { padding: 18px 24px; }
+
+.poli-tab-embed .antrean-number-digit {
+  font-size: 72px;
+  line-height: 1;
+}
+
+.poli-tab-embed .antrean-btn-prev,
+.poli-tab-embed .antrean-btn-next {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  min-height: 0;
+}
+
+.poli-tab-embed .antrean-page .page-intro,
+.poli-tab-embed .doctors-page .page-intro {
+  display: none;
+}
 
 /* =========================================================
    KOMPONEN UMUM
@@ -1936,10 +1970,6 @@ table.data-table {
 /* =========================================================
    HALAMAN LOKET (PETUGAS)
    ========================================================= */
-
-.loket-page {
-  max-width: 1400px;
-}
 
 /* ---------- Error ---------- */
 
@@ -4407,7 +4437,7 @@ table.data-table {
    IT DASHBOARD OVERVIEW
    ========================================================= */
 
-.shell__content .it-dashboard-welcome {
+/* .shell__content .it-dashboard-welcome {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: #ffffff;
   margin-bottom: 24px;
@@ -4430,6 +4460,65 @@ table.data-table {
   margin: 0;
   font-size: 13px;
   opacity: 0.9;
+} */
+
+.shell__content .it-dashboard-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 18px 28px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+}
+
+.it-dashboard-welcome__label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.it-dashboard-welcome__title {
+  margin: 4px 0 4px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.it-dashboard-welcome__description {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.it-dashboard-welcome__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.it-welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.it-welcome-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
 }
 
 .it-dashboard-section-title {

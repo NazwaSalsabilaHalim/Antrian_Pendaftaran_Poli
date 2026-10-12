@@ -7,11 +7,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowDown,
-  CheckCircle2,
-  AlertCircle,
   Tv,
 } from 'lucide-react'
 import { api } from '../../../api/client'
+import { Toast } from '../../../components/it/ITComponents'
 
 function formatNomor(value) {
   if (value === null || value === undefined || value === '') {
@@ -170,6 +169,11 @@ export default function KelolaAntrean() {
   }
 
   const selectedDoctor = doctors.find((item) => String(item.AID) === aid)
+  const toast = error
+    ? { type: 'error', text: error }
+    : success
+      ? { type: 'success', text: success }
+      : null
 
   return (
     <div className="loket-page antrean-page">
@@ -196,20 +200,7 @@ export default function KelolaAntrean() {
         </div>
       </div>
 
-      {/* NOTIFIKASI ERROR & SUCCESS */}
-      {error && (
-        <div className="error-banner antrean-error-banner">
-          <AlertCircle size={18} />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {success && (
-        <div className="antrean-success-banner">
-          <CheckCircle2 size={18} />
-          <span>{success}</span>
-        </div>
-      )}
+      <Toast toast={toast} onClose={() => { setError(''); setSuccess('') }} />
 
       {!doctor ? (
         /* ================= TAMPILAN LOGIN DOKTER ================= */
@@ -379,6 +370,44 @@ export default function KelolaAntrean() {
                 </button>
               </div>
             </div>
+
+            {/* Atur Nomor Manual */}
+            <div className="antrean-manual-box">
+              <div className="antrean-manual-header">
+                <div className="antrean-manual-icon">
+                  <ArrowDown size={16} />
+                </div>
+                <div>
+                  <h4 className="antrean-manual-title">
+                    Atur Nomor Antrean Manual
+                  </h4>
+                  <span className="antrean-manual-sub">
+                    Gunakan jika ingin melompati atau mereset nomor antrean secara langsung.
+                  </span>
+                </div>
+              </div>
+
+              <form onSubmit={handleManual} className="antrean-manual-form">
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={nomorManual}
+                  onChange={(e) => setNomorManual(e.target.value)}
+                  placeholder="Contoh: 5"
+                  disabled={processing}
+                  required
+                  className="antrean-manual-input"
+                />
+                <button
+                  type="submit"
+                  disabled={processing}
+                  className="btn btn-secondary antrean-manual-submit"
+                >
+                  {processing ? 'Menyimpan...' : 'Set Nomor'}
+                </button>
+              </form>
+            </div>
           </div>
 
           {/* SISI KANAN: Panel Kontrol Nomor Antrean */}
@@ -441,43 +470,7 @@ export default function KelolaAntrean() {
               </button>
             </div>
 
-            {/* Atur Nomor Manual */}
-            <div className="antrean-manual-box">
-              <div className="antrean-manual-header">
-                <div className="antrean-manual-icon">
-                  <ArrowDown size={16} />
-                </div>
-                <div>
-                  <h4 className="antrean-manual-title">
-                    Atur Nomor Antrean Manual
-                  </h4>
-                  <span className="antrean-manual-sub">
-                    Gunakan jika ingin melompati atau mereset nomor antrean secara langsung.
-                  </span>
-                </div>
-              </div>
 
-              <form onSubmit={handleManual} className="antrean-manual-form">
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  value={nomorManual}
-                  onChange={(e) => setNomorManual(e.target.value)}
-                  placeholder="Contoh: 5"
-                  disabled={processing}
-                  required
-                  className="antrean-manual-input"
-                />
-                <button
-                  type="submit"
-                  disabled={processing}
-                  className="btn btn-secondary antrean-manual-submit"
-                >
-                  {processing ? 'Menyimpan...' : 'Set Nomor'}
-                </button>
-              </form>
-            </div>
           </div>
         </div>
       )}
