@@ -41,26 +41,26 @@ export default function AntrianPage() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card_loket-header card_loket-header--date">
-        <label htmlFor="tanggal" className="muted">Tanggal:</label>
-
-        <input
-          id="tanggal"
-          type="date"
-          value={tanggal}
-          onChange={(e) => setTanggal(e.target.value)}
-        />
-
-        <button className="btn btn-outline" onClick={load}>
-          Refresh
-        </button>
-      </div>
-
       <div className="card">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {loading ? 'Memuat data...' : `${riwayat.length} antrian`}
-          </p>
+        <div className="table-toolbar">
+          <label htmlFor="tanggal" className="muted">Tanggal:</label>
+
+          <input
+            id="tanggal"
+            type="date"
+            value={tanggal}
+            onChange={(e) => setTanggal(e.target.value)}
+          />
+
+          <button className="btn btn-outline" onClick={load}>
+            Refresh
+          </button>
+
+          {!loading && (
+            <span className="muted table-toolbar__count">
+              {riwayat.length} antrian
+            </span>
+          )}
         </div>
 
         {!loading && (

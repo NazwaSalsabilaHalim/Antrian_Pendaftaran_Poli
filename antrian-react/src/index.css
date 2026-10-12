@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    DAFTAR ISI
 
     1. DESIGN TOKENS
@@ -599,7 +599,7 @@ button {
 .nurse-layout-shell,
 .poli-page-wrapper,
 .ambil-page {
-  padding: 24px 32px 48px;
+  padding: 24px 32px 24px;
   max-width: 1360px;
   margin: 0 auto;
   width: 100%;
@@ -1906,7 +1906,7 @@ table.data-table {
 }
 
 .data-table th {
-  padding: 14px 18px;
+  padding: 12px 18px;
   background: transparent;
   color: #ffffff;
   border: none;
@@ -1921,7 +1921,7 @@ table.data-table {
 /* ---------- Isi tabel ---------- */
 
 .data-table td {
-  padding: 14px 18px;
+  padding: 10px 18px;
   color: var(--text);
   background: var(--surface);
   border-bottom: 1px solid var(--border-soft);
@@ -4348,7 +4348,6 @@ table.data-table {
 }
 
 .management-table-wrapper {
-  max-height: 62vh;
   overflow: auto;
 }
 
@@ -4428,8 +4427,22 @@ table.data-table {
   font-weight: 400;
 }
 
-.card_loket-header--date {
-  margin-bottom: 20px;
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.table-toolbar input[type="date"] {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.table-toolbar__count {
+  margin-left: auto;
+  font-size: 12px;
 }
 
 
@@ -5945,4 +5958,4 @@ table.data-table {
   .table-pagination__btn-label {
     display: none;
   }
-}
+}
