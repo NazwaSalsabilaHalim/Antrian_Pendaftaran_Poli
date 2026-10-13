@@ -114,14 +114,6 @@ function upload_photo($file, $aid)
 
     /*
      * Folder foto sistem lama.
-     *
-     * Struktur:
-     *
-     * KP/
-     * ├── antripol/
-     * │   └── foto/
-     * └── api-antripol/
-     *     └── doctors.php
      */
     $photoDir = __DIR__ . '/../foto/';
 

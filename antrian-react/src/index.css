@@ -101,7 +101,7 @@
 
   /* ---------- Layout, font & kartu ---------- */
   --font-body: 'Inter', sans-serif;
-  --sidebar-width: 250px;
+  --sidebar-width: 230px;
   --card-radius: 18px;
   --card-radius-lg: 22px;
   --card-shadow: 0 6px 18px rgba(22, 45, 38, 0.06);
@@ -116,6 +116,24 @@
   --fs-eyebrow: 10px;
   --fs-section-title: 16px;
   --fs-tiny: 11px;
+
+  /* ---------- Skala tombol & chip ----------
+     Satu sumber ukuran untuk semua tombol (bisa diklik) dan
+     chip/badge (tidak bisa diklik), supaya bentuknya konsisten:
+     - Tombol = persegi membulat 10px, ada hover (naik sedikit).
+     - Chip   = pil bulat penuh, warna lembut, tanpa hover. */
+  --btn-h-sm: 34px;
+  --btn-h: 38px;
+  --btn-h-lg: 44px;
+  --btn-radius: 10px;
+  --btn-fs: 13px;
+  --btn-fs-lg: 14px;
+  --btn-px: 16px;
+
+  --chip-h: 26px;
+  --chip-px: 12px;
+  --chip-fs: 12px;
+  --chip-radius: 999px;
 }
 
 /* =========================================================
@@ -538,12 +556,13 @@ button {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 7px 11px;
-  border-radius: 20px;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--success-bg);
   color: #1c7a52;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--chip-fs);
+  font-weight: 600;
 }
 
 .topbar__live-dot {
@@ -701,14 +720,16 @@ input:focus {
 }
 
 .badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
   background: var(--primary-soft);
   color: var(--primary);
   border: 1px solid rgba(38, 142, 103, 0.14);
-  font-size: 12px;
+  font-size: var(--chip-fs);
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 999px;
+  padding: 2px var(--chip-px);
+  border-radius: var(--chip-radius);
 }
 
 .badge-success {
@@ -825,6 +846,10 @@ input:focus {
    - Sukses / peringatan / bahaya               = gradasi semantik
    - Aksi netral (refresh, batal, tutup)        = outline
    - Hapus                                      = outline merah
+
+   Ukuran (token di :root): kecil 34px (ikon, pagination, Edit/Hapus),
+   standar 38px (semua tombol), besar 44px (aksi utama & form).
+   Chip/badge (tidak bisa diklik) = pil bulat 26px, tanpa hover.
    ========================================================= */
 
 /* ---------- 1. Mesin dasar (default = primary) ---------- */
@@ -862,15 +887,16 @@ input:focus {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 17px;
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-px);
   border: 1px solid var(--btn-border);
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   background: var(--btn-bg);
   background-origin: border-box;
   color: var(--btn-color);
   box-shadow: var(--btn-shadow);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--btn-fs);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -1035,8 +1061,6 @@ input:focus {
 
 /* Soft (latar hijau muda, tanpa gradasi): tombol di bawah tiket Ambil Nomor */
 .ambil-ticket__bottom button {
-  padding: 11px 16px;
-  font-size: 12px;
   font-weight: 700;
   --btn-bg: var(--primary-soft);
   --btn-bg-hover: rgba(38, 142, 103, 0.16);
@@ -1048,32 +1072,22 @@ input:focus {
 
 /* ---------- 3. Ukuran & tata letak per konteks ---------- */
 
-/* Dashboard: tombol Refresh di filter tanggal */
-.card_loket-header .btn {
-  height: 46px;
-  padding: 0 24px;
-  border-radius: 12px;
-}
-
 /* Halaman Login & Kelola Antrean Dokter */
 .login-card .btn-primary {
   width: 100%;
-  padding: 13px;
-  font-size: 15px;
+  min-height: var(--btn-h-lg);
+  font-size: var(--btn-fs-lg);
   font-weight: 700;
 }
 
 .antrean-login-submit {
   width: 100%;
-  padding: 14px;
-  font-size: 15px;
+  min-height: var(--btn-h-lg);
+  font-size: var(--btn-fs-lg);
   font-weight: 700;
-  border-radius: 12px;
 }
 
 .antrean-manual-submit {
-  padding: 8px 16px;
-  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
@@ -1100,7 +1114,7 @@ input:focus {
   justify-content: center;
   padding: 16px;
   gap: 4px;
-  border-radius: 14px;
+  border-radius: var(--btn-radius);
 }
 
 .antrean-btn-prev {
@@ -1136,10 +1150,10 @@ input:focus {
 
 /* Loket: tombol Panggil / Ulang */
 .loket-btn {
-  height: 43px;
+  height: var(--btn-h-lg);
   gap: 8px;
-  padding: 0 16px;
-  font-size: 11px;
+  padding: 0 var(--btn-px);
+  font-size: var(--btn-fs);
   font-weight: 700;
 }
 
@@ -1151,22 +1165,13 @@ input:focus {
   min-width: 82px;
 }
 
-/* Data Dokter: tombol teks & tombol ikon */
-.doctor-add-button,
-.doctor-search-button,
-.doctor-refresh-button,
-.doctor-cancel-button {
-  min-height: 37px;
-  padding: 0 14px;
-  gap: 7px;
-  font-size: 13px;
-}
-
+/* Data Dokter: tombol ikon (ukuran kecil) */
 .doctor-edit-button,
 .doctor-delete-button,
 .doctor-modal-close {
-  width: 36px;
-  height: 36px;
+  width: var(--btn-h-sm);
+  min-height: var(--btn-h-sm);
+  height: var(--btn-h-sm);
   padding: 0;
 }
 
@@ -1336,12 +1341,15 @@ button.doctor-refresh-button:disabled {
 
 .waiting-col__count {
   flex-shrink: 0;
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
+  font-size: var(--chip-fs);
   font-weight: 600;
   color: var(--secondary);
   background: var(--secondary-soft);
-  padding: 4px 10px;
-  border-radius: 999px;
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
   white-space: nowrap;
 }
 
@@ -1444,15 +1452,16 @@ button.doctor-refresh-button:disabled {
 }
 
 .page-intro__status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 13px;
-  border-radius: 20px;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--success-bg);
   border: 1px solid rgba(47, 155, 108, 0.2);
-  font-size: var(--fs-tiny);
-  font-weight: 700;
+  font-size: var(--chip-fs);
+  font-weight: 600;
   color: #1c7a52;
   white-space: nowrap;
 }
@@ -1617,14 +1626,14 @@ button.doctor-refresh-button:disabled {
 
 .card_loket-header input[type="date"] {
   width: 190px;
-  height: 46px;
+  height: var(--btn-h);
   padding: 0 14px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   background: var(--surface);
   color: var(--text);
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--btn-fs-lg);
   outline: none;
 }
 
@@ -2114,12 +2123,15 @@ table.data-table {
 }
 
 .loket-section-heading__count {
-  padding: 6px 10px;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--surface-soft);
   color: var(--muted);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--chip-fs);
+  font-weight: 600;
 }
 
 /* ---------- Queue grid ---------- */
@@ -2585,12 +2597,15 @@ table.data-table {
 
 .ambil-ticket__category {
   max-width: 45%;
-  padding: 7px 12px;
-  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
+  padding: 2px var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--primary-soft);
   color: var(--primary);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--chip-fs);
+  font-weight: 600;
   text-align: right;
   overflow-wrap: anywhere;
 }
@@ -2691,12 +2706,13 @@ table.data-table {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 13px;
-  border-radius: 10px;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
   background: var(--surface-soft);
   color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--chip-fs);
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -4210,16 +4226,24 @@ table.data-table {
 
 .row-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .row-actions__edit,
 .row-actions__delete {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--btn-h-sm);
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--btn-radius);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: var(--btn-fs);
   font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .row-actions__edit {
@@ -4228,11 +4252,17 @@ table.data-table {
 
 .row-actions__delete {
   color: var(--danger);
+  border-color: rgba(193, 68, 58, 0.35);
 }
 
-.row-actions__edit:hover,
+.row-actions__edit:hover {
+  background: var(--secondary-soft);
+  border-color: var(--secondary);
+}
+
 .row-actions__delete:hover {
-  text-decoration: underline;
+  background: var(--danger-bg);
+  border-color: var(--danger);
 }
 
 /* ---------- Tabs (halaman gabungan) ---------- */
@@ -4395,11 +4425,11 @@ table.data-table {
 
 .it-form-actions__submit {
   flex: 1;
-  height: 44px;
+  height: var(--btn-h-lg);
 }
 
 .it-form-actions__cancel {
-  height: 44px;
+  height: var(--btn-h-lg);
 }
 
 /* ---------- Loket information ---------- */
@@ -4498,12 +4528,13 @@ table.data-table {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  border-radius: 12px;
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-px);
+  border-radius: var(--btn-radius);
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
-  font-size: 13px;
+  font-size: var(--btn-fs);
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -4624,51 +4655,53 @@ table.data-table {
 /* ---------- Ringkasan ---------- */
 
 .doctor-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .doctor-summary-card {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 15px;
-  padding: 20px;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  gap: 8px;
+  min-height: var(--chip-h);
+  padding: 2px var(--chip-px) 2px 2px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--chip-radius);
 }
 
 .doctor-summary-icon {
   display: grid;
   place-items: center;
-  width: 47px;
-  height: 47px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   color: #268e67;
   background: #e8f5ee;
-  border-radius: 13px;
+  border-radius: 50%;
 }
 
-.doctor-summary-icon-blue {
-  color: #4784c4;
-  background: #eaf3fc;
+.doctor-summary-icon-off {
+  color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .doctor-summary-card>div:last-child {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .doctor-summary-card span {
   color: #7d8a82;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .doctor-summary-card strong {
   color: #293a32;
-  font-size: 23px;
+  font-size: 14px;
 }
 
 .doctor-summary-card small {
@@ -4690,6 +4723,7 @@ table.data-table {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 15px;
   padding: 22px 23px;
   border-bottom: 1px solid var(--border);
@@ -4712,6 +4746,7 @@ table.data-table {
 .doctor-row-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -4851,22 +4886,29 @@ table.data-table {
 }
 
 .doctor-display-badge {
-  display: inline-block;
-  padding: 5px 9px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
   color: #437fb8;
   background: #eaf3fc;
-  border-radius: 6px;
-  font-size: 10px;
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-fs);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .doctor-status-badge {
-  display: inline-block;
-  padding: 5px 9px;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-px);
   color: #39845d;
   background: #eaf6ee;
-  border-radius: 6px;
-  font-size: 10px;
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-fs);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .doctor-status-badge--off {
@@ -5278,7 +5320,7 @@ table.data-table {
 
 @media (max-width: 600px) {
   .doctor-summary {
-    grid-template-columns: 1fr;
+    width: 100%;
   }
 
   .doctor-table-heading {
@@ -5478,20 +5520,31 @@ table.data-table {
 }
 
 .antrean-reload-btn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  font-size: 13px;
-  font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-px);
+  border: 1px solid var(--border);
+  border-radius: var(--btn-radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--btn-fs);
+  font-weight: 600;
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
-.antrean-reload-btn:hover {
-  color: var(--primary-dark);
+.antrean-reload-btn:hover:not(:disabled) {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.antrean-reload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---------- Workspace Dokter Aktif ---------- */
@@ -5548,12 +5601,15 @@ table.data-table {
 }
 
 .antrean-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--chip-h);
   background: var(--primary-soft);
   color: var(--primary-dark);
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-fs);
+  font-weight: 600;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
@@ -5624,12 +5680,13 @@ table.data-table {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: var(--chip-h);
   background: var(--success-bg);
   color: var(--success);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
+  padding: 0 var(--chip-px);
+  border-radius: var(--chip-radius);
+  font-size: var(--chip-fs);
+  font-weight: 600;
 }
 
 .antrean-tv-badge-dot {
@@ -5725,14 +5782,15 @@ table.data-table {
 
 .antrean-manual-input {
   flex: 1;
-  padding: 8px 12px;
-  border-radius: 10px;
+  min-width: 0;
+  height: var(--btn-h);
+  padding: 0 12px;
+  border-radius: var(--btn-radius);
   border: 1px solid var(--border);
   background: var(--surface);
-  font-size: 13px;
+  font-size: var(--btn-fs);
   color: var(--text);
   outline: none;
-  min-width: 0;
 }
 
 .antrean-manual-input:focus {
@@ -5908,12 +5966,12 @@ table.data-table {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-width: 34px;
-  height: 34px;
+  min-width: var(--btn-h-sm);
+  height: var(--btn-h-sm);
   padding: 0 10px;
-  font-size: 12px;
+  font-size: var(--btn-fs);
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--btn-radius);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);

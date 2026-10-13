@@ -3,7 +3,6 @@ import {
   Search,
   RefreshCw,
   Stethoscope,
-  Users,
   Plus,
   Pencil,
   Trash2,
@@ -281,6 +280,9 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       ? { type: 'success', text: message }
       : null
 
+  const dokterNonaktif = doctors.filter(isDokterNonaktif).length
+  const dokterAktif = doctors.length - dokterNonaktif
+
   return (
     <div className="doctors-page">
       {/* PAGE INTRO — Selaras dengan Pendaftaran */}
@@ -305,31 +307,6 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
         </div>
       </div>
 
-      {/* SUMMARY CARDS */}
-      <div className="doctor-summary">
-        <div className="doctor-summary-card">
-          <div className="doctor-summary-icon">
-            <Stethoscope size={22} />
-          </div>
-          <div>
-            <span>Jumlah Dokter</span>
-            <strong>{doctors.length}</strong>
-            <small>Dokter aktif sesuai filter</small>
-          </div>
-        </div>
-
-        <div className="doctor-summary-card">
-          <div className="doctor-summary-icon doctor-summary-icon-blue">
-            <Users size={22} />
-          </div>
-          <div>
-            <span>Filter Display</span>
-            <strong>{display ? `Display ${display}` : 'Semua Display'}</strong>
-            <small>Layar TV Antrean</small>
-          </div>
-        </div>
-      </div>
-
       <Toast toast={toast} onClose={() => { setError(''); setMessage('') }} />
 
       {/* TABLE PANEL */}
@@ -341,6 +318,38 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
           </div>
 
           <div className="doctor-heading-actions">
+            <div className="doctor-summary">
+              <div className="doctor-summary-card">
+                <div className="doctor-summary-icon">
+                  <Stethoscope size={14} />
+                </div>
+                <div>
+                  <span>Total Dokter</span>
+                  <strong>{loading ? '-' : doctors.length}</strong>
+                </div>
+              </div>
+
+              <div className="doctor-summary-card">
+                <div className="doctor-summary-icon">
+                  <CheckCircle2 size={14} />
+                </div>
+                <div>
+                  <span>Aktif</span>
+                  <strong>{loading ? '-' : dokterAktif}</strong>
+                </div>
+              </div>
+
+              <div className="doctor-summary-card">
+                <div className="doctor-summary-icon doctor-summary-icon-off">
+                  <X size={14} />
+                </div>
+                <div>
+                  <span>Tidak Aktif</span>
+                  <strong>{loading ? '-' : dokterNonaktif}</strong>
+                </div>
+              </div>
+            </div>
+
             <button
               type="button"
               className="doctor-refresh-button"
