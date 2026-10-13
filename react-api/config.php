@@ -11,7 +11,7 @@
  * PENTING: samakan 4 nilai di bawah dengan yang ada di connectdb.php project lama.
  */
 
-$DB_HOST = "localhost";
+$DB_HOST = "127.0.0.1";
 $DB_USER = "root";
 $DB_PASS = "";
 $DB_NAME = "antrian_pendaftaran";
