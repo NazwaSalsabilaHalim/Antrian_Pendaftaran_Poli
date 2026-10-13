@@ -1,5 +1,5 @@
-
 import { useCallback, useEffect, useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 import { api } from '../../api/client'
 import { useInterval } from '../../hooks/useInterval'
 import {
@@ -20,14 +20,33 @@ import Pagination, { usePagination } from '../../components/Pagination'
 
 const REFRESH_MS = 15000
 
+// Grafik per jam: 07:00–20:00
+const JAM_MULAI = 7
+const JUMLAH_JAM = 14
+
+// ================= HELPER =================
+
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
+}
+
+// "2026-10-13 14:30:00" -> Date
+function parseWaktu(value) {
+  return new Date(value.replace(' ', 'T'))
+}
+
+// Selisih dua waktu dalam menit (minimal 0)
+function selisihMenit(dari, sampai) {
+  return Math.max(
+    0,
+    Math.round((parseWaktu(sampai) - parseWaktu(dari)) / 60000)
+  )
 }
 
 function formatTanggalWaktu(value) {
   if (!value) return '-'
 
-  const date = new Date(value.replace(' ', 'T'))
+  const date = parseWaktu(value)
 
   if (Number.isNaN(date.getTime())) return value
 
@@ -41,11 +60,13 @@ function formatTanggalWaktu(value) {
 }
 
 export default function Dashboard() {
+  // ================= STATE =================
+
   const [tanggal, setTanggal] = useState(todayStr())
   const [data, setData] = useState(null)
+  const [riwayat, setRiwayat] = useState([])
   const [error, setError] = useState('')
   const [lastUpdate, setLastUpdate] = useState(null)
-  const [riwayat, setRiwayat] = useState([])
 
   const {
     currentPage,
@@ -54,6 +75,8 @@ export default function Dashboard() {
     startIndex,
     paginatedItems: paginatedRiwayat,
   } = usePagination(riwayat, 10)
+
+  // ================= AMBIL DATA =================
 
   const load = useCallback(() => {
     Promise.all([
@@ -70,20 +93,26 @@ export default function Dashboard() {
       .catch((e) => setError(e.message))
   }, [tanggal])
 
-  // Export Excel
-  const exportExcel = () => {
+  // Muat ulang saat tanggal berubah
+  useEffect(() => {
+    load()
+  }, [load])
+
+  // Auto-refresh setiap 15 detik untuk tanggal hari ini
+  useInterval(() => {
+    if (tanggal === todayStr()) load()
+  }, REFRESH_MS)
+
+  // ================= EXPORT =================
+
+  function exportExcel() {
     if (riwayat.length === 0) return
 
     const dataForExcel = riwayat.map((row) => ({
       'No. Antrian': row.nomor,
-      Prefix: row.prefix || '-',
       'Jenis Pasien': row.jenis_pasien,
       Counter: row.counter_nama,
       Status: row.status,
-      Dipanggil: row.panggil === 'Y' ? 'Ya' : 'Tidak',
-      'Panggil Ulang':
-        row.panggil_ulang === 'Y' ? 'Ya' : 'Tidak',
-      Tanggal: row.tanggal,
       'Waktu Ambil Nomor': row.tanggal_insert,
       'Waktu Dipanggil': row.tanggal_panggil,
     }))
@@ -92,11 +121,7 @@ export default function Dashboard() {
 
     ws['!cols'] = [
       { wch: 12 },
-      { wch: 8 },
       { wch: 26 },
-      { wch: 14 },
-      { wch: 12 },
-      { wch: 10 },
       { wch: 14 },
       { wch: 12 },
       { wch: 20 },
@@ -119,13 +144,9 @@ export default function Dashboard() {
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Antrian')
 
-    XLSX.writeFile(
-      wb,
-      `riwayat-antrian-${new Date().toISOString().slice(0, 10)}.xlsx`
-    )
+    XLSX.writeFile(wb, `riwayat-antrian-${tanggal}.xlsx`)
   }
 
-  // Export PDF
   function exportPDF() {
     const doc = new jsPDF()
 
@@ -162,55 +183,25 @@ export default function Dashboard() {
     doc.save(`riwayat-antrian-${tanggal}.pdf`)
   }
 
-  // Muat ulang saat tanggal berubah
-  useEffect(() => {
-    load()
-  }, [load])
-
-  // Auto-refresh setiap 15 detik untuk tanggal hari ini
-  useInterval(() => {
-    if (tanggal === todayStr()) load()
-  }, REFRESH_MS)
-
-  const persenSelesai =
-    data && data.total_dicetak > 0
-      ? Math.round(
-          (data.total_dipanggil / data.total_dicetak) * 100
-        )
-      : 0
-
-  // Data loket
-  const loketData = data?.per_counter || []
-
-  // Ringkasan jenis pasien
-  const jenisPasien = data?.per_tombol || []
-
   // ================= STATISTIK PELAYANAN =================
 
+  const loketData = data?.per_counter || []
+
+  // Waktu tunggu (menit) tiap pasien yang sudah dipanggil
   const waktuTunggu = riwayat
     .filter((r) => r.tanggal_insert && r.tanggal_panggil)
-    .map((r) => {
-      const masuk = new Date(r.tanggal_insert.replace(' ', 'T'))
-      const dipanggil = new Date(r.tanggal_panggil.replace(' ', 'T'))
-
-      return Math.max(
-        0,
-        Math.round((dipanggil - masuk) / 60000)
-      )
-    })
+    .map((r) => selisihMenit(r.tanggal_insert, r.tanggal_panggil))
 
   const rataRataTunggu =
     waktuTunggu.length > 0
       ? Math.round(
-          waktuTunggu.reduce((total, waktu) => total + waktu, 0) /
+          waktuTunggu.reduce((total, menit) => total + menit, 0) /
             waktuTunggu.length
         )
       : 0
 
   const waktuTungguTerlama =
-    waktuTunggu.length > 0
-      ? Math.max(...waktuTunggu)
-      : 0
+    waktuTunggu.length > 0 ? Math.max(...waktuTunggu) : 0
 
   const loketTeraktif =
     loketData.length > 0
@@ -221,12 +212,13 @@ export default function Dashboard() {
         )[0]
       : null
 
+  // Jumlah pemanggilan per jam
   const jumlahPerJam = {}
 
   riwayat.forEach((r) => {
     if (!r.tanggal_panggil) return
 
-    const waktu = new Date(r.tanggal_panggil.replace(' ', 'T'))
+    const waktu = parseWaktu(r.tanggal_panggil)
 
     if (Number.isNaN(waktu.getTime())) return
 
@@ -234,87 +226,47 @@ export default function Dashboard() {
     jumlahPerJam[jam] = (jumlahPerJam[jam] || 0) + 1
   })
 
-  const jamTerpadatData = Object.entries(jumlahPerJam)
-    .sort((a, b) => b[1] - a[1])[0]
+  const jamTerpadatData = Object.entries(jumlahPerJam).sort(
+    (a, b) => b[1] - a[1]
+  )[0]
 
   const jamTerpadat = jamTerpadatData
     ? `${String(jamTerpadatData[0]).padStart(2, '0')}:00`
     : '-'
 
-  const jumlahJamTerpadat = jamTerpadatData
-    ? jamTerpadatData[1]
-    : 0
+  const jumlahJamTerpadat = jamTerpadatData ? jamTerpadatData[1] : 0
 
-  // Chart per jam: 07:00–20:00
-  const jamOperasional = Array.from(
-    { length: 14 },
-    (_, i) => i + 7
-  )
+  // ================= DATA GRAFIK =================
 
-  const chartData = jamOperasional.map((jam) => ({
-    jam: `${String(jam).padStart(2, '0')}:00`,
-    jumlah: jumlahPerJam[jam] || 0,
-  }))
+  const chartData = Array.from({ length: JUMLAH_JAM }, (_, i) => {
+    const jam = JAM_MULAI + i
 
-  const maxJumlahPerJam = Math.max(
-    1,
-    ...chartData.map((d) => d.jumlah)
-  )
+    return {
+      jam: `${String(jam).padStart(2, '0')}:00`,
+      jumlah: jumlahPerJam[jam] || 0,
+    }
+  })
+
+  // Batang jam puncak diberi warna berbeda (kosong jika belum ada data)
+  const maxJumlah = Math.max(0, ...chartData.map((d) => d.jumlah))
 
   const jamPuncakIndex =
-    maxJumlahPerJam > 0
-      ? chartData.reduce(
-          (maxIdx, d, i, arr) =>
-            d.jumlah > arr[maxIdx].jumlah ? i : maxIdx,
-          0
-        )
+    maxJumlah > 0
+      ? chartData.findIndex((d) => d.jumlah === maxJumlah)
       : -1
 
-  // Rata-rata waktu tunggu per loket
-  const waktuTungguPerLoket = {}
-
-  riwayat
-    .filter(
-      (r) =>
-        r.tanggal_insert &&
-        r.tanggal_panggil &&
-        r.counter_nama
-    )
-    .forEach((r) => {
-      const masuk = new Date(r.tanggal_insert.replace(' ', 'T'))
-      const dipanggil = new Date(r.tanggal_panggil.replace(' ', 'T'))
-
-      const menit = Math.max(
-        0,
-        Math.round((dipanggil - masuk) / 60000)
-      )
-
-      if (!waktuTungguPerLoket[r.counter_nama]) {
-        waktuTungguPerLoket[r.counter_nama] = []
-      }
-
-      waktuTungguPerLoket[r.counter_nama].push(menit)
-    })
-
-  function rataRataPerLoket(namaLoket) {
-    const list = waktuTungguPerLoket[namaLoket]
-
-    if (!list || list.length === 0) return null
-
-    return Math.round(
-      list.reduce((a, b) => a + b, 0) / list.length
-    )
-  }
+  // ================= TAMPILAN =================
 
   return (
     <div>
       {error && (
-        <div className="error-banner">
-          {error}
+        <div className="it-toast it-toast--error" role="alert">
+          <AlertCircle size={18} />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* FILTER TANGGAL */}
+      {/* FILTER TANGGAL & EXPORT */}
       <div className="card_loket-header">
         <label htmlFor="tanggal" className="muted">
           Tanggal:
@@ -326,13 +278,6 @@ export default function Dashboard() {
           value={tanggal}
           onChange={(e) => setTanggal(e.target.value)}
         />
-
-        <button
-          className="btn btn-outline"
-          onClick={load}
-        >
-          Refresh
-        </button>
 
         <button
           className="btn btn-outline"
@@ -393,200 +338,7 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="dashboard-2col">
-            {/* KOLOM KIRI */}
-            <div className="dashboard-2col__column">
-              {/* PERSENTASE SELESAI */}
-              <div className="stat-card">
-                <div className="stat-card__label">
-                  Persentase Selesai
-                </div>
-
-                <div className="stat-card__pct">
-                  {persenSelesai}%
-                </div>
-
-                <div className="progress-bar">
-                  <div
-                    className="progress-bar__fill"
-                    style={{ width: `${persenSelesai}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* RINGKASAN JENIS PASIEN */}
-              <div className="card jenis-pasien-card">
-                <p className="jenis-pasien-title">
-                  Ringkasan Jenis Pasien
-                </p>
-
-                <div className="jenis-pasien-grid">
-                  {jenisPasien.map((t) => (
-                    <div
-                      key={t.tombol_id}
-                      className="jenis-pasien-item"
-                    >
-                      <div className="jenis-pasien-name">
-                        {t.nama}
-                      </div>
-
-                      <div className="jenis-pasien-stats">
-                        <div>
-                          <div className="jenis-pasien-label">
-                            Diambil
-                          </div>
-                          <strong>{t.total_dicetak}</strong>
-                        </div>
-
-                        <div>
-                          <div className="jenis-pasien-label">
-                            Dipanggil
-                          </div>
-                          <strong>{t.total_dipanggil}</strong>
-                        </div>
-
-                        <div>
-                          <div className="jenis-pasien-label">
-                            Sisa
-                          </div>
-                          <strong>{t.sisa}</strong>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* PER LOKET */}
-              <div className="card loket-card">
-                <div className="loket-header">
-                  <div>
-                    <p className="loket-title">
-                      Per Loket
-                    </p>
-                  </div>
-                </div>
-
-                <div className="loket-grid">
-                  {loketData.map((c) => {
-                    const rataRata = rataRataPerLoket(c.nama)
-
-                    return (
-                      <div
-                        key={c.counter_id}
-                        className="loket-item"
-                      >
-                        <div className="loket-item__content">
-                          <div>
-                            <div className="loket-item__label">
-                              LOKET
-                            </div>
-                            <strong className="loket-item__name">
-                              {c.nama}
-                            </strong>
-                          </div>
-
-                          <div className="loket-item__total">
-                            <div className="loket-item__label">
-                              DILAYANI
-                            </div>
-                            <strong className="loket-item__number">
-                              {c.total_dilayani}
-                            </strong>
-                          </div>
-                        </div>
-
-                        <div className="loket-item__wait">
-                          <span className="loket-item__wait-label">
-                            Rata-rata tunggu
-                          </span>
-                          <span className="loket-item__wait-value">
-                            {rataRata !== null
-                              ? `${rataRata} menit`
-                              : '-'}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* KOLOM KANAN */}
-            <div className="dashboard-2col__column">
-              {/* DISTRIBUSI PER JAM */}
-              <div className="card jam-chart-card">
-                <p className="jam-chart-title">
-                  Distribusi Pemanggilan per Jam
-                </p>
-
-                <span className="jam-chart-subtitle">
-                  Jumlah pasien dipanggil tiap jam pada tanggal ini
-                </span>
-
-                <div className="jam-chart-body">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        vertical={false}
-                        stroke="var(--border-soft)"
-                      />
-
-                      <XAxis
-                        dataKey="jam"
-                        tick={{
-                          fontSize: 10,
-                          fill: 'var(--muted)',
-                        }}
-                        axisLine={{
-                          stroke: 'var(--border-soft)',
-                        }}
-                        tickLine={false}
-                      />
-
-                      <YAxis
-                        allowDecimals={false}
-                        tick={{
-                          fontSize: 10,
-                          fill: 'var(--muted)',
-                        }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-
-                      <Tooltip
-                        formatter={(value) => [
-                          `${value} pasien`,
-                          'Dipanggil',
-                        ]}
-                        labelFormatter={(label) => `Jam ${label}`}
-                      />
-
-                      <Bar
-                        dataKey="jumlah"
-                        radius={[6, 6, 0, 0]}
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell
-                            key={index}
-                            fill={
-                              index === jamPuncakIndex
-                                ? 'var(--warning)'
-                                : 'var(--primary)'
-                            }
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* RIWAYAT */}
+          {/* RIWAYAT PEMANGGILAN */}
           <div className="card dashboard-history-card">
             <div className="dashboard-history-header">
               <p className="section-title dashboard-history-title">
@@ -644,6 +396,61 @@ export default function Dashboard() {
               onPageChange={setCurrentPage}
               itemName="antrian"
             />
+          </div>
+
+          {/* DISTRIBUSI PEMANGGILAN PER JAM */}
+          <div className="card jam-chart-card jam-chart-card--full">
+            <p className="jam-chart-title">
+              Distribusi Pemanggilan per Jam
+            </p>
+
+            <span className="jam-chart-subtitle">
+              Jumlah pasien dipanggil tiap jam pada tanggal ini
+            </span>
+
+            <div className="jam-chart-body">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="var(--border-soft)"
+                  />
+
+                  <XAxis
+                    dataKey="jam"
+                    tick={{ fontSize: 10, fill: 'var(--muted)' }}
+                    axisLine={{ stroke: 'var(--border-soft)' }}
+                    tickLine={false}
+                  />
+
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fontSize: 10, fill: 'var(--muted)' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+
+                  <Tooltip
+                    formatter={(value) => [`${value} pasien`, 'Dipanggil']}
+                    labelFormatter={(label) => `Jam ${label}`}
+                  />
+
+                  <Bar dataKey="jumlah" radius={[6, 6, 0, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={index}
+                        fill={
+                          index === jamPuncakIndex
+                            ? 'var(--warning)'
+                            : 'var(--primary)'
+                        }
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </>
       )}

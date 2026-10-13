@@ -1206,14 +1206,14 @@ button.doctor-refresh-button:disabled {
   transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-.card:hover,
+/* .card:hover,
 .serving-card:hover,
 .waiting-col:hover,
 .stat-card:hover,
 .shell__content .card:hover {
   box-shadow: var(--card-shadow-hover);
   border-color: #cfe0d8;
-}
+} */
 
 .card {
   padding: 22px;
@@ -1235,7 +1235,7 @@ button.doctor-refresh-button:disabled {
   display: grid;
   grid-template-columns: repeat(2, minmax(300px, 420px));
   gap: 20px;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
   justify-content: start;
 }
 
@@ -1261,21 +1261,23 @@ button.doctor-refresh-button:disabled {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   margin-bottom: 20px;
   min-width: 0;
 }
 
 .serving-card__top .badge {
-  max-width: 70%;
+  max-width: none;
   line-height: 1.35;
   text-align: left;
-  white-space: normal;
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 2px 10px;
 }
 
 .serving-card__room {
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
   font-weight: 600;
   text-align: right;
@@ -1325,18 +1327,19 @@ button.doctor-refresh-button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
+  gap: 8px;
+  padding: 16px 14px;
   border-bottom: none;
   background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary) 100%);
   color: #ffffff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .waiting-col__header>span:first-child {
   min-width: 0;
   line-height: 1.35;
+  white-space: nowrap;
 }
 
 .waiting-col__count {
@@ -1520,7 +1523,7 @@ button.doctor-refresh-button:disabled {
 .loket-item {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px 18px;
+  padding: 12px 14px;
   background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary) 45%, var(--secondary) 100%);
   display: flex;
   flex-direction: column;
@@ -1658,8 +1661,8 @@ button.doctor-refresh-button:disabled {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: 145px;
-  padding: 24px;
+  min-height: 110px;
+  padding: 22px;
   border-radius: var(--card-radius-lg);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1759,7 +1762,7 @@ button.doctor-refresh-button:disabled {
 
 .dashboard-2col {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
   margin-top: 0;
@@ -1768,7 +1771,7 @@ button.doctor-refresh-button:disabled {
 .dashboard-2col__column {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
   height: 100%;
 }
@@ -1790,6 +1793,7 @@ button.doctor-refresh-button:disabled {
   min-width: 0;
   overflow: visible;
   margin-top: 0;
+  padding: 16px 18px;
 }
 
 .dashboard-2col .jam-chart-card {
@@ -1797,6 +1801,10 @@ button.doctor-refresh-button:disabled {
   display: flex;
   flex-direction: column;
   margin-top: 0;
+}
+
+.jam-chart-card--full {
+  margin-top: 20px;
 }
 
 .jam-chart-title {
@@ -1810,7 +1818,12 @@ button.doctor-refresh-button:disabled {
   display: block;
   font-size: 12px;
   color: var(--muted);
-  margin-bottom: 24px;
+  margin-bottom: 12px;
+}
+
+.jam-chart-body {
+  width: 100%;
+  height: 220px;
 }
 
 
@@ -1866,7 +1879,7 @@ button.doctor-refresh-button:disabled {
 }
 
 .jenis-pasien-item {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1px solid var(--border-soft);
   border-radius: 12px;
   background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary) 45%, var(--secondary) 100%);
@@ -1875,8 +1888,9 @@ button.doctor-refresh-button:disabled {
 .jenis-pasien-name {
   margin-bottom: 10px;
   color: var(--primary-soft);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .jenis-pasien-stats {

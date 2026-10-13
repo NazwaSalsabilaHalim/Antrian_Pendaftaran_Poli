@@ -10,9 +10,9 @@ import { getPetugas, logoutPetugas } from '../../utils/auth'
 
 const NAV_PENDAFTARAN = [
   {
-    to: '/pendaftaran/overview',
-    label: 'Overview',
-    description: 'Monitoring loket',
+    to: '/pendaftaran/dashboard',
+    label: 'Riwayat & Rekap',
+    description: 'Statistik antrian',
     icon: LayoutGrid,
   },
   {
@@ -22,9 +22,9 @@ const NAV_PENDAFTARAN = [
     icon: Users,
   },
   {
-    to: '/pendaftaran/dashboard',
-    label: 'Riwayat & Rekap',
-    description: 'Statistik antrian',
+    to: '/pendaftaran/overview',
+    label: 'Overview',
+    description: 'Monitoring loket',
     icon: History,
   },
 ]

@@ -6,21 +6,32 @@ import {
   RotateCcw,
   ArrowRight,
   CheckCircle2,
+  AlertCircle,
 } from 'lucide-react'
 import { api } from '../../api/client'
 import { COUNTER_KEY } from '../../utils/auth'
 
+const TOAST_MS = 3000 // notifikasi berhasil
+const TOAST_ERROR_MS = 5000 // notifikasi gagal
+
 export default function Loket() {
+  // ================= STATE =================
+
   const [counterList, setCounterList] = useState([])
   const [tombolList, setTombolList] = useState([])
-  // loket yang dipilih disimpan, jadi tidak hilang saat refresh
+
+  // Loket yang dipilih disimpan, jadi tidak hilang saat refresh
   const [counterId, setCounterId] = useState(
     () => localStorage.getItem(COUNTER_KEY) || ''
   )
-  const [error, setError] = useState('')
-  const [toast, setToast] = useState('')
+
+  // ID panggilan terakhir per jenis antrian: { TombolID: panggil_id }
   const [lastPanggil, setLastPanggil] = useState({})
+
   const [busyId, setBusyId] = useState(null)
+  const [toast, setToast] = useState(null) // { tipe: 'success' | 'error', pesan }
+
+  // ================= AMBIL DATA =================
 
   useEffect(() => {
     Promise.all([api.getCounter(), api.getTombol()])
@@ -28,48 +39,64 @@ export default function Loket() {
         setCounterList(c.counter)
         setTombolList(t.tombol)
 
-        // kalau loket tersimpan sudah tidak ada di daftar, reset
+        // Kalau loket tersimpan sudah tidak ada di daftar, reset
         const saved = localStorage.getItem(COUNTER_KEY)
+
         if (saved && !c.counter.some((x) => String(x.CounterID) === saved)) {
           localStorage.removeItem(COUNTER_KEY)
           setCounterId('')
         }
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => showError(e.message))
   }, [])
 
+  // Sembunyikan notifikasi otomatis
   useEffect(() => {
     if (!toast) return
 
-    const id = setTimeout(() => setToast(''), 3000)
+    const durasi = toast.tipe === 'error' ? TOAST_ERROR_MS : TOAST_MS
+    const id = setTimeout(() => setToast(null), durasi)
 
     return () => clearTimeout(id)
   }, [toast])
 
+  // ================= AKSI =================
+
+  function showToast(pesan) {
+    setToast({ tipe: 'success', pesan })
+  }
+
+  function showError(pesan) {
+    setToast({ tipe: 'error', pesan })
+  }
+
+  function pilihCounter(value) {
+    setCounterId(value)
+    setToast(null)
+
+    if (value) localStorage.setItem(COUNTER_KEY, value)
+    else localStorage.removeItem(COUNTER_KEY)
+  }
 
   async function handlePanggil(tombol) {
     if (!counterId) {
-      setError('Pilih loket terlebih dahulu.')
+      showError('Pilih loket terlebih dahulu.')
       return
     }
 
-    setError('')
     setBusyId(tombol.TombolID)
 
     try {
       // 1. Ambil nomor antrean berikutnya
-      const hasil = await api.tekanCounter(
-        counterId,
-        tombol.TombolID
-      )
+      const hasil = await api.tekanCounter(counterId, tombol.TombolID)
 
-      // Jika tidak ada nomor baru yang bisa dipanggil
+      // Tidak ada nomor baru yang bisa dipanggil
       if (!hasil.panggil_id) {
-        setToast(hasil.text || 'Tidak ada antrean berikutnya.')
+        showError(hasil.text || 'Tidak ada antrean berikutnya.')
         return
       }
 
-      // 2. Konfirmasi panggilan agar Panggil menjadi Y
+      // 2. Konfirmasi panggilan agar status Panggil menjadi Y
       await api.panggilKonfirmasi(hasil.panggil_id)
 
       // 3. Simpan ID panggilan terakhir untuk tombol Ulangi
@@ -79,10 +106,9 @@ export default function Loket() {
       }))
 
       // 4. Tampilkan notifikasi berhasil
-      setToast(hasil.text)
-
+      showToast(hasil.text || 'Nomor berhasil dipanggil.')
     } catch (e) {
-      setError(e.message || 'Gagal memanggil nomor antrean.')
+      showError(e.message || 'Gagal memanggil nomor antrean.')
     } finally {
       setBusyId(null)
     }
@@ -93,13 +119,11 @@ export default function Loket() {
 
     if (!panggilId) return
 
-    setError('')
-
     try {
       await api.panggilUlang(panggilId)
-      setToast('Nomor dipanggil ulang.')
+      showToast('Nomor dipanggil ulang.')
     } catch (e) {
-      setError(e.message)
+      showError(e.message)
     }
   }
 
@@ -107,83 +131,50 @@ export default function Loket() {
     (c) => String(c.CounterID) === String(counterId)
   )
 
+  // ================= TAMPILAN =================
+
   return (
-    <div className="loket-page">
-
-      {error && (
-        <div className="loket-error">
-          <span>!</span>
-          {error}
-        </div>
-      )}
-
-      {/* COUNTER SELECTOR */}
+    <div>
+      {/* PILIH COUNTER */}
       <section className="loket-counter-card">
-
         <div className="loket-counter-card__icon">
           <Building2 size={23} />
         </div>
 
         <div className="loket-counter-card__info">
-          <span className="loket-counter-card__label">
-            LOKET PELAYANAN
-          </span>
+          <span className="loket-counter-card__label">LOKET PELAYANAN</span>
 
           <strong>
-            {selectedCounter
-              ? selectedCounter.Nama
-              : 'Pilih loket yang digunakan'}
+            {selectedCounter ? selectedCounter.Nama : 'Pilih loket yang digunakan'}
           </strong>
 
-          <small>
-            Pilih counter sebelum mulai memanggil antrian.
-          </small>
+          <small>Pilih counter sebelum mulai memanggil antrian.</small>
         </div>
 
         <div className="loket-counter-card__select">
-          <label htmlFor="counter">
-            Counter
-          </label>
+          <label htmlFor="counter">Counter</label>
 
           <select
             id="counter"
             value={counterId}
-            onChange={(e) => {
-              const value = e.target.value
-              setCounterId(value)
-              setError('')
-
-              if (value) localStorage.setItem(COUNTER_KEY, value)
-              else localStorage.removeItem(COUNTER_KEY)
-            }}
+            onChange={(e) => pilihCounter(e.target.value)}
           >
-            <option value="">
-              Pilih Counter
-            </option>
+            <option value="">Pilih Counter</option>
 
             {counterList.map((c) => (
-              <option
-                key={c.CounterID}
-                value={c.CounterID}
-              >
+              <option key={c.CounterID} value={c.CounterID}>
                 {c.Nama}
               </option>
             ))}
           </select>
         </div>
-
       </section>
 
-      {/* SECTION TITLE */}
+      {/* JUDUL BAGIAN */}
       <div className="loket-section-heading">
         <div>
-          <span className="loket-section-heading__eyebrow">
-            PELAYANAN
-          </span>
-
-          <h2>
-            Jenis Antrian
-          </h2>
+          <span className="loket-section-heading__eyebrow">PELAYANAN</span>
+          <h2>Jenis Antrian</h2>
         </div>
 
         <span className="loket-section-heading__count">
@@ -191,9 +182,8 @@ export default function Loket() {
         </span>
       </div>
 
-      {/* QUEUE CARDS */}
+      {/* KARTU JENIS ANTRIAN */}
       <div className="loket-queue-grid">
-
         {tombolList.map((t, index) => {
           const isBusy = busyId === t.TombolID
           const hasLastCall = Boolean(lastPanggil[t.TombolID])
@@ -203,48 +193,31 @@ export default function Loket() {
               key={t.TombolID}
               className={`loket-queue-card loket-queue-card--${index % 3}`}
             >
-
-              {/* CARD HEADER */}
+              {/* HEADER KARTU */}
               <div className="loket-queue-card__header">
-
                 <div className="loket-queue-card__category">
                   <span className="loket-queue-card__category-icon">
-                    {index === 0 ? (
-                      <Users size={17} />
-                    ) : (
-                      <Building2 size={17} />
-                    )}
+                    {index === 0 ? <Users size={17} /> : <Building2 size={17} />}
                   </span>
 
-                  <span>
-                    Jenis Antrian
-                  </span>
+                  <span>Jenis Antrian</span>
                 </div>
 
                 <span className="loket-queue-card__number">
-                  0{index + 1}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
-
               </div>
 
-              {/* TITLE */}
+              {/* ISI KARTU */}
               <div className="loket-queue-card__body">
+                <h3>{t.Nama}</h3>
+                <p>Antrian pasien</p>
 
-                <h3>
-                  {t.Nama}
-                </h3>
-
-                <p>
-                  Antrian pasien
-                </p>
-
-                {/* CURRENT STATUS */}
+                {/* STATUS PANGGILAN */}
                 <div
                   className={
                     'loket-current-status' +
-                    (hasLastCall
-                      ? ' loket-current-status--active'
-                      : '')
+                    (hasLastCall ? ' loket-current-status--active' : '')
                   }
                 >
                   <div className="loket-current-status__icon">
@@ -256,9 +229,7 @@ export default function Loket() {
                   </div>
 
                   <div>
-                    <span>
-                      Status panggilan
-                    </span>
+                    <span>Status panggilan</span>
 
                     <strong>
                       {hasLastCall
@@ -267,71 +238,68 @@ export default function Loket() {
                     </strong>
                   </div>
                 </div>
-
               </div>
 
-              {/* ACTIONS */}
+              {/* TOMBOL AKSI */}
               <div className="loket-queue-card__actions">
-
                 <button
                   className="loket-btn loket-btn--primary"
                   disabled={isBusy}
                   onClick={() => handlePanggil(t)}
                 >
-                  <span>
-                    {isBusy
-                      ? 'Memanggil...'
-                      : 'Panggil Berikutnya'}
-                  </span>
+                  <span>{isBusy ? 'Memanggil...' : 'Panggil Berikutnya'}</span>
 
-                  {!isBusy && (
-                    <ArrowRight size={18} />
-                  )}
+                  {!isBusy && <ArrowRight size={18} />}
                 </button>
 
                 <button
                   className="loket-btn loket-btn--secondary"
-                  disabled={!lastPanggil[t.TombolID]}
-                  onClick={() =>
-                    handlePanggilUlang(t.TombolID)
-                  }
+                  disabled={!hasLastCall}
+                  onClick={() => handlePanggilUlang(t.TombolID)}
                   title="Panggil nomor terakhir kembali"
                 >
                   <RotateCcw size={17} />
                   <span>Ulangi</span>
                 </button>
-
               </div>
-
             </div>
           )
         })}
-
       </div>
 
-      {/* EMPTY STATE */}
+      {/* KOSONG */}
       {tombolList.length === 0 && (
         <div className="loket-empty">
           <Users size={30} />
           <strong>Belum ada jenis antrian</strong>
-          <span>
-            Data jenis antrian belum tersedia.
-          </span>
+          <span>Data jenis antrian belum tersedia.</span>
         </div>
       )}
 
-      {/* TOAST */}
+      {/* NOTIFIKASI */}
       {toast && (
-        <div className="loket-toast">
-          <CheckCircle2 size={19} />
+        <div
+          className={'it-toast' + (toast.tipe === 'error' ? ' it-toast--error' : '')}
+          role={toast.tipe === 'error' ? 'alert' : 'status'}
+        >
+          {toast.tipe === 'error' ? (
+            <AlertCircle size={18} />
+          ) : (
+            <CheckCircle2 size={18} />
+          )}
 
-          <div>
-            <strong>Berhasil</strong>
-            <span>{toast}</span>
-          </div>
+          <span>{toast.pesan}</span>
+
+          <button
+            type="button"
+            className="it-toast__close"
+            onClick={() => setToast(null)}
+            aria-label="Tutup notifikasi"
+          >
+            ×
+          </button>
         </div>
       )}
-
     </div>
   )
 }
