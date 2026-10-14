@@ -118,39 +118,49 @@ export default function DisplayAntrean() {
 
   const now = useClock()
 
-  /* ---- Audio unlock ---- */
+  /* ---- Audio unlock (otomatis, coba berulang) ---- */
   useEffect(() => {
     const el = audioRef.current
     if (!el) return
 
     el.preload = 'auto'
     el.volume = 1
+    el.src = api.getBellUrl()
 
-    const unlockAudio = async () => {
+    let unlocked = false
+    let retryId = null
+
+    const cleanup = () => {
+      clearInterval(retryId)
+      window.removeEventListener('click', unlockAudio)
+      window.removeEventListener('keydown', unlockAudio)
+      window.removeEventListener('touchstart', unlockAudio)
+    }
+
+    async function unlockAudio() {
+      if (unlocked) return
       try {
         el.src = api.getBellUrl()
         el.load()
         await el.play()
         el.pause()
         el.currentTime = 0
+        unlocked = true
         setAudioReady(true)
-        window.removeEventListener('click', unlockAudio)
-        window.removeEventListener('keydown', unlockAudio)
-        window.removeEventListener('touchstart', unlockAudio)
+        cleanup()
       } catch {
         setAudioReady(false)
       }
     }
 
+    unlockAudio() // coba langsung saat halaman dibuka
+    retryId = setInterval(unlockAudio, 3000) // ulangi sampai berhasil
+
     window.addEventListener('click', unlockAudio)
     window.addEventListener('keydown', unlockAudio)
     window.addEventListener('touchstart', unlockAudio)
 
-    return () => {
-      window.removeEventListener('click', unlockAudio)
-      window.removeEventListener('keydown', unlockAudio)
-      window.removeEventListener('touchstart', unlockAudio)
-    }
+    return cleanup
   }, [])
 
   /* ---- Polling ---- */
@@ -183,7 +193,7 @@ export default function DisplayAntrean() {
 
         if (audioRef.current) {
           audioRef.current.currentTime = 0
-          audioRef.current.play().catch(() => {})
+          audioRef.current.play().catch(() => { })
         }
       }
 
@@ -206,10 +216,10 @@ export default function DisplayAntrean() {
   /* ---- Fullscreen ---- */
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {})
+      document.documentElement.requestFullscreen().catch(() => { })
       setIsFullscreen(true)
     } else {
-      document.exitFullscreen().catch(() => {})
+      document.exitFullscreen().catch(() => { })
       setIsFullscreen(false)
     }
   }
@@ -244,7 +254,7 @@ export default function DisplayAntrean() {
               className={`tv-poli-btn-audio${audioReady ? ' tv-poli-btn-audio--active' : ''}`}
               onClick={() => {
                 if (audioRef.current) {
-                  audioRef.current.play().then(() => setAudioReady(true)).catch(() => {})
+                  audioRef.current.play().then(() => setAudioReady(true)).catch(() => { })
                 }
               }}
               title={audioReady ? 'Audio Bell Aktif' : 'Klik untuk Aktifkan Audio'}

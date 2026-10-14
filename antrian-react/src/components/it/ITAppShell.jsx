@@ -13,6 +13,14 @@ import {
 } from 'lucide-react'
 import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
+const user = (() => {
+  try {
+    return JSON.parse(localStorage.getItem('admin_auth_user') || 'null')
+  } catch {
+    return null
+  }
+})()
+
 // Menu dikelompokkan: ringkasan, monitoring (pendaftaran & poli),
 // dan fitur khusus Admin IT.
 const NAV_GROUPS = [
@@ -114,11 +122,11 @@ export default function ITAppShell() {
       <aside className="sidebar">
 
         {/* BRAND */}
-          <div className="sidebar__brand">
-            <div className="tv-brand">
-              <img src={logoAwalBros} alt="Logo" />
-            </div>
+        <div className="sidebar__brand">
+          <div className="tv-brand">
+            <img src={logoAwalBros} alt="Logo" />
           </div>
+        </div>
 
         {/* STATUS LOGIN */}
         <div className="sidebar__status">
@@ -127,7 +135,9 @@ export default function ITAppShell() {
           </span>
 
           <div>
-            <strong>Administrator IT</strong>
+            <strong className="sidebar__user-name">
+              {user?.nama || user?.username || 'Admin'}
+            </strong>
             <span>Super Admin</span>
           </div>
         </div>

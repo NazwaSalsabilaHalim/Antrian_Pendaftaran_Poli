@@ -120,6 +120,10 @@ export default function TVDisplay() {
     el.preload = 'auto'
     el.volume = 1
 
+    let retryId = null
+
+    const stopRetry = () => clearInterval(retryId)
+
     const unlockAudio = async () => {
       try {
         const audioUrl = '/sounds_jelek/tingtong.mp3'
@@ -130,22 +134,24 @@ export default function TVDisplay() {
         el.pause()
         el.currentTime = 0
         setAudioReady(true)
+        stopRetry()
         window.removeEventListener('click', unlockAudio)
         window.removeEventListener('keydown', unlockAudio)
         window.removeEventListener('touchstart', unlockAudio)
       } catch (e) {
-        console.error('❌ Audio gagal diaktifkan otomatis, menunggu interaksi...', e)
         setAudioReady(false)
       }
     }
 
     unlockAudio()
+    retryId = setInterval(unlockAudio, 3000)
 
     window.addEventListener('click', unlockAudio)
     window.addEventListener('keydown', unlockAudio)
     window.addEventListener('touchstart', unlockAudio)
 
     return () => {
+      stopRetry()
       window.removeEventListener('click', unlockAudio)
       window.removeEventListener('keydown', unlockAudio)
       window.removeEventListener('touchstart', unlockAudio)
