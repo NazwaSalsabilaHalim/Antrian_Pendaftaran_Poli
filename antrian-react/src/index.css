@@ -1245,16 +1245,39 @@ button.doctor-refresh-button:disabled {
   overflow: hidden;
 }
 
+.serving-card>* {
+  position: relative;
+  z-index: 1;
+}
+
 .serving-card::after {
   content: '';
   position: absolute;
-  width: 160px;
-  height: 160px;
-  right: -60px;
-  top: -70px;
+  z-index: 0;
+  width: 155px;
+  height: 145px;
+  right: -50px;
+  top: -50px;
   border-radius: 50%;
-  border: 30px solid rgba(47, 111, 158, 0.08);
+  background: rgba(47, 111, 158, 0.06);
   pointer-events: none;
+}
+
+/* warna per aksen */
+.serving-card.accent-a::after {
+  background: rgba(31, 138, 91, 0.06);
+}
+
+.serving-card.accent-b::after {
+  background: rgba(47, 111, 158, 0.06);
+}
+
+.serving-card.accent-c::after {
+  background: rgba(217, 119, 6, 0.06);
+}
+
+.serving-card.accent-d::after {
+  background: rgba(124, 58, 237, 0.06);
 }
 
 .serving-card__top {
