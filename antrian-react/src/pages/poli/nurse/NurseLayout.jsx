@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
-import { getNurseIzin, logoutNurse } from '../../../utils/auth'
+import { getNurse, getNurseIzin, logoutNurse } from '../../../utils/auth'
 import DataDokter from '../DataDokter'
 import { Tv, LogOut } from 'lucide-react'
 
 export default function NurseLayout() {
   const navigate = useNavigate()
   const izin = getNurseIzin()
+  const user = getNurse()
 
   return (
     <div className="nurse-layout-shell">
@@ -18,6 +19,20 @@ export default function NurseLayout() {
         }}
         aksiTambahan={
           <>
+            {/* LIVE STATUS */}
+            <div className="sidebar__status">
+              <span className="sidebar__status-dot">
+                <span />
+              </span>
+
+              <div>
+                <strong className="sidebar__user-name">
+                  {user?.nama || user?.username || 'Nurse'}
+                </strong>
+                <span>Monitoring real-time</span>
+              </div>
+            </div>
+
             <a
               href="/poli/display"
               target="_blank"

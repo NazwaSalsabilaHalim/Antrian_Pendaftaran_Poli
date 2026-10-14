@@ -6169,3 +6169,10 @@ table.data-table {
   font-size: 13px;
   font-weight: 600;
 }
+
+.doctor-hero .doctor-page-actions .sidebar__status {
+  margin: 0;
+  height: 44px;
+  padding: 0 14px 0 8px;
+  white-space: nowrap;
+}
