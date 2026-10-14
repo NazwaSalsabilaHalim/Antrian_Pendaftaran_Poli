@@ -285,28 +285,21 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
   return (
     <div className="doctors-page">
-      {/* PAGE INTRO — Selaras dengan Pendaftaran */}
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">
-            <UserCog size={15} />
-            MASTER POLIKLINIK
-          </div>
 
-          <h1 className="page-intro__title">
-            Master Data Dokter
-          </h1>
-
-          <p className="page-intro__subtitle">
-            Kelola data dokter, spesialisasi poli, foto profil, dan status kehadiran dokter.
-          </p>
+      {/* HERO — sama dengan Ambil Nomor */}
+      <section className="ambil-hero doctor-hero">
+        <div className="ambil-hero__icon">
+          <UserCog size={25} strokeWidth={1.9} />
         </div>
 
-        <div className="doctor-page-actions">
-          {aksiTambahan}
+        <div className="ambil-hero__content">
+          <span className="ambil-hero__eyebrow">MASTER POLIKLINIK</span>
+          <h1>Master Data Dokter</h1>
+          <p>Kelola data dokter, spesialisasi poli, foto profil, dan status kehadiran dokter.</p>
         </div>
-      </div>
 
+        <div className="doctor-page-actions">{aksiTambahan}</div>
+      </section>
       <Toast toast={toast} onClose={() => { setError(''); setMessage('') }} />
 
       {/* TABLE PANEL */}

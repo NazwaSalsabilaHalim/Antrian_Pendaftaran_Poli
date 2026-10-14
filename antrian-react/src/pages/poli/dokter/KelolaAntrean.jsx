@@ -177,28 +177,21 @@ export default function KelolaAntrean() {
 
   return (
     <div className="loket-page antrean-page">
-      {/* PAGE INTRO */}
-      <div className="page-intro">
-        <div>
-          <div className="page-intro__eyebrow">
-            <Stethoscope size={15} />
-            PANEL POLIKLINIK
-          </div>
+      {/* HERO — sama dengan Ambil Nomor */}
+      <section className="ambil-hero">
+        <div className="ambil-hero__icon">
+          <Stethoscope size={25} strokeWidth={1.9} />
+        </div>
 
-          <h1 className="page-intro__title">
-            Kelola Antrean Dokter
-          </h1>
-
-          <p className="page-intro__subtitle">
+        <div className="ambil-hero__content">
+          <span className="ambil-hero__eyebrow">PANEL POLIKLINIK</span>
+          <h1>Kelola Antrean Dokter</h1>
+          <p>
             Pilih dokter dan perbarui nomor antrean pasien poliklinik secara langsung ke Layar TV Poli.
           </p>
         </div>
 
-        <div className="page-intro__status">
-          <span />
-          {doctor ? 'Dokter Aktif' : 'Siap Melayani'}
-        </div>
-      </div>
+      </section>
 
       <Toast toast={toast} onClose={() => { setError(''); setSuccess('') }} />
 

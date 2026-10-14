@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { getNurseIzin, logoutNurse } from '../../../utils/auth'
 import DataDokter from '../DataDokter'
+import { Tv, LogOut } from 'lucide-react'
 
 export default function NurseLayout() {
   const navigate = useNavigate()
@@ -21,19 +22,28 @@ export default function NurseLayout() {
               href="/poli/display"
               target="_blank"
               rel="noreferrer"
-              className="btn btn-outline"
+              className="sidebar__display-link"
             >
-              Layar TV Poli ↗
+              <span className="sidebar__display-icon">
+                <Tv size={18} />
+              </span>
+              <span>
+                <strong>TV Poli</strong>
+                <small>Layar antrean poli</small>
+              </span>
+              <span className="sidebar__display-arrow">↗</span>
             </a>
 
             <button
-              className="btn btn-outline"
+              type="button"
+              className="btn btn-danger-outline sidebar__logout"
               onClick={() => {
                 logoutNurse()
                 navigate('/login-nurse', { replace: true })
               }}
             >
-              Logout
+              <LogOut size={16} />
+              <span>Logout</span>
             </button>
           </>
         }
