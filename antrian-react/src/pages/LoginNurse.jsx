@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import { isNurseLoggedIn, saveNurse } from '../utils/auth'
+import { Stethoscope } from 'lucide-react'
 
 export default function LoginNurse() {
   const navigate = useNavigate()
@@ -47,11 +48,11 @@ export default function LoginNurse() {
       <div className="login-card">
 
         <div className="login-header">
+          <div className="ambil-hero__icon">
+            <Stethoscope size={25} strokeWidth={1.9} />
+          </div>
           <h1>Login Nurse</h1>
-
-          <p>
-            Silakan masuk untuk mengakses layanan poliklinik
-          </p>
+          <p>Silakan masuk untuk mengakses layanan poliklinik</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -86,8 +87,8 @@ export default function LoginNurse() {
             </div>
           )}
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Memproses...' : 'Login Nurse'}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Memproses...' : 'Login'}
           </button>
 
         </form>

@@ -6134,3 +6134,38 @@ table.data-table {
     margin-right: 0;
   }
 }
+
+/* Login: ikon di atas judul & blok registrasi */
+.login-header .ambil-hero__icon {
+  margin: 0 auto 16px;
+}
+
+.login-register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.login-register .btn {
+  min-height: var(--btn-h-sm);
+}
+
+.login-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--success-bg);
+  border: 1px solid rgba(47, 155, 108, 0.25);
+  color: #1c7a52;
+  font-size: 13px;
+  font-weight: 600;
+}

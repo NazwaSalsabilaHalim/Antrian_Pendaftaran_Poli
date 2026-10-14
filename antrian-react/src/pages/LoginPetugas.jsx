@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import { isPetugasLoggedIn, savePetugas } from '../utils/auth'
+import { Users } from 'lucide-react'
 
 export default function LoginPetugas() {
   const navigate = useNavigate()
@@ -52,11 +53,11 @@ export default function LoginPetugas() {
       <div className="login-card">
 
         <div className="login-header">
+          <div className="ambil-hero__icon">
+            <Users size={25} strokeWidth={1.9} />
+          </div>
           <h1>Login Petugas</h1>
-
-          <p>
-            Silakan masuk untuk mengakses loket pelayanan
-          </p>
+          <p>Silakan masuk untuk mengakses loket pelayanan</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -91,10 +92,9 @@ export default function LoginPetugas() {
             </div>
           )}
 
-          <button type="submit" disabled={loading}>
-            {loading ? 'Memproses...' : 'Login Petugas'}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Memproses...' : 'Login'}
           </button>
-
         </form>
 
       </div>

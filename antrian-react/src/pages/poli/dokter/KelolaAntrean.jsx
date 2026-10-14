@@ -31,12 +31,17 @@ export default function KelolaAntrean() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  async function loadDoctors() {
+  async function loadDoctors(manual = false) {
     setLoadingDoctors(true)
     setError('')
 
     try {
-      const result = await api.getDoctors()
+      // kalau diklik manual, tahan sebentar supaya spinner terlihat
+      const [result] = await Promise.all([
+        api.getDoctors(),
+        manual ? new Promise((resolve) => setTimeout(resolve, 600)) : null,
+      ])
+
       const rows = Array.isArray(result)
         ? result
         : Array.isArray(result.data)
@@ -47,6 +52,12 @@ export default function KelolaAntrean() {
 
       if (aid && !rows.some((item) => String(item.AID) === aid)) {
         setAid('')
+      }
+
+      if (manual) {
+        setAid('')
+        setPassword('')
+        setSuccess('Daftar dokter berhasil dimuat ulang.')
       }
     } catch (err) {
       setError(err.message || 'Gagal mengambil data dokter.')
@@ -292,12 +303,12 @@ export default function KelolaAntrean() {
             <div className="antrean-reload-wrap">
               <button
                 type="button"
-                onClick={loadDoctors}
+                onClick={() => loadDoctors(true)}
                 disabled={loadingDoctors || processing}
                 className="antrean-reload-btn"
               >
                 <RefreshCw size={14} className={loadingDoctors ? 'loading-spin' : ''} />
-                <span>Muat Ulang Daftar Dokter</span>
+                <span>{loadingDoctors ? 'Memuat...' : 'Muat Ulang Daftar Dokter'}</span>
               </button>
             </div>
           </div>
@@ -410,9 +421,6 @@ export default function KelolaAntrean() {
                 <span className="antrean-control-title">
                   NOMOR ANTREAN SAAT INI
                 </span>
-                <p className="antrean-control-sub">
-                  Nomor ini tampil secara langsung di Layar TV Poli {doctor.Display || '1'}.
-                </p>
               </div>
 
               <div className="antrean-tv-badge">

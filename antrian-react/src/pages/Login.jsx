@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
+import { ShieldCheck } from 'lucide-react'
 
 export default function Login() {
     const navigate = useNavigate()
@@ -124,6 +125,9 @@ export default function Login() {
             <div className="login-card">
 
                 <div className="login-header">
+                    <div className="ambil-hero__icon">
+                        <ShieldCheck size={25} strokeWidth={1.9} />
+                    </div>
                     <h1>Login Sistem</h1>
                     <p>Silakan masuk menggunakan akun Anda</p>
                 </div>
@@ -166,11 +170,10 @@ export default function Login() {
 
                     <button
                         type="submit"
+                        className="btn btn-primary"
                         disabled={loading}
                     >
-                        {loading
-                            ? 'Memproses...'
-                            : 'Login'}
+                        {loading ? 'Memproses...' : 'Login'}
                     </button>
 
                 </form>
@@ -183,6 +186,7 @@ export default function Login() {
 
                     <button
                         type="button"
+                        className="btn btn-outline"
                         onClick={() =>
                             navigate('/register-admin')
                         }

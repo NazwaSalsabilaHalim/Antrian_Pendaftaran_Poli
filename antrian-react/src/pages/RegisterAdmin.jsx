@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
+import { UserPlus } from 'lucide-react'
 
 export default function RegisterAdmin() {
     const navigate = useNavigate()
@@ -67,6 +68,9 @@ export default function RegisterAdmin() {
             <div className="login-card">
 
                 <div className="login-header">
+                    <div className="ambil-hero__icon">
+                        <UserPlus size={25} strokeWidth={1.9} />
+                    </div>
                     <h1>Registrasi Admin</h1>
                     <p>Buat akun Admin / IT</p>
                 </div>
@@ -127,11 +131,8 @@ export default function RegisterAdmin() {
                         </div>
                     )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                    >
-                        {loading ? 'Mendaftarkan...' : 'Daftar'}
+                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                        {loading ? 'Memproses...' : 'Daftar'}
                     </button>
 
                 </form>
@@ -140,6 +141,7 @@ export default function RegisterAdmin() {
                     <span>Sudah memiliki akun?</span>
                     <button
                         type="button"
+                        className="btn btn-outline"
                         onClick={() => navigate('/login')}
                     >
                         Login
