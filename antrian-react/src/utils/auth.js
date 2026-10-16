@@ -43,4 +43,11 @@ export function logoutNurse() {
 }
 
 // ===== ADMIN / IT =====
-export const isAdminLoggedIn = () => roleOf(readUser(ADMIN_KEY)) === 'admin'
+export const getAdmin = () => readUser(ADMIN_KEY)
+
+export const saveAdmin = (user) =>
+    localStorage.setItem(ADMIN_KEY, JSON.stringify(user))
+
+export const isAdminLoggedIn = () => roleOf(getAdmin()) === 'admin'
+
+export const logoutAdmin = () => localStorage.removeItem(ADMIN_KEY)

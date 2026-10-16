@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Users } from 'lucide-react'
 import { api } from '../api/client'
 import { isPetugasLoggedIn, savePetugas } from '../utils/auth'
-import { Users } from 'lucide-react'
+import AuthForm, { LOGIN_FIELDS } from '../components/AuthForm'
 
 export default function LoginPetugas() {
   const navigate = useNavigate()
@@ -12,92 +12,22 @@ export default function LoginPetugas() {
     ? location.state.from
     : '/pendaftaran/loket'
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  // sudah login -> langsung masuk
+  if (isPetugasLoggedIn()) return <Navigate to={from} replace />
 
-  // sudah login -> langsung masuk, tidak perlu login ulang
-  if (isPetugasLoggedIn()) {
-    return <Navigate to={from} replace />
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-
-    if (!username.trim() || !password) {
-      setError('Username dan password wajib diisi.')
-      return
-    }
-
-    try {
-      setLoading(true)
-
-      const result = await api.loginPetugas({
-        username: username.trim(),
-        password,
-      })
-
-      savePetugas(result.user)
-      navigate(from, { replace: true })
-    } catch (err) {
-      setError(err.message || 'Login petugas gagal.')
-    } finally {
-      setLoading(false)
-    }
+  async function handleLogin({ username, password }) {
+    const result = await api.loginPetugas({ username: username.trim(), password })
+    savePetugas(result.user)
+    navigate(from, { replace: true })
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-
-        <div className="login-header">
-          <div className="ambil-hero__icon">
-            <Users size={25} strokeWidth={1.9} />
-          </div>
-          <h1>Login Petugas</h1>
-          <p>Silakan masuk untuk mengakses loket pelayanan</p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-
-          <div className="form-group">
-            <label>Username</label>
-
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Masukkan username"
-              autoComplete="username"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan password"
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <div className="login-error">
-              {error}
-            </div>
-          )}
-
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Memproses...' : 'Login'}
-          </button>
-        </form>
-
-      </div>
-    </div>
+    <AuthForm
+      icon={Users}
+      title="Login Petugas"
+      subtitle="Silakan masuk untuk mengakses loket pelayanan"
+      fields={LOGIN_FIELDS}
+      onSubmit={handleLogin}
+    />
   )
 }

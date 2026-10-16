@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { AlertCircle } from 'lucide-react'
 import { api } from '../../api/client'
 import { useInterval } from '../../hooks/useInterval'
+import { Toast } from '../../components/it/ITComponents'
 
 const POLL_MS = 5000 // Sedang Dilayani & Menunggu
 const STAT_POLL_MS = 15000 // Ringkasan hari ini
@@ -42,15 +42,14 @@ export default function Overview() {
   const [data, setData] = useState(null)
   const [stat, setStat] = useState(null)
   const [riwayat, setRiwayat] = useState([])
-  const [error, setError] = useState('')
+  const [toast, setToast] = useState(null)
 
   // Sedang Dilayani & Menunggu (cepat, 5 detik)
   const load = useCallback(() => {
     api
       .getLiveMonitor()
       .then(setData)
-      .then(() => setError(''))
-      .catch((e) => setError(e.message))
+      .catch((e) => setToast({ type: 'error', text: e.message }))
   }, [])
 
   // Ringkasan hari ini (15 detik)
@@ -62,7 +61,7 @@ export default function Overview() {
         setStat(statistik)
         setRiwayat(riwayatData.riwayat || [])
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => setToast({ type: 'error', text: e.message }))
   }, [])
 
   useEffect(() => {
@@ -84,12 +83,7 @@ export default function Overview() {
 
   return (
     <div>
-      {error && (
-        <div className="it-toast it-toast--error" role="alert">
-          <AlertCircle size={18} />
-          <span>{error}</span>
-        </div>
-      )}
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="dashboard-2col">
         {/* ============ KOLOM KIRI: PANTAUAN LIVE ============ */}

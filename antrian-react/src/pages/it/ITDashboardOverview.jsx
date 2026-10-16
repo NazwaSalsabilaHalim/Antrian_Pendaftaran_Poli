@@ -4,16 +4,9 @@ import {
   StatCard,
   StatusBadge,
 } from '../../components/it/ITComponents'
-import { Tv, Stethoscope } from 'lucide-react'
+import { Tv } from 'lucide-react'
+import { formatNomor, isDokterNonaktif } from '../../utils/dokter'
 import Pagination, { usePagination } from '../../components/Pagination'
-
-function isDokterNonaktif(doctor) {
-  const label = String(doctor.NamaStatus ?? doctor.Status ?? '')
-    .trim()
-    .toLowerCase()
-
-  return label !== '' && label !== 'aktif'
-}
 
 export default function ITDashboardOverview() {
   const [data, setData] = useState(null)
@@ -338,7 +331,7 @@ export default function ITDashboardOverview() {
                     />
                   </td>
                   <td>
-                    <strong>{String(doctor.Antrian ?? 0).padStart(3, '0')}</strong>
+                    <strong>{formatNomor(doctor.Antrian)}</strong>
                   </td>
                 </tr>
               ))}

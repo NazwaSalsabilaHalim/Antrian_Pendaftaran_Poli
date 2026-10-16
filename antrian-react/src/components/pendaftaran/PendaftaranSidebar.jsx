@@ -7,6 +7,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { getPetugas, logoutPetugas } from '../../utils/auth'
+import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
 const NAV_PENDAFTARAN = [
   {
@@ -28,7 +29,6 @@ const NAV_PENDAFTARAN = [
     icon: History,
   },
 ]
-import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
 export default function PendaftaranSidebar() {
   const navigate = useNavigate()

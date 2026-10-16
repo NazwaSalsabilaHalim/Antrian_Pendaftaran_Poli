@@ -4,17 +4,29 @@ import {
   RefreshCw,
   Stethoscope,
   Plus,
-  Pencil,
-  Trash2,
   X,
-  Save,
   ImagePlus,
   CheckCircle2,
   UserCog,
   RotateCcw,
+  User,
+  Hash,
+  Lock,
+  Building2,
+  MapPin,
+  Tv,
+  ToggleLeft,
 } from 'lucide-react'
 import { api } from '../../api/client'
-import { Toast } from '../../components/it/ITComponents'
+import { formatNomor, isDokterNonaktif } from '../../utils/dokter'
+import {
+  FIELD,
+  FormActions,
+  FormField,
+  Modal,
+  RowActions,
+  Toast,
+} from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
 
 const EMPTY_FORM = {
@@ -22,22 +34,26 @@ const EMPTY_FORM = {
   Nama: '',
   DokterID: '',
   Pwd: '',
-  foto: '',
   NamaPoli: '',
   Ruang: '',
   Display: '1',
   Status: '',
 }
 
-function isDokterNonaktif(doctor) {
-  const label = String(doctor.NamaStatus ?? doctor.Status ?? '')
-    .trim()
-    .toLowerCase()
-
-  return label !== '' && label !== 'aktif'
-}
+const FORM_KEYS = Object.keys(EMPTY_FORM)
+const DISPLAY_NUMBERS = Array.from({ length: 10 }, (_, i) => String(i + 1))
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024
 
 const IZIN_PENUH = { tambah: true, edit: true, hapus: true, kosongkan: true }
+
+function DisplayOptions() {
+  return DISPLAY_NUMBERS.map((n) => (
+    <option key={n} value={n}>
+      Display {n}
+    </option>
+  ))
+}
 
 export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [doctors, setDoctors] = useState([])
@@ -46,6 +62,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [display, setDisplay] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [toast, setToast] = useState(null) // { type: 'success' | 'error', text }
 
   const {
     currentPage,
@@ -55,9 +72,6 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     paginatedItems: paginatedDoctors,
   } = usePagination(doctors, 10)
 
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')
-
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
@@ -65,35 +79,26 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [photoFile, setPhotoFile] = useState(null)
   const [photoPreview, setPhotoPreview] = useState('')
 
+  const notify = (type, text) => setToast({ type, text })
+
+  // ================= DATA =================
+
   async function fetchDoctors(searchTerm = search, displayFilter = display) {
     setLoading(true)
-    setError('')
 
     try {
       const params = new URLSearchParams()
-      if (searchTerm.trim()) {
-        params.set('search', searchTerm.trim())
-      }
-      if (displayFilter) {
-        params.set('display', displayFilter)
-      }
+      if (searchTerm.trim()) params.set('search', searchTerm.trim())
+      if (displayFilter) params.set('display', displayFilter)
 
       const result = await api.getDoctors(params.toString())
       setDoctors(Array.isArray(result.data) ? result.data : [])
       setCurrentPage(1)
-      return true
     } catch (err) {
-      setError(err.message || 'Gagal memuat data dokter.')
-      return false
+      notify('error', err.message || 'Gagal memuat data dokter.')
     } finally {
       setLoading(false)
     }
-  }
-
-  async function handleRefresh() {
-    setSearch('')
-    setDisplay('')
-    const ok = await fetchDoctors('', '')
   }
 
   async function fetchStatuses() {
@@ -101,8 +106,14 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       const result = await api.getDoctorOptions()
       setStatuses(result.data?.statuses ?? [])
     } catch (err) {
-      setError(err.message || 'Gagal memuat pilihan status.')
+      notify('error', err.message || 'Gagal memuat pilihan status.')
     }
+  }
+
+  function handleRefresh() {
+    setSearch('')
+    setDisplay('')
+    fetchDoctors('', '')
   }
 
   useEffect(() => {
@@ -110,19 +121,14 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     fetchStatuses()
   }, [])
 
+  // Bebaskan memori preview foto yang dibuat dari file lokal
   useEffect(() => {
     return () => {
-      if (photoPreview && photoPreview.startsWith('blob:')) {
-        URL.revokeObjectURL(photoPreview)
-      }
+      if (photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview)
     }
   }, [photoPreview])
 
-  useEffect(() => {
-    if (!message) return
-    const timer = setTimeout(() => setMessage(''), 4000)
-    return () => clearTimeout(timer)
-  }, [message])
+  // ================= FORM =================
 
   function resetPhoto() {
     setPhotoFile(null)
@@ -136,8 +142,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       Status: statuses.length ? String(statuses[0].Status) : '',
     })
     resetPhoto()
-    setMessage('')
-    setError('')
+    setToast(null)
     setModalOpen(true)
   }
 
@@ -148,7 +153,6 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       Nama: doctor.Nama ?? '',
       DokterID: doctor.DokterID ?? '',
       Pwd: '',
-      foto: doctor.foto ?? '',
       NamaPoli: doctor.NamaPoli ?? '',
       Ruang: doctor.Ruang ?? '',
       Display: String(doctor.Display ?? '1'),
@@ -156,46 +160,38 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     })
 
     setPhotoFile(null)
-    if (doctor.foto) {
-      setPhotoPreview(api.getDoctorPhotoUrl(doctor.foto))
-    } else {
-      setPhotoPreview('')
-    }
-
-    setMessage('')
-    setError('')
+    setPhotoPreview(doctor.foto ? api.getDoctorPhotoUrl(doctor.foto) : '')
+    setToast(null)
     setModalOpen(true)
+  }
+
+  function closeModal() {
+    if (!saving) setModalOpen(false)
   }
 
   function updateField(event) {
     const { name, value } = event.target
-    setForm((current) => ({
-      ...current,
-      [name]: value,
-    }))
+    setForm((current) => ({ ...current, [name]: value }))
   }
 
   function handlePhotoChange(event) {
     const file = event.target.files?.[0]
     if (!file) return
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      setError('Format foto harus JPG, PNG, GIF, atau WEBP.')
+    const problem = !PHOTO_TYPES.includes(file.type)
+      ? 'Format foto harus JPG, PNG, GIF, atau WEBP.'
+      : file.size > PHOTO_MAX_BYTES
+        ? 'Ukuran foto maksimal 5 MB.'
+        : ''
+
+    if (problem) {
+      notify('error', problem)
       event.target.value = ''
       setPhotoFile(null)
       return
     }
 
-    const maxSize = 5 * 1024 * 1024
-    if (file.size > maxSize) {
-      setError('Ukuran foto maksimal 5 MB.')
-      event.target.value = ''
-      setPhotoFile(null)
-      return
-    }
-
-    setError('')
+    setToast(null)
     setPhotoFile(file)
     setPhotoPreview(URL.createObjectURL(file))
   }
@@ -203,37 +199,28 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   async function submitForm(event) {
     event.preventDefault()
     setSaving(true)
-    setError('')
-    setMessage('')
+    setToast(null)
 
     try {
       const body = new FormData()
       body.append('action', editing ? 'update' : 'create')
-      body.append('AID', String(form.AID ?? ''))
-      body.append('Nama', String(form.Nama ?? ''))
-      body.append('DokterID', String(form.DokterID ?? ''))
-      body.append('Pwd', String(form.Pwd ?? ''))
-      body.append('NamaPoli', String(form.NamaPoli ?? ''))
-      body.append('Ruang', String(form.Ruang ?? ''))
-      body.append('Display', String(form.Display ?? ''))
-      body.append('Status', String(form.Status ?? ''))
-
-      if (photoFile) {
-        body.append('foto', photoFile)
-      }
+      FORM_KEYS.forEach((key) => body.append(key, String(form[key] ?? '')))
+      if (photoFile) body.append('foto', photoFile)
 
       const result = await api.saveDoctor(body)
 
       setModalOpen(false)
       resetPhoto()
-      setMessage(result.message || 'Data dokter berhasil disimpan.')
+      notify('success', result.message || 'Data dokter berhasil disimpan.')
       await fetchDoctors(search, display)
     } catch (err) {
-      setError(err.message || 'Gagal menyimpan data dokter.')
+      notify('error', err.message || 'Gagal menyimpan data dokter.')
     } finally {
       setSaving(false)
     }
   }
+
+  // ================= AKSI =================
 
   async function deleteDoctor(doctor) {
     const confirmed = window.confirm(
@@ -241,15 +228,14 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     )
     if (!confirmed) return
 
-    setError('')
-    setMessage('')
+    setToast(null)
 
     try {
       const result = await api.deleteDoctor(doctor.AID)
-      setMessage(result.message || 'Dokter berhasil dihapus.')
+      notify('success', result.message || 'Dokter berhasil dihapus.')
       await fetchDoctors(search, display)
     } catch (err) {
-      setError(err.message || 'Gagal menghapus dokter.')
+      notify('error', err.message || 'Gagal menghapus dokter.')
     }
   }
 
@@ -259,34 +245,57 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     )
     if (!confirmed) return
 
-    setError('')
-    setMessage('')
+    setToast(null)
     setSaving(true)
 
     try {
       const result = await api.resetQueuePoli()
-      setMessage(result.message || 'Seluruh nomor antrean berhasil dikosongkan.')
+      notify('success', result.message || 'Seluruh nomor antrean berhasil dikosongkan.')
       await fetchDoctors(search, display)
     } catch (err) {
-      setError(err.message || 'Terjadi kesalahan saat mengosongkan antrean.')
+      notify('error', err.message || 'Terjadi kesalahan saat mengosongkan antrean.')
     } finally {
       setSaving(false)
     }
   }
 
-  const toast = error
-    ? { type: 'error', text: error }
-    : message
-      ? { type: 'success', text: message }
-      : null
+  // ================= TURUNAN =================
 
   const dokterNonaktif = doctors.filter(isDokterNonaktif).length
   const dokterAktif = doctors.length - dokterNonaktif
 
+  const summary = [
+    { label: 'Total Dokter', value: doctors.length, icon: Stethoscope },
+    { label: 'Aktif', value: dokterAktif, icon: CheckCircle2 },
+    { label: 'Tidak Aktif', value: dokterNonaktif, icon: X, off: true },
+  ]
+
+  const showAksi = izin.edit || izin.hapus
+  const colCount = showAksi ? 8 : 7
+
+  // Isian teks di form, urut sesuai tampilan
+  const textFields = [
+    { name: 'Nama', icon: User, label: 'Nama Dokter *', placeholder: 'Contoh: dr. Budi Santoso, Sp.A' },
+    { name: 'DokterID', icon: Hash, label: 'ID Dokter (SIP / Kode) *', placeholder: 'Contoh: DOK-001' },
+    {
+      name: 'Pwd',
+      icon: Lock,
+      label: editing ? 'Password Baru (opsional)' : 'Password *',
+      type: 'password',
+      autoComplete: 'new-password',
+      required: !editing,
+      placeholder: editing ? 'Kosongkan jika tidak diubah' : 'Password login antrean',
+    },
+    { name: 'NamaPoli', icon: Building2, label: 'Nama Poli *', placeholder: 'Contoh: Poli Anak' },
+    { name: 'Ruang', icon: MapPin, label: 'Ruang Praktek *', placeholder: 'Contoh: 101' },
+  ]
+
+  // ================= TAMPILAN =================
+
   return (
     <div className="doctors-page">
 
-      {/* HERO — sama dengan Ambil Nomor */}
+      {/* HERO */}
       <section className="ambil-hero doctor-hero">
         <div className="ambil-hero__icon">
           <UserCog size={25} strokeWidth={1.9} />
@@ -300,10 +309,11 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
         <div className="doctor-page-actions">{aksiTambahan}</div>
       </section>
-      <Toast toast={toast} onClose={() => { setError(''); setMessage('') }} />
+
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       {/* TABLE PANEL */}
-      <div className="doctor-table-panel">
+      <div className="card doctor-table-panel">
         <div className="doctor-table-heading">
           <div>
             <h3>Daftar Dokter & Spesialisasi</h3>
@@ -312,40 +322,22 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
           <div className="doctor-heading-actions">
             <div className="doctor-summary">
-              <div className="doctor-summary-card">
-                <div className="doctor-summary-icon">
-                  <Stethoscope size={14} />
+              {summary.map(({ label, value, icon: Icon, off }) => (
+                <div className="doctor-summary-card" key={label}>
+                  <div className={'doctor-summary-icon' + (off ? ' doctor-summary-icon-off' : '')}>
+                    <Icon size={14} />
+                  </div>
+                  <div>
+                    <span>{label}</span>
+                    <strong>{loading ? '-' : value}</strong>
+                  </div>
                 </div>
-                <div>
-                  <span>Total Dokter</span>
-                  <strong>{loading ? '-' : doctors.length}</strong>
-                </div>
-              </div>
-
-              <div className="doctor-summary-card">
-                <div className="doctor-summary-icon">
-                  <CheckCircle2 size={14} />
-                </div>
-                <div>
-                  <span>Aktif</span>
-                  <strong>{loading ? '-' : dokterAktif}</strong>
-                </div>
-              </div>
-
-              <div className="doctor-summary-card">
-                <div className="doctor-summary-icon doctor-summary-icon-off">
-                  <X size={14} />
-                </div>
-                <div>
-                  <span>Tidak Aktif</span>
-                  <strong>{loading ? '-' : dokterNonaktif}</strong>
-                </div>
-              </div>
+              ))}
             </div>
 
             <button
               type="button"
-              className="doctor-refresh-button"
+              className="btn btn-outline"
               onClick={handleRefresh}
               disabled={loading}
             >
@@ -354,14 +346,14 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
             </button>
 
             {izin.tambah && (
-              <button type="button" className="doctor-add-button" onClick={openAddForm}>
+              <button type="button" className="btn" onClick={openAddForm}>
                 <Plus size={17} />
                 <span>Tambah Dokter</span>
               </button>
             )}
 
             {izin.kosongkan && (
-              <button type="button" className="btn-danger" onClick={handleResetQueue} disabled={saving}>
+              <button type="button" className="btn btn-danger-outline" onClick={handleResetQueue} disabled={saving}>
                 <RotateCcw size={15} />
                 <span>{saving ? 'Memproses...' : 'Reset Antrean 1-10'}</span>
               </button>
@@ -397,22 +389,18 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
             }}
           >
             <option value="">Semua Display</option>
-            {Array.from({ length: 10 }, (_, index) => (
-              <option key={index + 1} value={String(index + 1)}>
-                Display {index + 1}
-              </option>
-            ))}
+            <DisplayOptions />
           </select>
 
-          <button type="submit" className="doctor-refresh-button">
+          <button type="submit" className="btn btn-outline">
             <Search size={16} />
             <span>Cari</span>
           </button>
         </form>
 
         {/* TABLE */}
-        <div className="doctor-table-scroll">
-          <table className="doctor-table">
+        <div className="management-table-wrapper">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>No.</th>
@@ -422,20 +410,20 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                 <th>Display</th>
                 <th>Status</th>
                 <th>Antrean</th>
-                {(izin.edit || izin.hapus) && <th>Aksi</th>}
+                {showAksi && <th>Aksi</th>}
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="doctor-table-message">
+                  <td colSpan={colCount} className="empty-state">
                     Memuat data dokter...
                   </td>
                 </tr>
               ) : doctors.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="doctor-table-message">
+                  <td colSpan={colCount} className="empty-state">
                     Tidak ada data dokter yang sesuai.
                   </td>
                 </tr>
@@ -477,8 +465,10 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
                     <td>
                       <span
-                        className={`doctor-status-badge${isDokterNonaktif(doctor) ? ' doctor-status-badge--off' : ''
-                          }`}
+                        className={
+                          'doctor-status-badge' +
+                          (isDokterNonaktif(doctor) ? ' doctor-status-badge--off' : '')
+                        }
                       >
                         {doctor.NamaStatus || doctor.Status || '—'}
                       </span>
@@ -486,26 +476,16 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
                     <td>
                       <strong className="doctor-queue-number">
-                        {String(doctor.Antrian ?? 0).padStart(3, '0')}
+                        {formatNomor(doctor.Antrian)}
                       </strong>
                     </td>
 
-                    {(izin.edit || izin.hapus) && (
+                    {showAksi && (
                       <td>
-                        <div className="doctor-row-actions">
-                          {izin.edit && (
-                            <button type="button" className="doctor-edit-button" title="Edit dokter"
-                              aria-label={`Edit ${doctor.Nama}`} onClick={() => openEditForm(doctor)}>
-                              <Pencil size={16} />
-                            </button>
-                          )}
-                          {izin.hapus && (
-                            <button type="button" className="doctor-delete-button" title="Hapus dokter"
-                              aria-label={`Hapus ${doctor.Nama}`} onClick={() => deleteDoctor(doctor)}>
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                        </div>
+                        <RowActions
+                          onEdit={izin.edit ? () => openEditForm(doctor) : undefined}
+                          onDelete={izin.hapus ? () => deleteDoctor(doctor) : undefined}
+                        />
                       </td>
                     )}
                   </tr>
@@ -531,132 +511,55 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
       {/* MODAL TAMBAH / EDIT DOKTER */}
       {modalOpen && (
-        <div
-          className="doctor-modal-backdrop"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget && !saving) {
-              setModalOpen(false)
-            }
-          }}
+        <Modal
+          size="lg"
+          icon={UserCog}
+          title={editing ? 'Edit Data Dokter' : 'Tambah Dokter Baru'}
+          subtitle="Lengkapi informasi dokter, poliklinik, dan foto di bawah ini."
+          onClose={closeModal}
         >
-          <div
-            className="doctor-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="doctor-modal-title"
-          >
-            {/* MODAL HEADER */}
-            <div className="doctor-modal-heading">
-              <div>
-                <h3 id="doctor-modal-title">
-                  {editing ? 'Edit Data Dokter' : 'Tambah Dokter Baru'}
-                </h3>
-                <p>Lengkapi informasi dokter, poliklinik, dan foto di bawah ini.</p>
-              </div>
-
-              <button
-                type="button"
-                className="doctor-modal-close"
-                onClick={() => setModalOpen(false)}
-                disabled={saving}
-                aria-label="Tutup form"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* FORM */}
-            <form onSubmit={submitForm}>
-              <div className="doctor-form-grid">
-                <label>
-                  Nama Dokter *
+          <form onSubmit={submitForm}>
+            <div className="it-form-grid">
+              {textFields.map(({ label, icon, required = true, ...input }) => (
+                <FormField key={input.name} label={label} icon={icon}>
                   <input
-                    name="Nama"
-                    value={form.Nama}
+                    {...input}
+                    value={form[input.name]}
                     onChange={updateField}
-                    placeholder="Contoh: dr. Budi Santoso, Sp.A"
-                    required
+                    required={required}
+                    className={FIELD}
                   />
-                </label>
+                </FormField>
+              ))}
 
-                <label>
-                  ID Dokter (SIP / Kode) *
-                  <input
-                    name="DokterID"
-                    value={form.DokterID}
-                    onChange={updateField}
-                    placeholder="Contoh: DOK-001"
-                    required
-                  />
-                </label>
+              <FormField label="Display TV *" icon={Tv}>
+                <select
+                  name="Display"
+                  value={form.Display}
+                  onChange={updateField}
+                  required
+                  className={FIELD}
+                >
+                  <DisplayOptions />
+                </select>
+              </FormField>
 
-                <label>
-                  {editing ? 'Password Baru (opsional)' : 'Password *'}
-                  <input
-                    name="Pwd"
-                    type="password"
-                    value={form.Pwd}
-                    onChange={updateField}
-                    autoComplete="new-password"
-                    required={!editing}
-                    placeholder={editing ? 'Kosongkan jika tidak diubah' : 'Password login antrean'}
-                  />
-                </label>
-
-                <label>
-                  Nama Poli *
-                  <input
-                    name="NamaPoli"
-                    value={form.NamaPoli}
-                    onChange={updateField}
-                    placeholder="Contoh: Poli Anak"
-                    required
-                  />
-                </label>
-
-                <label>
-                  Ruang Praktek *
-                  <input
-                    name="Ruang"
-                    value={form.Ruang}
-                    onChange={updateField}
-                    placeholder="Contoh: 101"
-                    required
-                  />
-                </label>
-
-                <label>
-                  Display TV *
-                  <select
-                    name="Display"
-                    value={form.Display}
-                    onChange={updateField}
-                    required
-                  >
-                    {Array.from({ length: 10 }, (_, index) => (
-                      <option key={index + 1} value={String(index + 1)}>
-                        Display {index + 1}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  Status Dokter *
-                  <select
-                    name="Status"
-                    value={form.Status}
-                    onChange={updateField}
-                    required
-                  >
-                    <option value="">Pilih status</option>
-                    {statuses.map((status) => (
-                      <option key={status.Status} value={String(status.Status)}>
-                        {status.Nama}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+              <FormField label="Status Dokter *" icon={ToggleLeft}>
+                <select
+                  name="Status"
+                  value={form.Status}
+                  onChange={updateField}
+                  required
+                  className={FIELD}
+                >
+                  <option value="">Pilih status</option>
+                  {statuses.map((status) => (
+                    <option key={status.Status} value={String(status.Status)}>
+                      {status.Nama}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
 
                 {/* UPLOAD FOTO */}
                 <div className="doctor-photo-field doctor-photo-full">
@@ -689,7 +592,7 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                     <input
                       type="file"
                       name="foto"
-                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      accept={PHOTO_TYPES.join(',')}
                       onChange={handlePhotoChange}
                     />
                   </label>
@@ -706,31 +609,15 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                     </div>
                   )}
                 </div>
-              </div>
+            </div>
 
-              {/* MODAL ACTIONS */}
-              <div className="doctor-modal-actions">
-                <button
-                  type="button"
-                  className="doctor-cancel-button"
-                  onClick={() => setModalOpen(false)}
-                  disabled={saving}
-                >
-                  Batal
-                </button>
-
-                <button
-                  type="submit"
-                  className="doctor-add-button"
-                  disabled={saving}
-                >
-                  <Save size={16} />
-                  <span>{saving ? 'Menyimpan...' : 'Simpan Data'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <FormActions
+              submitLabel={saving ? 'Menyimpan...' : 'Simpan Data'}
+              onCancel={closeModal}
+              busy={saving}
+            />
+          </form>
+        </Modal>
       )}
     </div>
   )

@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/KP/antrian_pendaftaran/sw.js', { scope: '/KP/antrian_pendaftaran/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/antrian_react/sw.js', { scope: '/antrian_react/' })})}

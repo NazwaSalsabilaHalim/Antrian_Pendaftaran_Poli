@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { AlertCircle } from 'lucide-react'
 import { api } from '../../api/client'
 import { useInterval } from '../../hooks/useInterval'
 import {
@@ -15,7 +14,7 @@ import {
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
-import { StatCard } from '../../components/it/ITComponents'
+import { StatCard, Toast } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
 
 const REFRESH_MS = 15000
@@ -65,7 +64,7 @@ export default function Dashboard() {
   const [tanggal, setTanggal] = useState(todayStr())
   const [data, setData] = useState(null)
   const [riwayat, setRiwayat] = useState([])
-  const [error, setError] = useState('')
+  const [toast, setToast] = useState(null)
   const [lastUpdate, setLastUpdate] = useState(null)
 
   const {
@@ -87,10 +86,9 @@ export default function Dashboard() {
         setData(statistik)
         setRiwayat(riwayatData.riwayat || [])
         setCurrentPage(1)
-        setError('')
         setLastUpdate(new Date())
       })
-      .catch((e) => setError(e.message))
+      .catch((e) => setToast({ type: 'error', text: e.message }))
   }, [tanggal])
 
   // Muat ulang saat tanggal berubah
@@ -259,12 +257,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      {error && (
-        <div className="it-toast it-toast--error" role="alert">
-          <AlertCircle size={18} />
-          <span>{error}</span>
-        </div>
-      )}
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       {/* FILTER TANGGAL & EXPORT */}
       <div className="card_loket-header">

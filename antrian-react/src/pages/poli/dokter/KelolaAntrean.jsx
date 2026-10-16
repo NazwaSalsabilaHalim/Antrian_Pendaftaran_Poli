@@ -10,13 +10,13 @@ import {
   Tv,
 } from 'lucide-react'
 import { api } from '../../../api/client'
+import { formatNomor } from '../../../utils/dokter'
 import { Toast } from '../../../components/it/ITComponents'
 
-function formatNomor(value) {
-  if (value === null || value === undefined || value === '') {
-    return '000'
-  }
-  return String(value).padStart(3, '0')
+// Backend antrean membalas { OK: 0, MSG } kalau gagal
+function ensureOk(result, fallback) {
+  if (Number(result.OK) === 0) throw new Error(result.MSG || fallback)
+  return result
 }
 
 export default function KelolaAntrean() {
@@ -28,12 +28,29 @@ export default function KelolaAntrean() {
   const [nomorManual, setNomorManual] = useState('')
   const [loadingDoctors, setLoadingDoctors] = useState(true)
   const [processing, setProcessing] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [toast, setToast] = useState(null) // { type: 'success' | 'error', text }
+
+  const notify = (type, text) => setToast({ type, text })
+
+  // Jalankan satu aksi: kunci tombol, bersihkan notifikasi, tangkap error
+  async function run(action, failMessage) {
+    setToast(null)
+    setProcessing(true)
+
+    try {
+      await action()
+    } catch (err) {
+      notify('error', err.message || failMessage)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  // ================= DAFTAR DOKTER =================
 
   async function loadDoctors(manual = false) {
     setLoadingDoctors(true)
-    setError('')
+    setToast(null)
 
     try {
       // kalau diklik manual, tahan sebentar supaya spinner terlihat
@@ -50,17 +67,15 @@ export default function KelolaAntrean() {
 
       setDoctors(rows)
 
-      if (aid && !rows.some((item) => String(item.AID) === aid)) {
-        setAid('')
-      }
-
       if (manual) {
         setAid('')
         setPassword('')
-        setSuccess('Daftar dokter berhasil dimuat ulang.')
+        notify('success', 'Daftar dokter berhasil dimuat ulang.')
+      } else if (aid && !rows.some((item) => String(item.AID) === aid)) {
+        setAid('')
       }
     } catch (err) {
-      setError(err.message || 'Gagal mengambil data dokter.')
+      notify('error', err.message || 'Gagal mengambil data dokter.')
     } finally {
       setLoadingDoctors(false)
     }
@@ -70,104 +85,72 @@ export default function KelolaAntrean() {
     loadDoctors()
   }, [])
 
-  useEffect(() => {
-    if (!success) return
-    const timer = setTimeout(() => setSuccess(''), 4000)
-    return () => clearTimeout(timer)
-  }, [success])
+  // ================= AKSI =================
 
-  async function handleLogin(event) {
+  function handleLogin(event) {
     event.preventDefault()
-    setError('')
-    setSuccess('')
 
     if (!aid || !password) {
-      setError('Pilih dokter dan masukkan password terlebih dahulu.')
+      notify('error', 'Pilih dokter dan masukkan password terlebih dahulu.')
       return
     }
 
-    setProcessing(true)
-
-    try {
-      const result = await api.loginDoctor(aid, password)
-
-      if (Number(result.OK) === 0) {
-        throw new Error(result.MSG || 'Login dokter gagal. Periksa password Anda.')
-      }
+    run(async () => {
+      ensureOk(
+        await api.loginDoctor(aid, password),
+        'Login dokter gagal. Periksa password Anda.'
+      )
 
       const data = await api.getDoctorQueueData(aid, password)
 
       setDoctor(data)
       setNomor(formatNomor(data.Antrian))
       setNomorManual(String(Number(data.Antrian) || 0))
-      setSuccess('Login berhasil! Panel antrean dokter siap digunakan.')
-    } catch (err) {
-      setError(err.message || 'Tidak dapat menghubungi server database.')
-    } finally {
-      setProcessing(false)
-    }
+      notify('success', 'Login berhasil! Panel antrean dokter siap digunakan.')
+    }, 'Tidak dapat menghubungi server database.')
   }
 
-  async function handleChangeNomor(direction) {
+  function handleChangeNomor(direction) {
     if (!doctor || processing) return
 
-    setError('')
-    setSuccess('')
-    setProcessing(true)
-
-    try {
-      const result = await api.updateDoctorQueue(aid, password, direction)
-
-      if (Number(result.OK) === 0) {
-        throw new Error(result.MSG || 'Nomor antrean gagal diubah.')
-      }
+    run(async () => {
+      const result = ensureOk(
+        await api.updateDoctorQueue(aid, password, direction),
+        'Nomor antrean gagal diubah.'
+      )
 
       setNomor(formatNomor(result.Antrian))
       setNomorManual(String(Number(result.Antrian)))
-      setSuccess(
+      notify(
+        'success',
         direction > 0
           ? `Nomor antrean bertambah ke ${formatNomor(result.Antrian)} (Tampil di TV Poli).`
-          : `Nomor antrean diubah ke ${formatNomor(result.Antrian)}.`,
+          : `Nomor antrean diubah ke ${formatNomor(result.Antrian)}.`
       )
-    } catch (err) {
-      setError(err.message || 'Gagal mengubah nomor antrean.')
-    } finally {
-      setProcessing(false)
-    }
+    }, 'Gagal mengubah nomor antrean.')
   }
 
-  async function handleManual(event) {
+  function handleManual(event) {
     event.preventDefault()
 
     if (!doctor || processing) return
 
-    if (
-      nomorManual.trim() === '' ||
-      !Number.isInteger(Number(nomorManual)) ||
-      Number(nomorManual) < 0
-    ) {
-      setError('Masukkan nomor antrean berupa bilangan bulat minimal 0.')
+    const angka = Number(nomorManual)
+
+    if (nomorManual.trim() === '' || !Number.isInteger(angka) || angka < 0) {
+      notify('error', 'Masukkan nomor antrean berupa bilangan bulat minimal 0.')
       return
     }
 
-    setError('')
-    setSuccess('')
-    setProcessing(true)
-
-    try {
-      const result = await api.setDoctorQueueManual(aid, password, Number(nomorManual))
-
-      if (Number(result.OK) === 0) {
-        throw new Error(result.MSG || 'Nomor manual gagal disimpan.')
-      }
+    run(async () => {
+      const result = ensureOk(
+        await api.setDoctorQueueManual(aid, password, angka),
+        'Nomor manual gagal disimpan.'
+      )
 
       setNomor(formatNomor(result.Antrian))
-      setSuccess(`Nomor antrean manual berhasil disimpan: ${formatNomor(result.Antrian)}.`)
-    } catch (err) {
-      setError(err.message || 'Gagal menyimpan nomor antrean.')
-    } finally {
-      setProcessing(false)
-    }
+      notify('success', `Nomor antrean manual berhasil disimpan: ${formatNomor(result.Antrian)}.`)
+    }, 'Gagal menyimpan nomor antrean.')
   }
 
   function handleLogout() {
@@ -175,20 +158,16 @@ export default function KelolaAntrean() {
     setPassword('')
     setNomor('000')
     setNomorManual('')
-    setError('')
-    setSuccess('')
+    setToast(null)
   }
 
   const selectedDoctor = doctors.find((item) => String(item.AID) === aid)
-  const toast = error
-    ? { type: 'error', text: error }
-    : success
-      ? { type: 'success', text: success }
-      : null
+
+  // ================= TAMPILAN =================
 
   return (
     <div className="loket-page antrean-page">
-      {/* HERO — sama dengan Ambil Nomor */}
+      {/* HERO */}
       <section className="ambil-hero">
         <div className="ambil-hero__icon">
           <Stethoscope size={25} strokeWidth={1.9} />
@@ -201,13 +180,12 @@ export default function KelolaAntrean() {
             Pilih dokter dan perbarui nomor antrean pasien poliklinik secara langsung ke Layar TV Poli.
           </p>
         </div>
-
       </section>
 
-      <Toast toast={toast} onClose={() => { setError(''); setSuccess('') }} />
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       {!doctor ? (
-        /* ================= TAMPILAN LOGIN DOKTER ================= */
+        /* ================= LOGIN DOKTER ================= */
         <div className="antrean-login-container">
           <div className="card antrean-login-card">
             <div className="antrean-login-header">
@@ -221,11 +199,8 @@ export default function KelolaAntrean() {
             </div>
 
             <form onSubmit={handleLogin}>
-              {/* Field Dokter */}
               <div className="antrean-field-group">
-                <label className="antrean-label">
-                  Nama Dokter / Poli Tujuan
-                </label>
+                <label className="antrean-label">Nama Dokter / Poli Tujuan</label>
                 <select
                   value={aid}
                   onChange={(e) => setAid(e.target.value)}
@@ -244,7 +219,7 @@ export default function KelolaAntrean() {
                 </select>
               </div>
 
-              {/* Preview Dokter yang dipilih */}
+              {/* Preview dokter yang dipilih */}
               {selectedDoctor && (
                 <div className="antrean-selected-preview">
                   <div className="antrean-selected-avatar">
@@ -262,9 +237,7 @@ export default function KelolaAntrean() {
                     )}
                   </div>
                   <div className="antrean-selected-info">
-                    <strong className="antrean-selected-name">
-                      {selectedDoctor.Nama}
-                    </strong>
+                    <strong className="antrean-selected-name">{selectedDoctor.Nama}</strong>
                     <span className="antrean-selected-meta">
                       {selectedDoctor.NamaPoli} • Ruang {selectedDoctor.Ruang || '-'} • Display {selectedDoctor.Display || '1'}
                     </span>
@@ -272,11 +245,8 @@ export default function KelolaAntrean() {
                 </div>
               )}
 
-              {/* Field Password */}
               <div className="antrean-field-group antrean-password-group">
-                <label className="antrean-label">
-                  Password Dokter
-                </label>
+                <label className="antrean-label">Password Dokter</label>
                 <input
                   type="password"
                   value={password}
@@ -289,7 +259,6 @@ export default function KelolaAntrean() {
                 />
               </div>
 
-              {/* Tombol Submit */}
               <button
                 type="submit"
                 className="btn btn-primary antrean-login-submit"
@@ -316,7 +285,7 @@ export default function KelolaAntrean() {
       ) : (
         /* ================= WORKSPACE DOKTER AKTIF ================= */
         <div className="antrean-workspace-grid">
-          {/* SISI KIRI: Profil Dokter & Status Display */}
+          {/* KIRI: profil dokter & nomor manual */}
           <div className="antrean-profile-col">
             <div className="card antrean-profile-card">
               <div className="antrean-profile-center">
@@ -335,16 +304,10 @@ export default function KelolaAntrean() {
                   )}
                 </div>
 
-                <div className="antrean-profile-badge">
-                  DOKTER AKTIF
-                </div>
+                <div className="antrean-profile-badge">DOKTER AKTIF</div>
 
-                <h3 className="antrean-profile-name">
-                  {doctor.Nama}
-                </h3>
-                <span className="antrean-profile-poli">
-                  {doctor.NamaPoli}
-                </span>
+                <h3 className="antrean-profile-name">{doctor.Nama}</h3>
+                <span className="antrean-profile-poli">{doctor.NamaPoli}</span>
                 <span className="antrean-profile-room">
                   Ruang {doctor.Ruang || '-'} • Display TV {doctor.Display || '1'}
                 </span>
@@ -354,10 +317,10 @@ export default function KelolaAntrean() {
 
               <div className="antrean-profile-actions">
                 <a
-                  href={`/poli/display`}
+                  href="/poli/display"
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn-outline antrean-tv-link"
+                  className="btn btn-secondary antrean-tv-link"
                 >
                   <Tv size={16} />
                   <span>Buka Layar TV Poli</span>
@@ -375,16 +338,14 @@ export default function KelolaAntrean() {
               </div>
             </div>
 
-            {/* Atur Nomor Manual */}
+            {/* Atur nomor manual */}
             <div className="antrean-manual-box">
               <div className="antrean-manual-header">
                 <div className="antrean-manual-icon">
                   <ArrowDown size={16} />
                 </div>
                 <div>
-                  <h4 className="antrean-manual-title">
-                    Atur Nomor Antrean Manual
-                  </h4>
+                  <h4 className="antrean-manual-title">Atur Nomor Antrean Manual</h4>
                   <span className="antrean-manual-sub">
                     Gunakan jika ingin melompati atau mereset nomor antrean secara langsung.
                   </span>
@@ -414,14 +375,10 @@ export default function KelolaAntrean() {
             </div>
           </div>
 
-          {/* SISI KANAN: Panel Kontrol Nomor Antrean */}
+          {/* KANAN: panel kontrol nomor */}
           <div className="card antrean-control-card">
             <div className="antrean-control-top">
-              <div>
-                <span className="antrean-control-title">
-                  NOMOR ANTREAN SAAT INI
-                </span>
-              </div>
+              <span className="antrean-control-title">NOMOR ANTREAN SAAT INI</span>
 
               <div className="antrean-tv-badge">
                 <span className="antrean-tv-badge-dot" />
@@ -429,49 +386,39 @@ export default function KelolaAntrean() {
               </div>
             </div>
 
-            {/* Kotak Nomor Antrean Besar */}
             <div className="antrean-number-box">
-              <span className="antrean-number-label">
-                Nomor Antrean
-              </span>
-              <div className="antrean-number-digit">
-                {nomor}
-              </div>
+              <span className="antrean-number-label">Nomor Antrean</span>
+              <div className="antrean-number-digit">{nomor}</div>
               <span className="antrean-number-sub">
                 {doctor.NamaPoli} • Ruang {doctor.Ruang || '-'}
               </span>
             </div>
 
-            {/* Tombol Pemanggilan Pasien (Next & Prev) */}
             <div className="antrean-actions-grid">
               <button
                 type="button"
                 onClick={() => handleChangeNomor(-1)}
                 disabled={processing || Number(nomor) <= 0}
-                className="btn btn-outline antrean-btn-prev"
+                className="btn btn-outline"
               >
-                <ArrowLeft size={20} />
-                <span className="antrean-btn-prev-text">Prev (-1)</span>
-                <small className="antrean-btn-prev-sub">Nomor sebelumnya</small>
+                <ArrowLeft size={18} />
+                <span>Sebelumnya (-1)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleChangeNomor(1)}
                 disabled={processing}
-                className="btn antrean-btn-next"
+                className="btn"
               >
-                <div className="antrean-btn-next-main">
-                  <span>Panggil Pasien Berikutnya (+1)</span>
-                  <ArrowRight size={20} />
-                </div>
-                <small className="antrean-btn-next-sub">
-                  Update ke nomor {formatNomor(Number(nomor) + 1)} & bunyikan bel TV
-                </small>
+                <span>Panggil Berikutnya (+1)</span>
+                <ArrowRight size={18} />
               </button>
             </div>
 
-
+            <p className="muted antrean-actions-hint">
+              Panggil berikutnya memperbarui ke nomor {formatNomor(Number(nomor) + 1)} dan membunyikan bel TV.
+            </p>
           </div>
         </div>
       )}

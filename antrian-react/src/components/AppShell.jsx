@@ -1,34 +1,9 @@
-import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
-import { Users, Clock3 } from 'lucide-react'
+import { Users } from 'lucide-react'
+import TopbarClock from './TopbarClock'
 
-function useClock() {
-  const [now, setNow] = useState(new Date())
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setNow(new Date())
-    }, 1000)
-
-    return () => clearInterval(id)
-  }, [])
-
-  return now
-}
-
-/**
- * Layout bersama (topbar + area konten).
- * Sidebar TIDAK ada di sini. Sidebar dikirim lewat props `sidebar`,
- * jadi tiap bagian punya sidebar sendiri:
- *   - Pendaftaran -> components/pendaftaran/PendaftaranSidebar.jsx
- *   - Poliklinik  -> components/poli/...
- *   - IT          -> components/it/ITAppShell.jsx (shell sendiri)
- *
- * `pageInfo` = judul & subjudul topbar per path.
- */
 export default function AppShell({ sidebar, pageInfo = {} }) {
   const location = useLocation()
-  const now = useClock()
 
   const [title, subtitle] =
     pageInfo[location.pathname] || ['Antrian Rumah Sakit', 'Sistem Informasi Antrian']
@@ -73,29 +48,7 @@ export default function AppShell({ sidebar, pageInfo = {} }) {
 
             <div className="topbar__divider" />
 
-            <div className="topbar__clock">
-
-              <div className="topbar__clock-icon">
-                <Clock3 size={17} strokeWidth={2} />
-              </div>
-
-              <div className="topbar__clock-info">
-                <span className="topbar__time">
-                  {now.toLocaleTimeString('id-ID')}
-                </span>
-
-                <span className="topbar__date">
-                  {now.toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
-
-            </div>
-
+            <TopbarClock />
           </div>
         </header>
 

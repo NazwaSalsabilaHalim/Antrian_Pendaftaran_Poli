@@ -6,13 +6,10 @@ import {
   RotateCcw,
   ArrowRight,
   CheckCircle2,
-  AlertCircle,
 } from 'lucide-react'
 import { api } from '../../api/client'
 import { COUNTER_KEY } from '../../utils/auth'
-
-const TOAST_MS = 3000 // notifikasi berhasil
-const TOAST_ERROR_MS = 5000 // notifikasi gagal
+import { Toast } from '../../components/it/ITComponents'
 
 export default function Loket() {
   // ================= STATE =================
@@ -29,7 +26,7 @@ export default function Loket() {
   const [lastPanggil, setLastPanggil] = useState({})
 
   const [busyId, setBusyId] = useState(null)
-  const [toast, setToast] = useState(null) // { tipe: 'success' | 'error', pesan }
+  const [toast, setToast] = useState(null) // { type: 'success' | 'error', text }
 
   // ================= AMBIL DATA =================
 
@@ -50,24 +47,14 @@ export default function Loket() {
       .catch((e) => showError(e.message))
   }, [])
 
-  // Sembunyikan notifikasi otomatis
-  useEffect(() => {
-    if (!toast) return
-
-    const durasi = toast.tipe === 'error' ? TOAST_ERROR_MS : TOAST_MS
-    const id = setTimeout(() => setToast(null), durasi)
-
-    return () => clearTimeout(id)
-  }, [toast])
-
   // ================= AKSI =================
 
   function showToast(pesan) {
-    setToast({ tipe: 'success', pesan })
+    setToast({ type: 'success', text: pesan })
   }
 
   function showError(pesan) {
-    setToast({ tipe: 'error', pesan })
+    setToast({ type: 'error', text: pesan })
   }
 
   function pilihCounter(value) {
@@ -277,29 +264,7 @@ export default function Loket() {
       )}
 
       {/* NOTIFIKASI */}
-      {toast && (
-        <div
-          className={'it-toast' + (toast.tipe === 'error' ? ' it-toast--error' : '')}
-          role={toast.tipe === 'error' ? 'alert' : 'status'}
-        >
-          {toast.tipe === 'error' ? (
-            <AlertCircle size={18} />
-          ) : (
-            <CheckCircle2 size={18} />
-          )}
-
-          <span>{toast.pesan}</span>
-
-          <button
-            type="button"
-            className="it-toast__close"
-            onClick={() => setToast(null)}
-            aria-label="Tutup notifikasi"
-          >
-            ×
-          </button>
-        </div>
-      )}
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   )
 }

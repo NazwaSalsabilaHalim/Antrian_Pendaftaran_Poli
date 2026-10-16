@@ -68,7 +68,7 @@ export default function AntrianPage() {
 
           <button
             type="button"
-            className="doctor-refresh-button"
+            className="btn btn-outline"
             onClick={handleRefresh}
             disabled={loading}
           >

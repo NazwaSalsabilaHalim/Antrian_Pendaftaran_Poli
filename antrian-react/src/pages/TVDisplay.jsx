@@ -2,37 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useInterval } from '../hooks/useInterval'
 import { buildAntrianSounds, playQueue } from '../utils/audioQueue'
-import logoAwalBros from './LOGOAWALBROS.png'
+import {
+  FlapRow,
+  TVBackground,
+  TVFooter,
+  TVHeader,
+  useAudioUnlock,
+} from '../components/tv/TVShared'
 
 const POLL_MS = 10000
-
-function FlapRow({ value }) {
-  return (
-    <div className="tv-flap-row">
-      {String(value)
-        .split('')
-        .map((char, index) => (
-          <span key={index} className="tv-flap-char">
-            {char}
-          </span>
-        ))}
-    </div>
-  )
-}
-
-function useClock() {
-  const [now, setNow] = useState(new Date())
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setNow(new Date())
-    }, 1000)
-
-    return () => clearInterval(id)
-  }, [])
-
-  return now
-}
 
 /*
  * Memecah "A3" -> { prefix: "A", nomor: 3 }
@@ -82,13 +60,12 @@ function CounterCard({ counterNama, serving }) {
 export default function TVDisplay() {
   const [counterList, setCounterList] = useState([])
   const [servingByCounter, setServingByCounter] = useState({})
-  const [audioReady, setAudioReady] = useState(false)
 
   const audioRef = useRef(null)
+  // Autoplay butuh browser dengan flag --autoplay-policy=no-user-gesture-required
+  const [audioReady] = useAudioUnlock(audioRef, '/sounds_jelek/tingtong.mp3')
   const prevServingRef = useRef({})
   const isFirstPoll = useRef(true)
-
-  const now = useClock()
 
   /*
    * ================================
@@ -100,65 +77,6 @@ export default function TVDisplay() {
       .getCounter()
       .then((d) => setCounterList(d.counter || []))
       .catch((e) => console.warn('Gagal ambil daftar counter:', e.message))
-  }, [])
-
-  /*
-   * ================================
-   * AUDIO
-   * ================================
-   *
-   * Autoplay diaktifkan langsung saat halaman dibuka.
-   * Butuh browser/device yang dijalankan dengan flag
-   * --autoplay-policy=no-user-gesture-required
-   * (lihat shortcut TV Display).
-   */
-  useEffect(() => {
-    console.log('🎯 TVDisplay AUDIO EFFECT DIJALANKAN')
-    const el = audioRef.current
-    if (!el) return
-
-    el.preload = 'auto'
-    el.volume = 1
-
-    let retryId = null
-
-    const stopRetry = () => clearInterval(retryId)
-
-    const unlockAudio = async () => {
-      try {
-        const audioUrl = '/sounds_jelek/tingtong.mp3'
-        el.src = audioUrl
-        el.load()
-        await el.play()
-        console.log('🔊 Audio berhasil diaktifkan')
-        el.pause()
-        el.currentTime = 0
-        setAudioReady(true)
-        stopRetry()
-        window.removeEventListener('click', unlockAudio)
-        window.removeEventListener('keydown', unlockAudio)
-        window.removeEventListener('touchstart', unlockAudio)
-      } catch (e) {
-        setAudioReady(false)
-      }
-    }
-
-    unlockAudio()
-    retryId = setInterval(unlockAudio, 3000)
-
-    window.addEventListener('click', unlockAudio)
-    window.addEventListener('keydown', unlockAudio)
-    window.addEventListener('touchstart', unlockAudio)
-
-    return () => {
-      stopRetry()
-      window.removeEventListener('click', unlockAudio)
-      window.removeEventListener('keydown', unlockAudio)
-      window.removeEventListener('touchstart', unlockAudio)
-      el.pause()
-      el.removeAttribute('src')
-      el.load()
-    }
   }, [])
 
   /*
@@ -216,62 +134,12 @@ export default function TVDisplay() {
 
   useInterval(poll, POLL_MS)
 
-  const time = now.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
-
-  const date = now.toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-
   return (
     <div className="tv-screen">
+      <audio ref={audioRef} preload="auto" />
 
-      {/* Audio tidak lagi memiliki tombol kontrol */}
-      <audio
-        ref={audioRef}
-        preload="auto"
-      />
-
-      {/* Decorative background */}
-      <div className="tv-bg-shape tv-bg-shape--one" />
-      <div className="tv-bg-shape tv-bg-shape--two" />
-      <div className="tv-bg-grid" />
-
-      {/* Header */}
-      <header className="tv-header">
-
-        <div className="tv-brand">
-          <img src={logoAwalBros} alt="Logo" />
-        </div>
-
-        <div className="tv-header__right">
-
-          <div className="tv-live">
-            <span className="tv-live__dot" />
-            <span>LIVE MONITOR</span>
-          </div>
-
-          <div className="tv-clock">
-
-            <div className="tv-clock__time">
-              {time}
-            </div>
-
-            <div className="tv-clock__date">
-              {date}
-            </div>
-
-          </div>
-
-        </div>
-
-      </header>
+      <TVBackground />
+      <TVHeader liveLabel="LIVE MONITOR" />
 
       {/* Main display — satu kartu per loket */}
       <main className="tv-main">
@@ -299,28 +167,10 @@ export default function TVDisplay() {
 
       </main>
 
-      {/* Bottom information */}
-      <footer className="tv-footer">
-
-        <div className="tv-footer__icon">
-          ℹ
-        </div>
-
-        <div className="tv-footer__text">
-
-          <span className="tv-footer__label">
-            INFORMASI
-          </span>
-
-          <marquee>
-            Selamat datang di Rumah Sakit Awal Bros Yasmine Dumai,
-            Konfirmasi ke Admission apabila anda mengalami keterlambatan.
-          </marquee>
-
-        </div>
-
-      </footer>
-
+      <TVFooter>
+        Selamat datang di Rumah Sakit Awal Bros Yasmine Dumai,
+        Konfirmasi ke Admission apabila anda mengalami keterlambatan.
+      </TVFooter>
     </div>
   )
 }

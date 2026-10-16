@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom'
 import {
   Building2,
   User,
-  ToggleLeft,
   Tag,
   Hash,
   FileText,
@@ -13,7 +12,10 @@ import {
   StatusBadge,
   RowActions,
   Modal,
-  FieldWrap,
+  FormField,
+  FormActions,
+  StatusSelect,
+  FIELD,
   Tabs,
   Toast,
 } from '../../components/it/ITComponents'
@@ -79,6 +81,12 @@ function LoketTab() {
   const [form, setForm] = useState({
     petugas_nama: '',
     status: 'Aktif',
+  })
+
+  // Pasangan value/onChange untuk input teks di form
+  const field = (name) => ({
+    value: form[name],
+    onChange: (e) => setForm({ ...form, [name]: e.target.value }),
   })
 
   function notify(type, text) {
@@ -203,61 +211,32 @@ function LoketTab() {
           onClose={closeModal}
         >
           <form onSubmit={handleSubmit}>
-            <div className="it-form-group">
-              <label className="it-form-label">Petugas</label>
-              <FieldWrap icon={User}>
-                <select
-                  value={form.petugas_nama}
-                  onChange={(e) =>
-                    setForm({ ...form, petugas_nama: e.target.value })
-                  }
-                  className="it-form-field it-form-field--icon"
-                >
-                  <option value="">Belum ada petugas</option>
+            <FormField
+              label="Petugas"
+              icon={User}
+              hint={
+                petugasList.length === 0
+                  ? 'Belum ada data petugas — tambahkan dulu di halaman Akun Pengguna.'
+                  : undefined
+              }
+            >
+              <select {...field('petugas_nama')} className={FIELD}>
+                <option value="">Belum ada petugas</option>
 
-                  {petugasList.map((p) => (
-                    <option key={p.id} value={p.nama}>
-                      {p.nama}
-                    </option>
-                  ))}
-                </select>
-              </FieldWrap>
+                {petugasList.map((p) => (
+                  <option key={p.id} value={p.nama}>
+                    {p.nama}
+                  </option>
+                ))}
+              </select>
+            </FormField>
 
-              {petugasList.length === 0 && (
-                <span className="muted it-form-hint">
-                  Belum ada data petugas — tambahkan dulu di halaman
-                  Akun Pengguna.
-                </span>
-              )}
-            </div>
+            <StatusSelect
+              value={form.status}
+              onChange={(status) => setForm({ ...form, status })}
+            />
 
-            <div className="it-form-group it-form-group--last">
-              <label className="it-form-label">Status</label>
-              <FieldWrap icon={ToggleLeft}>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                >
-                  <option value="Aktif">Aktif</option>
-                  <option value="Tidak Aktif">Tidak Aktif</option>
-                </select>
-              </FieldWrap>
-            </div>
-
-            <div className="it-form-actions">
-              <button type="submit" className="btn it-form-actions__submit">
-                Simpan Perubahan
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-outline it-form-actions__cancel"
-                onClick={closeModal}
-              >
-                Batal
-              </button>
-            </div>
+            <FormActions submitLabel="Simpan Perubahan" onCancel={closeModal} />
           </form>
         </Modal>
       )}
@@ -283,6 +262,12 @@ function JenisTab() {
 
   const [modalMode, setModalMode] = useState(null) // null | create | edit
   const [form, setForm] = useState(EMPTY_JENIS)
+
+  // Pasangan value/onChange untuk input teks di form
+  const field = (name) => ({
+    value: form[name],
+    onChange: (e) => setForm({ ...form, [name]: e.target.value }),
+  })
 
   function notify(type, text) {
     setToast({ type, text })
@@ -453,77 +438,43 @@ function JenisTab() {
           onClose={closeModal}
         >
           <form onSubmit={handleSubmit}>
-            <div className="it-form-group">
-              <label className="it-form-label">Kode</label>
-              <FieldWrap icon={Hash}>
-                <input
-                  value={form.tombol_id}
-                  disabled={modalMode === 'edit'}
-                  onChange={(e) =>
-                    setForm({ ...form, tombol_id: e.target.value.toUpperCase() })
-                  }
-                  placeholder="Mis. B5"
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
+            <FormField
+              label="Kode"
+              icon={Hash}
+              hint={modalMode === 'edit' ? 'Kode tidak bisa diubah setelah dibuat.' : undefined}
+            >
+              <input
+                value={form.tombol_id}
+                disabled={modalMode === 'edit'}
+                onChange={(e) =>
+                  setForm({ ...form, tombol_id: e.target.value.toUpperCase() })
+                }
+                placeholder="Mis. B5"
+                className={FIELD}
+              />
+            </FormField>
 
-              {modalMode === 'edit' && (
-                <span className="muted it-form-hint">
-                  Kode tidak bisa diubah setelah dibuat.
-                </span>
-              )}
-            </div>
+            <FormField label="Nama Jenis Pendaftaran" icon={FileText}>
+              <input {...field('nama')} className={FIELD} />
+            </FormField>
 
-            <div className="it-form-group">
-              <label className="it-form-label">Nama Jenis Pendaftaran</label>
-              <FieldWrap icon={FileText}>
-                <input
-                  value={form.nama}
-                  onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
-            </div>
+            <FormField label="Prefix Nomor" icon={Tag}>
+              <input
+                {...field('prefix')}
+                placeholder="Mis. A (boleh kosong)"
+                className={FIELD}
+              />
+            </FormField>
 
-            <div className="it-form-group">
-              <label className="it-form-label">Prefix Nomor</label>
-              <FieldWrap icon={Tag}>
-                <input
-                  value={form.prefix}
-                  onChange={(e) => setForm({ ...form, prefix: e.target.value })}
-                  placeholder="Mis. A (boleh kosong)"
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
-            </div>
+            <StatusSelect
+              value={form.status}
+              onChange={(status) => setForm({ ...form, status })}
+            />
 
-            <div className="it-form-group it-form-group--last">
-              <label className="it-form-label">Status</label>
-              <FieldWrap icon={ToggleLeft}>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                >
-                  <option value="Aktif">Aktif</option>
-                  <option value="Tidak Aktif">Tidak Aktif</option>
-                </select>
-              </FieldWrap>
-            </div>
-
-            <div className="it-form-actions">
-              <button type="submit" className="btn it-form-actions__submit">
-                {modalMode === 'create' ? 'Tambah Jenis' : 'Simpan Perubahan'}
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-outline it-form-actions__cancel"
-                onClick={closeModal}
-              >
-                Batal
-              </button>
-            </div>
+            <FormActions
+              submitLabel={modalMode === 'create' ? 'Tambah Jenis' : 'Simpan Perubahan'}
+              onCancel={closeModal}
+            />
           </form>
         </Modal>
       )}

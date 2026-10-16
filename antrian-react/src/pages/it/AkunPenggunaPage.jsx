@@ -6,14 +6,16 @@ import {
   User,
   AtSign,
   Lock,
-  ToggleLeft,
 } from 'lucide-react'
 import { api } from '../../api/client'
 import {
   StatusBadge,
   RowActions,
   Modal,
-  FieldWrap,
+  FormField,
+  FormActions,
+  StatusSelect,
+  FIELD,
   Tabs,
   Toast,
 } from '../../components/it/ITComponents'
@@ -104,6 +106,12 @@ function AkunTab({ role }) {
   const [modalMode, setModalMode] = useState(null) // null | create | edit
   const [editId, setEditId] = useState(null)
   const [form, setForm] = useState(EMPTY_FORM)
+
+  // Pasangan value/onChange untuk input teks di form
+  const field = (name) => ({
+    value: form[name],
+    onChange: (e) => setForm({ ...form, [name]: e.target.value }),
+  })
 
   function notify(type, text) {
     setToast({ type, text })
@@ -268,74 +276,39 @@ function AkunTab({ role }) {
           onClose={closeModal}
         >
           <form onSubmit={handleSubmit}>
-            <div className="it-form-group">
-              <label className="it-form-label">Nama {cfg.nama}</label>
-              <FieldWrap icon={User}>
-                <input
-                  value={form.nama}
-                  onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
-            </div>
+            <FormField label={`Nama ${cfg.nama}`} icon={User}>
+              <input {...field('nama')} className={FIELD} />
+            </FormField>
 
-            <div className="it-form-group">
-              <label className="it-form-label">Username</label>
-              <FieldWrap icon={AtSign}>
-                <input
-                  value={form.username}
-                  onChange={(e) => setForm({ ...form, username: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
-            </div>
+            <FormField label="Username" icon={AtSign}>
+              <input {...field('username')} className={FIELD} />
+            </FormField>
 
-            <div className="it-form-group">
-              <label className="it-form-label">
-                Password
-                {modalMode === 'edit' && (
-                  <span className="muted it-form-hint-normal">
-                    {' '}(kosongkan jika tidak diubah)
-                  </span>
-                )}
-              </label>
-              <FieldWrap icon={Lock}>
-                <input
-                  type="password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                />
-              </FieldWrap>
-            </div>
+            <FormField
+              label={
+                <>
+                  Password
+                  {modalMode === 'edit' && (
+                    <span className="muted it-form-hint-normal">
+                      {' '}(kosongkan jika tidak diubah)
+                    </span>
+                  )}
+                </>
+              }
+              icon={Lock}
+            >
+              <input type="password" {...field('password')} className={FIELD} />
+            </FormField>
 
-            <div className="it-form-group it-form-group--last">
-              <label className="it-form-label">Status</label>
-              <FieldWrap icon={ToggleLeft}>
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                  className="it-form-field it-form-field--icon"
-                >
-                  <option value="Aktif">Aktif</option>
-                  <option value="Tidak Aktif">Tidak Aktif</option>
-                </select>
-              </FieldWrap>
-            </div>
+            <StatusSelect
+              value={form.status}
+              onChange={(status) => setForm({ ...form, status })}
+            />
 
-            <div className="it-form-actions">
-              <button type="submit" className="btn it-form-actions__submit">
-                {modalMode === 'create' ? `Tambah ${cfg.nama}` : 'Simpan Perubahan'}
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-outline it-form-actions__cancel"
-                onClick={closeModal}
-              >
-                Batal
-              </button>
-            </div>
+            <FormActions
+              submitLabel={modalMode === 'create' ? `Tambah ${cfg.nama}` : 'Simpan Perubahan'}
+              onCancel={closeModal}
+            />
           </form>
         </Modal>
       )}

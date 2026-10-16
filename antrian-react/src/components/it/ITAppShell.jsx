@@ -1,25 +1,17 @@
-import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutGrid,
   Settings,
   History,
   Activity,
-  Clock3,
   ShieldCheck,
   LogOut,
   UserCog,
   Stethoscope,
 } from 'lucide-react'
+import TopbarClock from '../TopbarClock'
+import { getAdmin, logoutAdmin } from '../../utils/auth'
 import logoAwalBros from '../../pages/LOGOAWALBROS.png'
-
-const user = (() => {
-  try {
-    return JSON.parse(localStorage.getItem('admin_auth_user') || 'null')
-  } catch {
-    return null
-  }
-})()
 
 // Menu dikelompokkan: ringkasan, monitoring (pendaftaran & poli),
 // dan fitur khusus Admin IT.
@@ -91,27 +83,16 @@ const PAGE_INFO = {
   aktivitas: ['Aktivitas Sistem', 'Riwayat aktivitas pengguna pada sistem'],
 }
 
-function useClock() {
-  const [now, setNow] = useState(new Date())
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  return now
-}
-
 export default function ITAppShell() {
   const location = useLocation()
   const navigate = useNavigate()
-  const now = useClock()
+  const user = getAdmin()
 
   const segment = location.pathname.split('/').filter(Boolean).pop()
   const [title, subtitle] = PAGE_INFO[segment] || ['Panel Admin IT', '']
 
   function handleLogout() {
-    localStorage.removeItem('admin_auth_user')
+    logoutAdmin()
     navigate('/it-login', { replace: true })
   }
 
@@ -221,29 +202,7 @@ export default function ITAppShell() {
 
             <div className="topbar__divider" />
 
-            <div className="topbar__clock">
-
-              <div className="topbar__clock-icon">
-                <Clock3 size={17} strokeWidth={2} />
-              </div>
-
-              <div className="topbar__clock-info">
-                <span className="topbar__time">
-                  {now.toLocaleTimeString('id-ID')}
-                </span>
-
-                <span className="topbar__date">
-                  {now.toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </span>
-              </div>
-
-            </div>
-
+            <TopbarClock />
           </div>
         </header>
 

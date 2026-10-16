@@ -4,7 +4,7 @@
 */
 
 import { useEffect } from 'react'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, ToggleLeft } from 'lucide-react'
 
 export function StatCard({ label, value, description }) {
   return (
@@ -37,7 +37,7 @@ export function StatusBadge({ status }) {
   return <span className={className}>{status}</span>
 }
 
-// [BARU] Notifikasi kecil (berhasil / gagal), hilang sendiri.
+// Notifikasi kecil (berhasil / gagal), hilang sendiri.
 // toast = { type: 'success' | 'error', text } atau null
 export function Toast({ toast, onClose, duration = 4000 }) {
   useEffect(() => {
@@ -70,7 +70,7 @@ export function Toast({ toast, onClose, duration = 4000 }) {
   )
 }
 
-// [BARU] Tab untuk halaman gabungan.
+// Tab untuk halaman gabungan.
 // tabs = [{ key, label }], active = key tab aktif, onChange(key)
 export function Tabs({ tabs, active, onChange }) {
   return (
@@ -95,6 +95,7 @@ export function Modal({
   title,
   subtitle,
   icon: Icon,
+  size,
   onClose,
   children,
 }) {
@@ -104,7 +105,9 @@ export function Modal({
       onClick={onClose}
     >
       <div
-        className="card it-modal-card"
+        className={'card it-modal-card' + (size === 'lg' ? ' it-modal-card--lg' : '')}
+        role="dialog"
+        aria-modal="true"
         onClick={(e) => e.stopPropagation()}
       >
         {/* HEADER */}
@@ -162,75 +165,72 @@ export function FieldWrap({ icon: Icon, children }) {
 }
 
 export function RowActions({ onEdit, onDelete }) {
+  // Tombol hanya tampil kalau aksinya diberikan
   return (
     <div className="row-actions">
-      <button
-        onClick={onEdit}
-        className="row-actions__edit"
-      >
-        Edit
-      </button>
+      {onEdit && (
+        <button type="button" onClick={onEdit} className="row-actions__edit">
+          Edit
+        </button>
+      )}
 
-      <button
-        onClick={onDelete}
-        className="row-actions__delete"
-      >
-        Hapus
-      </button>
+      {onDelete && (
+        <button type="button" onClick={onDelete} className="row-actions__delete">
+          Hapus
+        </button>
+      )}
     </div>
   )
 }
 
-export function ManagementPage({
-  eyebrow,
-  title,
-  description,
-  button,
-  onButtonClick,
-  children,
-}) {
+// ===== Form di dalam Modal =====
+
+// Class standar untuk input/select yang memakai ikon
+export const FIELD = 'it-form-field it-form-field--icon'
+
+// Satu baris form: label + kolom berikon + petunjuk kecil (opsional)
+export function FormField({ label, icon, hint, last, children }) {
   return (
-    <>
-      <div className="page-intro">
-        <div>
-          {eyebrow && (
-            <div className="page-intro__eyebrow">
-              {eyebrow}
-            </div>
-          )}
+    <div className={'it-form-group' + (last ? ' it-form-group--last' : '')}>
+      <label className="it-form-label">{label}</label>
 
-          <h1 className="page-intro__title">
-            {title}
-          </h1>
+      <FieldWrap icon={icon}>{children}</FieldWrap>
 
-          {description && (
-            <p className="page-intro__subtitle">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
+      {hint && <span className="muted it-form-hint">{hint}</span>}
+    </div>
+  )
+}
 
-      <div className="card">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {title}
-          </p>
+export function StatusSelect({ value, onChange }) {
+  return (
+    <FormField label="Status" icon={ToggleLeft} last>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={FIELD}
+      >
+        <option value="Aktif">Aktif</option>
+        <option value="Tidak Aktif">Tidak Aktif</option>
+      </select>
+    </FormField>
+  )
+}
 
-          {button && (
-            <button
-              className="btn"
-              onClick={onButtonClick}
-            >
-              {button}
-            </button>
-          )}
-        </div>
+export function FormActions({ submitLabel, onCancel, busy = false }) {
+  return (
+    <div className="it-form-actions">
+      <button type="submit" className="btn it-form-actions__submit" disabled={busy}>
+        {submitLabel}
+      </button>
 
-        <div className="management-table-wrapper">
-          {children}
-        </div>
-      </div>
-    </>
+      <button
+        type="button"
+        className="btn btn-outline it-form-actions__cancel"
+        onClick={onCancel}
+        disabled={busy}
+      >
+        Batal
+      </button>
+    </div>
   )
 }

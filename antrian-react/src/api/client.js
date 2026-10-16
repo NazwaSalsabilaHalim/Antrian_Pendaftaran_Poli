@@ -1,4 +1,4 @@
-const BASE = import.meta.env.VITE_API_BASE || 'http://localhost/KP/antrian_pendaftaran'
+const BASE = import.meta.env.VITE_API_BASE || '/KP/antrian_pendaftaran'
 const API = `${BASE}/react-api`
 
 async function req(path, options = {}) {
