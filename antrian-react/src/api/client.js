@@ -1,3 +1,5 @@
+import { publicUrl } from '../utils/publicUrl'
+
 const BASE = import.meta.env.VITE_API_BASE || '/KP/antrian_pendaftaran'
 const API = `${BASE}/react-api`
 
@@ -138,7 +140,7 @@ export const api = {
     return `${BASE}/foto/${cleaned}`
   },
 
-  getBellUrl: () => '/Bells.mp3',
+  getBellUrl: () => publicUrl('Bells.mp3'),
 
   // ===== Panel Admin IT =====
   getRingkasanIT: () => get('ringkasan_it.php'),

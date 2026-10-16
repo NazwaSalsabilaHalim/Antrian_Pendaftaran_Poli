@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
-import { Toast } from '../../components/it/ITComponents'
+import { CardHeading, Toast } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
 
 export default function AktivitasPage() {
@@ -29,12 +29,11 @@ export default function AktivitasPage() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {loading ? 'Memuat data...' : `${aktivitas.length} aktivitas terakhir`}
-          </p>
-        </div>
+      <div className="card card--table-narrow">
+        <CardHeading
+          title="Aktivitas Terbaru"
+          description="Perubahan akun, loket, dan hak akses yang tercatat di sistem."
+        />
 
         {!loading && (
           <div className="management-table-wrapper">

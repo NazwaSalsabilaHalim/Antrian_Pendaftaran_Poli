@@ -1,3 +1,5 @@
+import { publicUrl } from './publicUrl'
+
 /**
  * Menyusun daftar file suara:
  * ting-tong → nomor antrian → prefix → angka → ke loket → nomor loket
@@ -5,7 +7,7 @@
 export function buildAntrianSounds({ nomor, prefix, loket }) {
   const suara = []
 
-  const url = (name) => `/sounds_jelek/${name}`
+  const url = (name) => publicUrl(`sounds_jelek/${name}`)
 
   suara.push(url('tingtong.mp3'))
   suara.push(url('nomorantrian.mp3'))

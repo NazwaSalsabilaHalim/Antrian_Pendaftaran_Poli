@@ -18,6 +18,8 @@ import {
   FIELD,
   Tabs,
   Toast,
+  CardHeading,
+  ringkasStatus,
 } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
 
@@ -34,11 +36,13 @@ const TABS = [
 const ROLE = {
   petugas: {
     nama: 'Petugas',
+    deskripsi: 'Akun yang dipakai untuk login di loket pendaftaran.',
     load: () => api.getPetugas(),
     createExtra: {},
   },
   nurse: {
     nama: 'Nurse',
+    deskripsi: 'Akun nurse yang mengelola data dokter dan antrean poli.',
     load: () => api.getNurse(),
     createExtra: { role: 'nurse' },
   },
@@ -201,15 +205,16 @@ function AkunTab({ role }) {
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card card--table-narrow">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {loading ? 'Memuat data...' : `${items.length} akun ${label}`}
-          </p>
-
-          <button className="btn" onClick={openCreate}>
-            + Tambah {cfg.nama}
-          </button>
-        </div>
+        <CardHeading
+          title={`Daftar Akun ${cfg.nama}`}
+          description={cfg.deskripsi}
+          meta={loading ? 'Memuat data...' : ringkasStatus(items)}
+          action={
+            <button className="btn" onClick={openCreate}>
+              + Tambah {cfg.nama}
+            </button>
+          }
+        />
 
         {!loading && (
           <div className="management-table-wrapper">
@@ -384,6 +389,12 @@ function HakAksesTab() {
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card card--table-narrow">
+        <CardHeading
+          title="Hak Akses per Nurse"
+          description="Centang tindakan yang boleh dilakukan tiap nurse, lalu klik Simpan. Berlaku setelah nurse login ulang."
+          meta={loading ? 'Memuat data...' : `${nurses.length} nurse aktif`}
+        />
+
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (

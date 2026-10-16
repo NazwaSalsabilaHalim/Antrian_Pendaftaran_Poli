@@ -18,6 +18,8 @@ import {
   FIELD,
   Tabs,
   Toast,
+  CardHeading,
+  ringkasStatus,
 } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
 
@@ -147,11 +149,11 @@ function LoketTab() {
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card card--table-narrow">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {loading ? 'Memuat data...' : `${loket.length} loket`}
-          </p>
-        </div>
+        <CardHeading
+          title="Daftar Loket"
+          description="Atur petugas yang bertugas dan status tiap loket."
+          meta={loading ? 'Memuat data...' : ringkasStatus(loket)}
+        />
 
         {!loading && (
           <div className="management-table-wrapper">
@@ -357,15 +359,16 @@ function JenisTab() {
       <Toast toast={toast} onClose={() => setToast(null)} />
 
       <div className="card card--table-narrow">
-        <div className="section-header">
-          <p className="section-title management-section-title">
-            {loading ? 'Memuat data...' : `${jenis.length} jenis pendaftaran`}
-          </p>
-
-          <button className="btn" onClick={openCreate}>
-            + Tambah Jenis
-          </button>
-        </div>
+        <CardHeading
+          title="Daftar Jenis Pendaftaran"
+          description="Kategori yang muncul di layar Ambil Nomor."
+          meta={loading ? 'Memuat data...' : ringkasStatus(jenis)}
+          action={
+            <button className="btn" onClick={openCreate}>
+              + Tambah Jenis
+            </button>
+          }
+        />
 
         {!loading && (
           <div className="management-table-wrapper">

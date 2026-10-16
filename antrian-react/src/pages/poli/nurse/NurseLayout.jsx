@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { getNurse, getNurseIzin, logoutNurse } from '../../../utils/auth'
+import { publicUrl } from '../../../utils/publicUrl'
 import DataDokter from '../DataDokter'
 import { Tv, LogOut } from 'lucide-react'
 
@@ -34,7 +35,7 @@ export default function NurseLayout() {
             </div>
 
             <a
-              href="/poli/display"
+              href={publicUrl('poli/display')}
               target="_blank"
               rel="noreferrer"
               className="sidebar__display-link"

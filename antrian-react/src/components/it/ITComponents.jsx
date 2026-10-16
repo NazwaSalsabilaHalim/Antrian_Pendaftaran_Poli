@@ -234,3 +234,27 @@ export function FormActions({ submitLabel, onCancel, busy = false }) {
     </div>
   )
 }
+
+// ===== Judul kartu tabel =====
+
+// "5 total · 3 aktif · 2 tidak aktif"
+export function ringkasStatus(list) {
+  const aktif = list.filter((item) => item.status === 'Aktif').length
+  return `${list.length} total · ${aktif} aktif · ${list.length - aktif} tidak aktif`
+}
+
+// Judul + keterangan + ringkasan, tombol aksi (opsional) di kanan
+export function CardHeading({ title, description, meta, action }) {
+  return (
+    <div className="section-header">
+      <div className="card-heading">
+        <p className="section-title management-section-title">{title}</p>
+
+        {description && <p className="muted card-heading__desc">{description}</p>}
+        {meta && <p className="card-heading__meta">{meta}</p>}
+      </div>
+
+      {action}
+    </div>
+  )
+}

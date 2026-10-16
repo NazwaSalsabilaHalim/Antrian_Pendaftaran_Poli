@@ -7,6 +7,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import { getPetugas, logoutPetugas } from '../../utils/auth'
+import { publicUrl } from '../../utils/publicUrl'
 import logoAwalBros from '../../pages/LOGOAWALBROS.png'
 
 const NAV_PENDAFTARAN = [
@@ -95,7 +96,7 @@ export default function PendaftaranSidebar() {
       <div className="sidebar__footer">
 
         <a
-          href="/display"
+          href={publicUrl('display')}
           target="_blank"
           rel="noreferrer"
           className="sidebar__display-link"

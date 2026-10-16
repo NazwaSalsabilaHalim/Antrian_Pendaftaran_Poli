@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/client'
 import { useInterval } from '../hooks/useInterval'
 import { buildAntrianSounds, playQueue } from '../utils/audioQueue'
+import { publicUrl } from '../utils/publicUrl'
 import {
   FlapRow,
   TVBackground,
@@ -63,7 +64,7 @@ export default function TVDisplay() {
 
   const audioRef = useRef(null)
   // Autoplay butuh browser dengan flag --autoplay-policy=no-user-gesture-required
-  const [audioReady] = useAudioUnlock(audioRef, '/sounds_jelek/tingtong.mp3')
+  const [audioReady] = useAudioUnlock(audioRef, publicUrl('sounds_jelek/tingtong.mp3'))
   const prevServingRef = useRef({})
   const isFirstPoll = useRef(true)
 

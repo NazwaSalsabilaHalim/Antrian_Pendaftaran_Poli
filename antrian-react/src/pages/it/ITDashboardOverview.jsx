@@ -6,6 +6,7 @@ import {
 } from '../../components/it/ITComponents'
 import { Tv } from 'lucide-react'
 import { formatNomor, isDokterNonaktif } from '../../utils/dokter'
+import { publicUrl } from '../../utils/publicUrl'
 import Pagination, { usePagination } from '../../components/Pagination'
 
 export default function ITDashboardOverview() {
@@ -94,7 +95,7 @@ export default function ITDashboardOverview() {
 
         <div className="it-dashboard-welcome__actions">
           <a
-            href="/display"
+            href={publicUrl('display')}
             target="_blank"
             rel="noreferrer"
             className="it-welcome-btn"
@@ -105,7 +106,7 @@ export default function ITDashboardOverview() {
           </a>
 
           <a
-            href="/poli/display"
+            href={publicUrl('poli/display')}
             target="_blank"
             rel="noreferrer"
             className="it-welcome-btn"

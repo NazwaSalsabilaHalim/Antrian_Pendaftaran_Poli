@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { api } from '../../../api/client'
 import { formatNomor } from '../../../utils/dokter'
+import { publicUrl } from '../../../utils/publicUrl'
 import { Toast } from '../../../components/it/ITComponents'
 
 // Backend antrean membalas { OK: 0, MSG } kalau gagal
@@ -317,7 +318,7 @@ export default function KelolaAntrean() {
 
               <div className="antrean-profile-actions">
                 <a
-                  href="/poli/display"
+                  href={publicUrl('poli/display')}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-secondary antrean-tv-link"
