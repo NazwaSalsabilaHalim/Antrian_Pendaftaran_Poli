@@ -593,6 +593,14 @@ button {
   margin: 0;
 }
 
+/* Halaman dokter mandiri: pembungkus .poli-page-wrapper sudah memberi padding,
+   jadi isi halaman tidak boleh menambah padding lagi (jarak dobel) */
+.poli-page-wrapper > .loket-page {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
 /* Tab Antrean Dokter: ringkas supaya muat satu layar */
 .poli-tab-embed .antrean-profile-col {
   display: flex;
@@ -2158,48 +2166,6 @@ table.data-table {
   color: var(--muted);
 }
 
-.ambil-hero__step {
-  display: none;
-}
-
-.ambil-error {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 22px;
-  padding: 16px 18px;
-  border-radius: 14px;
-  background: var(--danger-bg);
-  border: 1px solid #f1d6d3;
-  color: var(--danger);
-}
-
-.ambil-error>span {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #f9d9d6;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.ambil-error div {
-  display: flex;
-  flex-direction: column;
-}
-
-.ambil-error strong {
-  font-size: 13px;
-}
-
-.ambil-error p {
-  margin: 3px 0 0;
-  font-size: 12px;
-}
 
 .ambil-ticket {
   margin-bottom: 28px;
@@ -2320,9 +2286,6 @@ table.data-table {
   margin-bottom: 24px;
 }
 
-.ambil-selection__heading>div:first-child>span {
-  display: none;
-}
 
 .ambil-selection__heading h2 {
   margin: 0;
@@ -3929,6 +3892,22 @@ table.data-table {
   overflow: auto;
 }
 
+/* Tabel dengan sedikit kolom: kartu dibatasi supaya kolom tidak
+   terlalu renggang di layar lebar */
+.card.card--table-narrow {
+  max-width: 1040px;
+}
+
+/* Bingkai fokus keyboard yang seragam (hijau), menggantikan bingkai hitam bawaan browser */
+:where(a, button, [role='tab']):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sidebar__link:focus-visible {
+  outline-offset: -2px;
+}
+
 .management-table-wrapper .data-table thead {
   position: sticky;
   top: 0;
@@ -4278,6 +4257,17 @@ table.data-table {
   padding: 0;
 }
 
+/* Panel tanpa padding: tabel dan pagination memakai gutter 23px
+   seperti heading, dan margin negatif bawaan .card dimatikan */
+.card.doctor-table-panel > .management-table-wrapper {
+  padding: 18px 23px;
+}
+
+.card.doctor-table-panel > .table-pagination {
+  margin: 0;
+  padding: 16px 23px;
+}
+
 .doctor-table-heading {
   display: flex;
   align-items: center;
@@ -4373,8 +4363,8 @@ table.data-table {
 .doctor-photo-placeholder {
   display: grid;
   place-items: center;
-  width: 39px;
-  height: 39px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
   color: var(--primary);
   background: #e8f5ee;
@@ -4389,14 +4379,13 @@ table.data-table {
 }
 
 .doctor-name-cell strong {
-  color: #34453b;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .doctor-name-cell small {
-  color: #96a198;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .doctor-display-badge {

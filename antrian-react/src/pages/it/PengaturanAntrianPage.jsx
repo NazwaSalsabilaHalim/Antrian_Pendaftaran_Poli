@@ -146,7 +146,7 @@ function LoketTab() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
+      <div className="card card--table-narrow">
         <div className="section-header">
           <p className="section-title management-section-title">
             {loading ? 'Memuat data...' : `${loket.length} loket`}
@@ -356,7 +356,7 @@ function JenisTab() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
+      <div className="card card--table-narrow">
         <div className="section-header">
           <p className="section-title management-section-title">
             {loading ? 'Memuat data...' : `${jenis.length} jenis pendaftaran`}

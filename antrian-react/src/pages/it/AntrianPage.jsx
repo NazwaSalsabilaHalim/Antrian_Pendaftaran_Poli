@@ -55,7 +55,7 @@ export default function AntrianPage() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
+      <div className="card card--table-narrow">
         <div className="table-toolbar">
           <label htmlFor="tanggal" className="muted">Tanggal:</label>
 

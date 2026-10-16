@@ -200,7 +200,7 @@ function AkunTab({ role }) {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
+      <div className="card card--table-narrow">
         <div className="section-header">
           <p className="section-title management-section-title">
             {loading ? 'Memuat data...' : `${items.length} akun ${label}`}
@@ -383,7 +383,7 @@ function HakAksesTab() {
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <div className="card">
+      <div className="card card--table-narrow">
         {loading ? (
           <div className="empty-state">Memuat data...</div>
         ) : (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
+import { Toast } from '../components/it/ITComponents'
 import {
   Ticket,
   Users,
@@ -80,27 +81,12 @@ export default function AmbilNomor() {
           </p>
         </div>
 
-        <div className="ambil-hero__step">
-          <span>01</span>
-          <small>
-            Pilih jenis
-            <br />
-            pendaftaran
-          </small>
-        </div>
-
       </section>
 
-      {/* ERROR */}
-      {error && (
-        <div className="ambil-error">
-          <span>!</span>
-          <div>
-            <strong>Terjadi kesalahan</strong>
-            <p>{error}</p>
-          </div>
-        </div>
-      )}
+      <Toast
+        toast={error ? { type: 'error', text: error } : null}
+        onClose={() => setError('')}
+      />
 
       {/* SUCCESS TICKET */}
       {tiket && (
@@ -164,7 +150,6 @@ export default function AmbilNomor() {
 
         <div className="ambil-selection__heading">
           <div>
-            <span>LANGKAH 01</span>
             <h2>Pilih Jenis Pendaftaran</h2>
             <p>
               Ketuk salah satu pilihan di bawah untuk mendapatkan nomor antrian.
@@ -198,7 +183,7 @@ export default function AmbilNomor() {
 
                 {/* NUMBER */}
                 <span className="ambil-option__number">
-                  0{index + 1}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
 
                 {/* CONTENT */}

@@ -107,7 +107,7 @@ export default function TVDisplay() {
           if (isBaru && audioReady && audioRef.current) {
             const { prefix, nomor } = parseNomorDisplay(s.nomor_display)
 
-            const sounds = buildAntrianSounds(null, {
+            const sounds = buildAntrianSounds({
               nomor,
               prefix,
               loket: s.counter_id,

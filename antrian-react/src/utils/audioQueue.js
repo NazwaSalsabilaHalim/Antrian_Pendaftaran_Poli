@@ -2,7 +2,7 @@
  * Menyusun daftar file suara:
  * ting-tong → nomor antrian → prefix → angka → ke loket → nomor loket
  */
-export function buildAntrianSounds(base, { nomor, prefix, loket }) {
+export function buildAntrianSounds({ nomor, prefix, loket }) {
   const suara = []
 
   const url = (name) => `/sounds_jelek/${name}`
@@ -55,7 +55,6 @@ export function buildAntrianSounds(base, { nomor, prefix, loket }) {
 
 export function playQueue(audioEl, sounds) {
   if (!audioEl || !sounds?.length) {
-    console.warn('Audio atau daftar suara kosong')
     return
   }
 
@@ -74,11 +73,6 @@ export function playQueue(audioEl, sounds) {
     audioEl.src = currentSound
     audioEl.load()
 
-    console.log(
-      `🔊 Memutar ${index + 1}/${sounds.length}:`,
-      currentSound
-    )
-
     try {
       await audioEl.play()
 
@@ -88,8 +82,7 @@ export function playQueue(audioEl, sounds) {
       }
 
     } catch (err) {
-      console.error('❌ Gagal memutar:', currentSound)
-      console.error(err)
+      console.error('Gagal memutar suara:', currentSound, err)
       audioEl.onended = null
     }
   }

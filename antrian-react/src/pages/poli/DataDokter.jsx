@@ -430,7 +430,11 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
               ) : (
                 paginatedDoctors.map((doctor, index) => (
                   <tr key={doctor.AID}>
-                    <td>{startIndex + index + 1}</td>
+                    <td>
+                      <span className="doctor-row-number">
+                        {startIndex + index + 1}
+                      </span>
+                    </td>
                     <td>
                       <div className="doctor-name-cell">
                         {doctor.foto ? (
@@ -455,8 +459,8 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                       </div>
                     </td>
 
-                    <td>{doctor.NamaPoli || '—'}</td>
-                    <td>{doctor.Ruang ? `Ruang ${doctor.Ruang}` : '—'}</td>
+                    <td><span className="doctor-poli-chip">{doctor.NamaPoli || '—'}</span></td>
+                    <td><span className="doctor-ruang-chip">{doctor.Ruang ? `Ruang ${doctor.Ruang}` : '—'}</span></td>
                     <td>
                       <span className="doctor-display-badge">
                         Display {doctor.Display ?? '1'}
@@ -475,7 +479,13 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                     </td>
 
                     <td>
-                      <strong className="doctor-queue-number">
+                      <strong
+                        className={`doctor-queue-number${
+                          !doctor.Antrian || formatNomor(doctor.Antrian) === '000'
+                            ? ' queue-zero'
+                            : ''
+                        }`}
+                      >
                         {formatNomor(doctor.Antrian)}
                       </strong>
                     </td>
