@@ -456,7 +456,7 @@ button {
 
 .shell__main {
   width: calc(100% - var(--sidebar-width));
-  min-height: 100dvh;
+  min-height: 100vh;
   min-height: 100vh;
   margin-left: var(--sidebar-width);
   display: flex;
@@ -2856,10 +2856,10 @@ table.data-table {
 }
 
 .tv-counter-card .tv-flap-char {
-  min-width: 200px;
-  height: 260px;
-  border-radius: 24px;
-  font-size: 145px;
+  min-width: 300px;
+  height: 380px;
+  border-radius: 30px;
+  font-size: 240px;
 }
 
 .tv-counter-card__meta {
