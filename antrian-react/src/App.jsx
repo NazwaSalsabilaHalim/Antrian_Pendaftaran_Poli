@@ -31,7 +31,6 @@ import Loket from './pages/pendaftaran/Loket'
 import Dashboard from './pages/pendaftaran/Dashboard'
 
 // ================= POLIKLINIK =================
-import DataDokter from './pages/poli/DataDokter'
 import KelolaAntrean from './pages/poli/dokter/KelolaAntrean'
 import NurseLayout from './pages/poli/nurse/NurseLayout'
 
