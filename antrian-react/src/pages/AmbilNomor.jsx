@@ -7,7 +7,6 @@ import {
   Building2,
   ArrowRight,
   Printer,
-  CheckCircle2,
   RotateCcw,
 } from 'lucide-react'
 
@@ -15,6 +14,7 @@ export default function AmbilNomor() {
   const [tombolList, setTombolList] = useState([])
   const [tiket, setTiket] = useState(null)
   const [error, setError] = useState('')
+  const [sukses, setSukses] = useState(false)
   const [loadingId, setLoadingId] = useState(null)
 
   useEffect(() => {
@@ -31,12 +31,24 @@ export default function AmbilNomor() {
     return () => clearTimeout(timer)
   }, [tiket])
 
+  // Toast "berhasil" hilang sendiri setelah beberapa detik
+  useEffect(() => {
+    if (!sukses) return
+
+    const timer = setTimeout(() => {
+      setSukses(false)
+    }, 4000)
+
+    return () => clearTimeout(timer)
+  }, [sukses])
+
   async function handleAmbil(tombol) {
     setError('')
     setLoadingId(tombol.TombolID)
     try {
       const hasil = await api.ambilNomor(tombol.TombolID)
       setTiket(hasil)
+      setSukses(true)
       // buka struk cetak di tab baru, sama seperti perilaku aplikasi lama
       window.open(
         api.cetakStrukUrl(tombol.TombolID, hasil.tombol_nama, hasil.nomor, hasil.prefix),
@@ -56,6 +68,13 @@ export default function AmbilNomor() {
 
     return <Users size={28} strokeWidth={1.8} />
   }
+
+  // Toast: error diutamakan, kalau tidak ada tampilkan "berhasil"
+  const toast = error
+    ? { type: 'error', text: error }
+    : sukses
+      ? { type: 'success', text: 'Nomor berhasil diambil' }
+      : null
 
   return (
     <div className="ambil-page">
@@ -84,30 +103,24 @@ export default function AmbilNomor() {
       </section>
 
       <Toast
-        toast={error ? { type: 'error', text: error } : null}
-        onClose={() => setError('')}
+        toast={toast}
+        onClose={() => {
+          setError('')
+          setSukses(false)
+        }}
       />
 
-      {/* SUCCESS TICKET */}
+      {/* TIKET */}
       {tiket && (
         <section className="ambil-ticket">
-
-          <div className="ambil-ticket__top">
-
-            <div className="ambil-ticket__success">
-              <CheckCircle2 size={18} />
-              Nomor berhasil diambil
-            </div>
-
-            <span className="ambil-ticket__category">
-              {tiket.tombol_nama}
-            </span>
-
-          </div>
 
           <div className="ambil-ticket__content">
 
             <div className="ambil-ticket__left">
+              <span className="ambil-ticket__category">
+                {tiket.tombol_nama}
+              </span>
+
               <span>Nomor Antrian Anda</span>
 
               <strong>

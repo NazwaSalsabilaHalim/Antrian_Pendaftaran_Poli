@@ -20,20 +20,7 @@ export default function NurseLayout() {
         }}
         aksiTambahan={
           <>
-            {/* LIVE STATUS */}
-            <div className="sidebar__status">
-              <span className="sidebar__status-dot">
-                <span />
-              </span>
-
-              <div>
-                <strong className="sidebar__user-name">
-                  {user?.nama || user?.username || 'Nurse'}
-                </strong>
-                <span>Monitoring real-time</span>
-              </div>
-            </div>
-
+            {/* TV POLI */}
             <a
               href={publicUrl('poli/display')}
               target="_blank"
@@ -49,6 +36,20 @@ export default function NurseLayout() {
               </span>
               <span className="sidebar__display-arrow">↗</span>
             </a>
+
+            {/* AKUN: nama petugas + logout, berdampingan di paling kanan */}
+            <div className="sidebar__status">
+              <span className="sidebar__status-dot">
+                <span />
+              </span>
+
+              <div>
+                <strong className="sidebar__user-name">
+                  {user?.nama || user?.username || 'Nurse'}
+                </strong>
+                <span>Monitoring real-time</span>
+              </div>
+            </div>
 
             <button
               type="button"

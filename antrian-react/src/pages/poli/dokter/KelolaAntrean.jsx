@@ -321,7 +321,7 @@ export default function KelolaAntrean() {
                   href={publicUrl('poli/display')}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn-secondary antrean-tv-link"
+                  className="btn antrean-tv-link"
                 >
                   <Tv size={16} />
                   <span>Buka Layar TV Poli</span>
@@ -368,7 +368,7 @@ export default function KelolaAntrean() {
                 <button
                   type="submit"
                   disabled={processing}
-                  className="btn btn-secondary antrean-manual-submit"
+                  className="btn antrean-manual-submit"
                 >
                   {processing ? 'Menyimpan...' : 'Set Nomor'}
                 </button>

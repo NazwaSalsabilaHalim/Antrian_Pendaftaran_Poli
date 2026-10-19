@@ -306,8 +306,6 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
           <h1>Master Data Dokter</h1>
           <p>Kelola data dokter, spesialisasi poli, foto profil, dan status kehadiran dokter.</p>
         </div>
-
-        <div className="doctor-page-actions">{aksiTambahan}</div>
       </section>
 
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -315,25 +313,20 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
       {/* TABLE PANEL */}
       <div className="card doctor-table-panel">
         <div className="doctor-table-heading">
+          {/* Kiri: judul */}
           <div>
             <h3>Daftar Dokter & Spesialisasi</h3>
             <p>Kelola data dokter, poli, nomor ruang, dan display antrean.</p>
           </div>
 
+          {/* Kanan: tombol aksi (+ Nurse1, TV Poli, Logout jika ada) */}
           <div className="doctor-heading-actions">
-            <div className="doctor-summary">
-              {summary.map(({ label, value, icon: Icon, off }) => (
-                <div className="doctor-summary-card" key={label}>
-                  <div className={'doctor-summary-icon' + (off ? ' doctor-summary-icon-off' : '')}>
-                    <Icon size={14} />
-                  </div>
-                  <div>
-                    <span>{label}</span>
-                    <strong>{loading ? '-' : value}</strong>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {izin.tambah && (
+              <button type="button" className="btn" onClick={openAddForm}>
+                <Plus size={17} />
+                <span>Tambah Dokter</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -345,19 +338,16 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
               <span>Refresh</span>
             </button>
 
-            {izin.tambah && (
-              <button type="button" className="btn" onClick={openAddForm}>
-                <Plus size={17} />
-                <span>Tambah Dokter</span>
-              </button>
-            )}
-
             {izin.kosongkan && (
               <button type="button" className="btn btn-danger-outline" onClick={handleResetQueue} disabled={saving}>
                 <RotateCcw size={15} />
                 <span>{saving ? 'Memproses...' : 'Reset Antrean 1-10'}</span>
               </button>
             )}
+
+            {/* Pemisah: aksi data | TV Poli & akun (hanya di halaman Nurse) */}
+            {aksiTambahan && <span className="topbar__divider" />}
+            {aksiTambahan}
           </div>
         </div>
 
@@ -396,6 +386,21 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
             <Search size={16} />
             <span>Cari</span>
           </button>
+
+          {/* Ringkasan: sejajar dengan pencarian, rata kanan */}
+          <div className="doctor-summary table-toolbar__count">
+            {summary.map(({ label, value, icon: Icon, off }) => (
+              <div className="doctor-summary-card" key={label}>
+                <div className={'doctor-summary-icon' + (off ? ' doctor-summary-icon-off' : '')}>
+                  <Icon size={14} />
+                </div>
+                <div>
+                  <span>{label}</span>
+                  <strong>{loading ? '-' : value}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
         </form>
 
         {/* TABLE */}
@@ -571,54 +576,54 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
                 </select>
               </FormField>
 
-                {/* UPLOAD FOTO */}
-                <div className="doctor-photo-field doctor-photo-full">
-                  <span className="doctor-photo-label">Foto Dokter</span>
+              {/* UPLOAD FOTO */}
+              <div className="doctor-photo-field doctor-photo-full">
+                <span className="doctor-photo-label">Foto Dokter</span>
 
-                  <label className={`doctor-photo-dropzone ${photoPreview ? 'has-photo' : ''}`}>
-                    {photoPreview ? (
-                      <>
-                        <img
-                          src={photoPreview}
-                          alt="Preview foto dokter"
-                          className="doctor-photo-preview-image"
-                        />
-                        <div className="doctor-photo-overlay">
-                          <ImagePlus size={20} />
-                          <span>Ganti Foto</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="doctor-photo-empty">
-                        <div className="doctor-photo-upload-icon">
-                          <ImagePlus size={25} />
-                        </div>
-                        <strong>Pilih Foto Dokter</strong>
-                        <span>Klik untuk memilih foto dari komputer</span>
-                        <small>JPG, PNG, GIF, atau WEBP • Maks. 5 MB</small>
+                <label className={`doctor-photo-dropzone ${photoPreview ? 'has-photo' : ''}`}>
+                  {photoPreview ? (
+                    <>
+                      <img
+                        src={photoPreview}
+                        alt="Preview foto dokter"
+                        className="doctor-photo-preview-image"
+                      />
+                      <div className="doctor-photo-overlay">
+                        <ImagePlus size={20} />
+                        <span>Ganti Foto</span>
                       </div>
-                    )}
-
-                    <input
-                      type="file"
-                      name="foto"
-                      accept={PHOTO_TYPES.join(',')}
-                      onChange={handlePhotoChange}
-                    />
-                  </label>
-
-                  {photoFile && (
-                    <div className="doctor-selected-file">
-                      <div className="doctor-selected-file-icon">
-                        <CheckCircle2 size={16} />
+                    </>
+                  ) : (
+                    <div className="doctor-photo-empty">
+                      <div className="doctor-photo-upload-icon">
+                        <ImagePlus size={25} />
                       </div>
-                      <div>
-                        <strong>{photoFile.name}</strong>
-                        <small>{(photoFile.size / 1024 / 1024).toFixed(2)} MB</small>
-                      </div>
+                      <strong>Pilih Foto Dokter</strong>
+                      <span>Klik untuk memilih foto dari komputer</span>
+                      <small>JPG, PNG, GIF, atau WEBP • Maks. 5 MB</small>
                     </div>
                   )}
-                </div>
+
+                  <input
+                    type="file"
+                    name="foto"
+                    accept={PHOTO_TYPES.join(',')}
+                    onChange={handlePhotoChange}
+                  />
+                </label>
+
+                {photoFile && (
+                  <div className="doctor-selected-file">
+                    <div className="doctor-selected-file-icon">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <div>
+                      <strong>{photoFile.name}</strong>
+                      <small>{(photoFile.size / 1024 / 1024).toFixed(2)} MB</small>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <FormActions
