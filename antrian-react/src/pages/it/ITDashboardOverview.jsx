@@ -9,6 +9,8 @@ import { formatNomor, isDokterNonaktif } from '../../utils/dokter'
 import { publicUrl } from '../../utils/publicUrl'
 import Pagination, { usePagination } from '../../components/Pagination'
 
+const REFRESH_MS = 5000 // segarkan dashboard tiap 5 detik
+
 export default function ITDashboardOverview() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
@@ -35,18 +37,70 @@ export default function ITDashboardOverview() {
   const [poliLoading, setPoliLoading] = useState(true)
   const [poliError, setPoliError] = useState('')
 
+  // =========================
+  // Load data + auto refresh
+  // =========================
   useEffect(() => {
-    api.getDoctors()
-      .then((res) => {
-        const rows = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.data)
-            ? res.data
-            : []
-        setDoctors(rows)
-      })
-      .catch((e) => setPoliError(e.message || 'Gagal memuat data poli.'))
-      .finally(() => setPoliLoading(false))
+    let batal = false
+
+    function loadRingkasan() {
+      api.getRingkasanIT()
+        .then((res) => {
+          if (batal) return
+          setData(res)
+          setError('')
+        })
+        .catch((e) => {
+          if (!batal) setError(e.message)
+        })
+        .finally(() => {
+          if (!batal) setLoading(false)
+        })
+    }
+
+    function loadPoli() {
+      api.getDoctors()
+        .then((res) => {
+          if (batal) return
+          const rows = Array.isArray(res)
+            ? res
+            : Array.isArray(res?.data)
+              ? res.data
+              : []
+          setDoctors(rows)
+          setPoliError('')
+        })
+        .catch((e) => {
+          if (!batal) setPoliError(e.message || 'Gagal memuat data poli.')
+        })
+        .finally(() => {
+          if (!batal) setPoliLoading(false)
+        })
+    }
+
+    function loadSemua() {
+      loadRingkasan()
+      loadPoli()
+    }
+
+    loadSemua()
+
+    // Segarkan berkala, hanya saat tab sedang dibuka
+    const timer = setInterval(() => {
+      if (!document.hidden) loadSemua()
+    }, REFRESH_MS)
+
+    // Saat tab dibuka lagi, langsung segarkan
+    function onVisible() {
+      if (!document.hidden) loadSemua()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
+    return () => {
+      batal = true
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [])
 
   const dokterNonaktif = doctors.filter(isDokterNonaktif).length
@@ -203,7 +257,7 @@ export default function ITDashboardOverview() {
                   {statusLoket.length === 0 && (
                     <tr>
                       <td colSpan={4} className="empty-state">
-                        {loading ? 'Memuat data...' : 'Belum ada panggilan hari ini.'}
+                        {loading ? 'Memuat data...' : 'Belum ada loket aktif.'}
                       </td>
                     </tr>
                   )}

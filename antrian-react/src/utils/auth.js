@@ -1,3 +1,5 @@
+import { api } from '../api/client'
+
 export const PETUGAS_KEY = 'petugas_auth_user'
 export const NURSE_KEY = 'nurse_auth_user'
 export const ADMIN_KEY = 'admin_auth_user'
@@ -15,6 +17,17 @@ function readUser(key) {
 
 const roleOf = (user) => String(user?.role || '').toLowerCase()
 
+// Lepas loket yang sedang dipakai supaya bisa dipilih petugas lain
+function lepasLoketSaatKeluar(user) {
+    const counterId = localStorage.getItem(COUNTER_KEY)
+
+    if (user?.id && counterId) {
+        api.lepasLoket(counterId, user.id).catch(() => { })
+    }
+
+    localStorage.removeItem(COUNTER_KEY)
+}
+
 // ===== PETUGAS =====
 export const getPetugas = () => readUser(PETUGAS_KEY)
 
@@ -24,8 +37,8 @@ export const savePetugas = (user) =>
     localStorage.setItem(PETUGAS_KEY, JSON.stringify(user))
 
 export function logoutPetugas() {
+    lepasLoketSaatKeluar(getPetugas())
     localStorage.removeItem(PETUGAS_KEY)
-    localStorage.removeItem(COUNTER_KEY)
 }
 
 // ===== NURSE =====
@@ -50,4 +63,7 @@ export const saveAdmin = (user) =>
 
 export const isAdminLoggedIn = () => roleOf(getAdmin()) === 'admin'
 
-export const logoutAdmin = () => localStorage.removeItem(ADMIN_KEY)
+export function logoutAdmin() {
+    lepasLoketSaatKeluar(getAdmin())
+    localStorage.removeItem(ADMIN_KEY)
+}

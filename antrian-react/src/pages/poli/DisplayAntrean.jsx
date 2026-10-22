@@ -108,10 +108,11 @@ export default function DisplayAntrean() {
         const currentQueue = Number(doc.Antrian) || 0
         const prevQueue = prevQueuesRef.current[aid]
 
-        if (!isFirstPollRef.current && prevQueue !== undefined && prevQueue !== currentQueue) {
+        // Dianggap "dipanggil" hanya kalau nomor NAIK.
+        // Nomor dimundurkan atau di-reset ke 0 cukup memperbarui tampilan, tanpa bel dan badge.
+        if (!isFirstPollRef.current && prevQueue !== undefined && currentQueue > prevQueue) {
           changedAid = aid
         }
-
         prevQueuesRef.current[aid] = currentQueue
       })
 
@@ -162,45 +163,45 @@ export default function DisplayAntrean() {
       <TVBackground />
 
       <TVHeader liveLabel="LIVE MONITOR POLIKLINIK">
-          <div className="tv-poli-controls">
-            {/* Tombol Audio */}
-            <button
-              type="button"
-              className={`tv-poli-btn-audio${audioReady ? ' tv-poli-btn-audio--active' : ''}`}
-              onClick={() => {
-                if (audioRef.current) {
-                  audioRef.current.play().then(() => setAudioReady(true)).catch(() => { })
-                }
-              }}
-              title={audioReady ? 'Audio Bell Aktif' : 'Klik untuk Aktifkan Audio'}
-            >
-              {audioReady ? <Volume2 size={16} /> : <VolumeX size={16} />}
-              <span>{audioReady ? 'Audio Aktif' : 'Aktifkan Audio'}</span>
-            </button>
+        <div className="tv-poli-controls">
+          {/* Tombol Audio */}
+          <button
+            type="button"
+            className={`tv-poli-btn-audio${audioReady ? ' tv-poli-btn-audio--active' : ''}`}
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.play().then(() => setAudioReady(true)).catch(() => { })
+              }
+            }}
+            title={audioReady ? 'Audio Bell Aktif' : 'Klik untuk Aktifkan Audio'}
+          >
+            {audioReady ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            <span>{audioReady ? 'Audio Aktif' : 'Aktifkan Audio'}</span>
+          </button>
 
-            {/* Selector Nurse Station */}
-            <select
-              className="tv-poli-select"
-              value={display}
-              onChange={(e) => setDisplay(e.target.value)}
-            >
-              {Array.from({ length: 10 }, (_, i) => (
-                <option key={i + 1} value={String(i + 1)} className="tv-poli-select__option">
-                  Nurse Station {i + 1}
-                </option>
-              ))}
-            </select>
+          {/* Selector Nurse Station */}
+          <select
+            className="tv-poli-select"
+            value={display}
+            onChange={(e) => setDisplay(e.target.value)}
+          >
+            {Array.from({ length: 10 }, (_, i) => (
+              <option key={i + 1} value={String(i + 1)} className="tv-poli-select__option">
+                Nurse Station {i + 1}
+              </option>
+            ))}
+          </select>
 
-            {/* Tombol Fullscreen */}
-            <button
-              type="button"
-              className="tv-poli-btn-fs"
-              onClick={toggleFullscreen}
-              title="Layar Penuh"
-            >
-              {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
-            </button>
-          </div>
+          {/* Tombol Fullscreen */}
+          <button
+            type="button"
+            className="tv-poli-btn-fs"
+            onClick={toggleFullscreen}
+            title="Layar Penuh"
+          >
+            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+          </button>
+        </div>
       </TVHeader>
 
       {/* Main Content */}

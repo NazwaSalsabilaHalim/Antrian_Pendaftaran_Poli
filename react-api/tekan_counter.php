@@ -5,8 +5,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_error('Method harus POST', 405);
 }
 
+require_once __DIR__ . '/loket_helper.php';
+
 $counterId = trim((string) input('counter_id', ''));
 $tombolId  = trim((string) input('tombol_id', ''));
+$userId    = (int) input('user_id', 0);
 
 if ($counterId === '' || $tombolId === '') {
     json_error('counter_id dan tombol_id wajib diisi');
@@ -14,33 +17,27 @@ if ($counterId === '' || $tombolId === '') {
 
 /*
 |--------------------------------------------------------------------------
-| 1. Cek counter
+| 1. Cek akun + counter (harus sedang dipakai akun ini)
 |--------------------------------------------------------------------------
 */
-$stmt = mysqli_prepare(
-    $conn,
-    "SELECT CounterID, Nama, Display
-     FROM counter
-     WHERE CounterID = ? AND NA = 'N'
-     LIMIT 1"
-);
-
-if (!$stmt) {
-    json_error('Prepare counter gagal: ' . mysqli_error($conn), 500);
+if (!user_loket_valid($conn, $userId)) {
+    json_error('Akun tidak aktif atau tidak dikenal.', 403);
 }
 
-mysqli_stmt_bind_param($stmt, "s", $counterId);
+$counter = ambil_loket($conn, $counterId);
 
-if (!mysqli_stmt_execute($stmt)) {
-    json_error('Query counter gagal: ' . mysqli_stmt_error($stmt), 500);
-}
-
-$counter = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-
-if (!$counter) {
+if (!$counter || $counter['NA'] === 'Y') {
     json_error('Counter tidak ditemukan / tidak aktif', 404);
 }
 
+if ((int) $counter['petugas_id'] !== $userId) {
+    json_error('Loket ini tidak sedang kamu pakai. Pilih loket ulang.', 403);
+}
+
+// Segarkan penanda "sedang dipakai"
+$stmt = mysqli_prepare($conn, "UPDATE sesi_loket SET last_ping = NOW() WHERE counter_id = ? AND user_id = ?");
+mysqli_stmt_bind_param($stmt, "si", $counterId, $userId);
+mysqli_stmt_execute($stmt);
 
 /*
 |--------------------------------------------------------------------------

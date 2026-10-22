@@ -46,14 +46,22 @@ $petugasAktif = (int) mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS
 $loketAktif = (int) mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM counter WHERE NA = 'N'"))['total'];
 // lap('Q4_loket');
 
-// Status tiap loket = panggilan terakhir hari ini per counter
-$sql = "SELECT p.CounterID, c.Nama AS counter_nama, c.petugas_nama, p.Prefix, p.Nomor
-        FROM panggil p
-        INNER JOIN (
-          SELECT CounterID, MAX(TanggalPanggil) AS terakhir
-          FROM panggil WHERE Tgl = ? GROUP BY CounterID
-        ) t ON t.CounterID = p.CounterID AND t.terakhir = p.TanggalPanggil
-        LEFT JOIN counter c ON c.CounterID = p.CounterID";
+// Status tiap loket = semua loket aktif + petugas yang sedang memakainya + panggilan terakhir hari ini
+require_once __DIR__ . '/loket_helper.php';
+$sqlDipakai = sql_loket_dipakai('s');
+
+$sql = "SELECT c.CounterID, c.Nama AS counter_nama, u.nama AS petugas_nama,
+               $sqlDipakai AS dipakai,
+               (SELECT CONCAT(p.Prefix, p.Nomor)
+                FROM panggil p
+                WHERE p.Tgl = ? AND p.CounterID = c.CounterID
+                ORDER BY p.TanggalPanggil DESC
+                LIMIT 1) AS antrian
+        FROM counter c
+        LEFT JOIN sesi_loket s ON s.counter_id = c.CounterID
+        LEFT JOIN users u ON u.id = s.user_id
+        WHERE c.NA = 'N'
+        ORDER BY c.ID";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "s", $tgl);
 mysqli_stmt_execute($stmt);
@@ -61,11 +69,13 @@ $res = mysqli_stmt_get_result($stmt);
 
 $statusLoket = [];
 while ($r = mysqli_fetch_assoc($res)) {
+  $dipakai = (int) $r['dipakai'] === 1;
+
   $statusLoket[] = [
-    "loket"   => $r['counter_nama'] ?? $r['CounterID'],
-    "petugas" => $r['petugas_nama'] ?: '-',
-    "status"  => 'Aktif',
-    "antrian" => $r['Prefix'] . $r['Nomor'],
+    "loket"   => $r['counter_nama'],
+    "petugas" => $dipakai ? $r['petugas_nama'] : '-',
+    "status"  => $dipakai ? 'Aktif' : 'Tidak Aktif',
+    "antrian" => $r['antrian'] ?: '-',
   ];
 }
 // lap('Q5_status_loket');

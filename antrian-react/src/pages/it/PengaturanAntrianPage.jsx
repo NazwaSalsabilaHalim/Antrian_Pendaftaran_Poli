@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  Building2,
-  User,
   Tag,
   Hash,
   FileText,
@@ -22,6 +20,7 @@ import {
   ringkasStatus,
 } from '../../components/it/ITComponents'
 import Pagination, { usePagination } from '../../components/Pagination'
+import LoketTab from './LoketTab'
 
 // =========================
 // Konfigurasi
@@ -58,190 +57,6 @@ export default function PengaturanAntrianPage() {
       />
 
       {tab === 'loket' ? <LoketTab /> : <JenisTab />}
-    </>
-  )
-}
-
-// =========================
-// Tab Loket
-// =========================
-function LoketTab() {
-  const [loket, setLoket] = useState([])
-  const [petugasList, setPetugasList] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [toast, setToast] = useState(null)
-
-  const {
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    startIndex,
-    paginatedItems: paginatedLoket,
-  } = usePagination(loket, 10)
-
-  const [editItem, setEditItem] = useState(null)
-  const [form, setForm] = useState({
-    petugas_nama: '',
-    status: 'Aktif',
-  })
-
-  // Pasangan value/onChange untuk input teks di form
-  const field = (name) => ({
-    value: form[name],
-    onChange: (e) => setForm({ ...form, [name]: e.target.value }),
-  })
-
-  function notify(type, text) {
-    setToast({ type, text })
-  }
-
-  function load() {
-    setLoading(true)
-
-    Promise.all([
-      api.getLoketIT(),
-      api.getPetugas(),
-    ])
-      .then(([loketResponse, petugasResponse]) => {
-        setLoket(loketResponse.loket || [])
-        setPetugasList(petugasResponse.petugas || [])
-        setCurrentPage(1)
-      })
-      .catch((e) => notify('error', e.message))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  function openEdit(item) {
-    setForm({
-      petugas_nama: item.petugas_nama === '-' ? '' : item.petugas_nama,
-      status: item.status,
-    })
-    setEditItem(item)
-  }
-
-  function closeModal() {
-    setEditItem(null)
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault()
-
-    api.saveLoketIT({
-      action: 'update',
-      counter_id: editItem.counter_id,
-      petugas_nama: form.petugas_nama,
-      status: form.status,
-    })
-      .then(() => {
-        closeModal()
-        notify('success', 'Loket berhasil diperbarui.')
-        load()
-      })
-      .catch((e) => notify('error', e.message))
-  }
-
-  return (
-    <>
-      <Toast toast={toast} onClose={() => setToast(null)} />
-
-      <div className="card card--table-narrow">
-        <CardHeading
-          title="Daftar Loket"
-          description="Atur petugas yang bertugas dan status tiap loket."
-          meta={loading ? 'Memuat data...' : ringkasStatus(loket)}
-        />
-
-        {!loading && (
-          <div className="management-table-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Loket</th>
-                  <th>Petugas</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {paginatedLoket.map((item, index) => (
-                  <tr key={item.counter_id}>
-                    <td>{startIndex + index + 1}</td>
-                    <td><strong>{item.nama}</strong></td>
-                    <td>{item.petugas_nama}</td>
-                    <td><StatusBadge status={item.status} /></td>
-                    <td>
-                      <RowActions onEdit={() => openEdit(item)} />
-                    </td>
-                  </tr>
-                ))}
-
-                {loket.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="empty-state">
-                      Belum ada data loket.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {!loading && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={loket.length}
-            pageSize={10}
-            onPageChange={setCurrentPage}
-            itemName="loket"
-          />
-        )}
-      </div>
-
-      {editItem && (
-        <Modal
-          title={`Edit Loket — ${editItem.nama}`}
-          subtitle="Atur petugas yang bertugas dan status loket"
-          icon={Building2}
-          onClose={closeModal}
-        >
-          <form onSubmit={handleSubmit}>
-            <FormField
-              label="Petugas"
-              icon={User}
-              hint={
-                petugasList.length === 0
-                  ? 'Belum ada data petugas — tambahkan dulu di halaman Akun Pengguna.'
-                  : undefined
-              }
-            >
-              <select {...field('petugas_nama')} className={FIELD}>
-                <option value="">Belum ada petugas</option>
-
-                {petugasList.map((p) => (
-                  <option key={p.id} value={p.nama}>
-                    {p.nama}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-
-            <StatusSelect
-              value={form.status}
-              onChange={(status) => setForm({ ...form, status })}
-            />
-
-            <FormActions submitLabel="Simpan Perubahan" onCancel={closeModal} />
-          </form>
-        </Modal>
-      )}
     </>
   )
 }

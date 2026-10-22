@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   Users,
   Building2,
@@ -8,16 +9,24 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { api } from '../../api/client'
-import { COUNTER_KEY } from '../../utils/auth'
+import { COUNTER_KEY, getAdmin, getPetugas } from '../../utils/auth'
 import { Toast } from '../../components/it/ITComponents'
 
+const PING_MS = 30000     // tandai loket "masih dipakai" tiap 30 detik
+const REFRESH_MS = 10000  // segarkan daftar loket tiap 10 detik
+
 export default function Loket() {
+  // Halaman ini juga bisa dibuka admin dari panel IT
+  const { pathname } = useLocation()
+  const user = pathname.startsWith('/it-dashboard') ? getAdmin() : getPetugas()
+  const userId = user?.id
+
   // ================= STATE =================
 
   const [counterList, setCounterList] = useState([])
   const [tombolList, setTombolList] = useState([])
 
-  // Loket yang dipilih disimpan, jadi tidak hilang saat refresh
+  // Loket yang sudah berhasil dipilih (disimpan, jadi tidak hilang saat refresh)
   const [counterId, setCounterId] = useState(
     () => localStorage.getItem(COUNTER_KEY) || ''
   )
@@ -30,22 +39,79 @@ export default function Loket() {
 
   // ================= AMBIL DATA =================
 
-  useEffect(() => {
-    Promise.all([api.getCounter(), api.getTombol()])
-      .then(([c, t]) => {
-        setCounterList(c.counter)
-        setTombolList(t.tombol)
-
-        // Kalau loket tersimpan sudah tidak ada di daftar, reset
-        const saved = localStorage.getItem(COUNTER_KEY)
-
-        if (saved && !c.counter.some((x) => String(x.CounterID) === saved)) {
-          localStorage.removeItem(COUNTER_KEY)
-          setCounterId('')
-        }
-      })
-      .catch((e) => showError(e.message))
+  const loadCounters = useCallback(async () => {
+    const res = await api.getCounter()
+    setCounterList(res.counter)
+    return res.counter
   }, [])
+
+  useEffect(() => {
+    let batal = false
+
+    async function init() {
+      let list
+
+      try {
+        const [c, t] = await Promise.all([loadCounters(), api.getTombol()])
+        if (batal) return
+        list = c
+        setTombolList(t.tombol)
+      } catch (e) {
+        if (!batal) showError(e.message)
+        return
+      }
+
+      // Klaim ulang loket yang tersimpan (mis. setelah refresh halaman)
+      const saved = localStorage.getItem(COUNTER_KEY)
+      if (!saved) return
+
+      if (!list.some((x) => String(x.CounterID) === saved)) {
+        lepasLokal()
+        return
+      }
+
+      try {
+        await api.pilihLoket(saved, userId)
+      } catch (e) {
+        if (batal) return
+        lepasLokal()
+        showError(e.message)
+        loadCounters().catch(() => {})
+      }
+    }
+
+    init()
+
+    return () => {
+      batal = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Segarkan status loket (dipakai / kosong) secara berkala
+  useEffect(() => {
+    const t = setInterval(() => loadCounters().catch(() => {}), REFRESH_MS)
+    return () => clearInterval(t)
+  }, [loadCounters])
+
+  // Heartbeat: selama halaman terbuka, loket tetap dianggap dipakai
+  useEffect(() => {
+    if (!counterId || !userId) return
+
+    const t = setInterval(() => {
+      api.pingLoket(counterId, userId).catch((e) => {
+        // Gangguan jaringan sesaat jangan sampai melepas loket
+        if (e.name === 'TypeError') return
+
+        lepasLokal()
+        showError(e.message || 'Loket sudah tidak kamu pakai.')
+        loadCounters().catch(() => {})
+      })
+    }, PING_MS)
+
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counterId, userId])
 
   // ================= AKSI =================
 
@@ -57,12 +123,34 @@ export default function Loket() {
     setToast({ type: 'error', text: pesan })
   }
 
-  function pilihCounter(value) {
-    setCounterId(value)
+  // Hapus pilihan loket di browser saja (tanpa panggil server)
+  function lepasLokal() {
+    setCounterId('')
+    localStorage.removeItem(COUNTER_KEY)
+  }
+
+  async function pilihCounter(value) {
     setToast(null)
 
-    if (value) localStorage.setItem(COUNTER_KEY, value)
-    else localStorage.removeItem(COUNTER_KEY)
+    // Pilihan dikosongkan -> lepas loket lama
+    if (!value) {
+      const lama = counterId
+      lepasLokal()
+      if (lama) await api.lepasLoket(lama, userId).catch(() => {})
+      loadCounters().catch(() => {})
+      return
+    }
+
+    // Klaim loket di server dulu; kalau gagal, pilihan lama tetap
+    try {
+      await api.pilihLoket(value, userId)
+      setCounterId(value)
+      localStorage.setItem(COUNTER_KEY, value)
+    } catch (e) {
+      showError(e.message)
+    } finally {
+      loadCounters().catch(() => {})
+    }
   }
 
   async function handlePanggil(tombol) {
@@ -75,7 +163,7 @@ export default function Loket() {
 
     try {
       // 1. Ambil nomor antrean berikutnya
-      const hasil = await api.tekanCounter(counterId, tombol.TombolID)
+      const hasil = await api.tekanCounter(counterId, tombol.TombolID, userId)
 
       // Tidak ada nomor baru yang bisa dipanggil
       if (!hasil.panggil_id) {
@@ -96,6 +184,12 @@ export default function Loket() {
       showToast(hasil.text || 'Nomor berhasil dipanggil.')
     } catch (e) {
       showError(e.message || 'Gagal memanggil nomor antrean.')
+
+      // Loket sudah bukan milik akun ini -> minta pilih ulang
+      if (String(e.message).includes('tidak sedang kamu pakai')) {
+        lepasLokal()
+        loadCounters().catch(() => {})
+      }
     } finally {
       setBusyId(null)
     }
@@ -148,11 +242,20 @@ export default function Loket() {
           >
             <option value="">Pilih Counter</option>
 
-            {counterList.map((c) => (
-              <option key={c.CounterID} value={c.CounterID}>
-                {c.Nama}
-              </option>
-            ))}
+            {counterList.map((c) => {
+              const dipakaiLain =
+                c.dipakai && String(c.petugas_id) !== String(userId)
+
+              return (
+                <option
+                  key={c.CounterID}
+                  value={c.CounterID}
+                  disabled={dipakaiLain}
+                >
+                  {dipakaiLain ? `${c.Nama} (dipakai ${c.petugas_nama})` : c.Nama}
+                </option>
+              )
+            })}
           </select>
         </div>
       </section>
