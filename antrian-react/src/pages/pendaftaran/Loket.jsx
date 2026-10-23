@@ -9,11 +9,43 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { api } from '../../api/client'
-import { COUNTER_KEY, getAdmin, getPetugas } from '../../utils/auth'
+import { COUNTER_KEY, LAST_PANGGIL_KEY, getAdmin, getPetugas } from '../../utils/auth'
 import { Toast } from '../../components/it/ITComponents'
 
 const PING_MS = 30000     // tandai loket "masih dipakai" tiap 30 detik
 const REFRESH_MS = 10000  // segarkan daftar loket tiap 10 detik
+
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function loadLastPanggil(counterId) {
+  if (!counterId) return {}
+  try {
+    const raw = localStorage.getItem(LAST_PANGGIL_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    if (parsed.tgl === getTodayStr() && String(parsed.counterId) === String(counterId)) {
+      return parsed.data || {}
+    }
+  } catch {}
+  return {}
+}
+
+function saveLastPanggil(counterId, data) {
+  if (!counterId) {
+    localStorage.removeItem(LAST_PANGGIL_KEY)
+    return
+  }
+  localStorage.setItem(
+    LAST_PANGGIL_KEY,
+    JSON.stringify({
+      tgl: getTodayStr(),
+      counterId,
+      data,
+    })
+  )
+}
 
 export default function Loket() {
   // Halaman ini juga bisa dibuka admin dari panel IT
@@ -32,7 +64,9 @@ export default function Loket() {
   )
 
   // ID panggilan terakhir per jenis antrian: { TombolID: panggil_id }
-  const [lastPanggil, setLastPanggil] = useState({})
+  const [lastPanggil, setLastPanggil] = useState(() =>
+    loadLastPanggil(localStorage.getItem(COUNTER_KEY) || '')
+  )
 
   const [busyId, setBusyId] = useState(null)
   const [toast, setToast] = useState(null) // { type: 'success' | 'error', text }
@@ -127,6 +161,8 @@ export default function Loket() {
   function lepasLokal() {
     setCounterId('')
     localStorage.removeItem(COUNTER_KEY)
+    localStorage.removeItem(LAST_PANGGIL_KEY)
+    setLastPanggil({})
   }
 
   async function pilihCounter(value) {
@@ -146,6 +182,7 @@ export default function Loket() {
       await api.pilihLoket(value, userId)
       setCounterId(value)
       localStorage.setItem(COUNTER_KEY, value)
+      setLastPanggil(loadLastPanggil(value))
     } catch (e) {
       showError(e.message)
     } finally {
@@ -175,10 +212,14 @@ export default function Loket() {
       await api.panggilKonfirmasi(hasil.panggil_id)
 
       // 3. Simpan ID panggilan terakhir untuk tombol Ulangi
-      setLastPanggil((prev) => ({
-        ...prev,
-        [tombol.TombolID]: hasil.panggil_id,
-      }))
+      setLastPanggil((prev) => {
+        const next = {
+          ...prev,
+          [tombol.TombolID]: hasil.panggil_id,
+        }
+        saveLastPanggil(counterId, next)
+        return next
+      })
 
       // 4. Tampilkan notifikasi berhasil
       showToast(hasil.text || 'Nomor berhasil dipanggil.')

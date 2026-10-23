@@ -4,6 +4,7 @@ export const PETUGAS_KEY = 'petugas_auth_user'
 export const NURSE_KEY = 'nurse_auth_user'
 export const ADMIN_KEY = 'admin_auth_user'
 export const COUNTER_KEY = 'petugas_counter_id'
+export const LAST_PANGGIL_KEY = 'petugas_last_panggil'
 
 function readUser(key) {
     try {
@@ -26,6 +27,7 @@ function lepasLoketSaatKeluar(user) {
     }
 
     localStorage.removeItem(COUNTER_KEY)
+    localStorage.removeItem(LAST_PANGGIL_KEY)
 }
 
 // ===== PETUGAS =====
