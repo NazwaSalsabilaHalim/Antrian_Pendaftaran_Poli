@@ -102,7 +102,9 @@ export default function TVDisplay() {
 
           const isBaru =
             !prev ||
-            prev.dipanggil_pukul !== s.dipanggil_pukul ||
+            (s.tanggal_panggil && prev.tanggal_panggil
+              ? prev.tanggal_panggil !== s.tanggal_panggil
+              : prev.dipanggil_pukul !== s.dipanggil_pukul) ||
             prev.nomor_display !== s.nomor_display
 
           if (isBaru && audioReady && audioRef.current) {

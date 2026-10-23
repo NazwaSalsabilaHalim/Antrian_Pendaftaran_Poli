@@ -3,13 +3,13 @@ require __DIR__ . '/config.php';
 
 $tgl = date('Y-m-d');
 
-// "Sedang dilayani" = panggilan TERAKHIR hari ini per counter (yang sudah diumumkan)
+// "Sedang dilayani" = panggilan TERAKHIR hari ini per counter
 $sql = "SELECT p.CounterID, c.Nama AS counter_nama, p.Prefix, p.Nomor, p.Nama AS tombol_nama, p.TanggalPanggil
         FROM panggil p
         INNER JOIN (
           SELECT CounterID, MAX(TanggalPanggil) AS terakhir
           FROM panggil
-          WHERE Tgl = ? AND Panggil = 'Y'
+          WHERE Tgl = ?
           GROUP BY CounterID
         ) terbaru ON terbaru.CounterID = p.CounterID AND terbaru.terakhir = p.TanggalPanggil
         LEFT JOIN counter c ON c.CounterID = p.CounterID
@@ -28,6 +28,7 @@ while ($row = mysqli_fetch_assoc($res)) {
     "tombol_nama"     => $row['tombol_nama'],
     "nomor_display"   => $row['Prefix'] . $row['Nomor'],
     "dipanggil_pukul" => date('H:i', strtotime($row['TanggalPanggil'])),
+    "tanggal_panggil" => $row['TanggalPanggil'],
   ];
 }
 
