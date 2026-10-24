@@ -48,7 +48,7 @@ if ($method === 'POST') {
     json_ok();
   }
 
-  if ($action === 'update') {
+  if ($action === 'update' || $action === 'edit') {
     $tombol_id = trim((string) input('tombol_id', ''));
     $nama      = trim((string) input('nama', ''));
     $prefix    = trim((string) input('prefix', ''));

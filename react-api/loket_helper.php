@@ -8,7 +8,7 @@
 
 // Sesi dianggap masih hidup kalau last_ping (dikirim Loket.jsx tiap 30 detik)
 // belum lewat batas ini.
-const LOKET_TIMEOUT_DETIK = 120;
+const LOKET_TIMEOUT_DETIK = 45;
 
 // Potongan SQL: 1 kalau sesi masih hidup, 0 kalau tidak ada / sudah kedaluwarsa.
 // $alias = alias tabel sesi_loket di query.

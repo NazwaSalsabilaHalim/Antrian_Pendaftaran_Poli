@@ -11,7 +11,7 @@ import {
   useAudioUnlock,
 } from '../components/tv/TVShared'
 
-const POLL_MS = 10000
+const POLL_MS = 2500
 
 /*
  * Memecah "A3" -> { prefix: "A", nomor: 3 }
@@ -39,21 +39,17 @@ function CounterCard({ counterNama, serving }) {
         {counterNama}
       </div>
 
-      {hasNomor ? (
-        <>
-          <div className="tv-number-wrap">
-            <FlapRow value={serving.nomor_display} />
-          </div>
+      <div className={`tv-number-wrap${!hasNomor ? ' tv-number-wrap--empty' : ''}`}>
+        {hasNomor ? (
+          <FlapRow value={serving.nomor_display} />
+        ) : (
+          <span className="tv-flap-char tv-flap-char--empty">—</span>
+        )}
+      </div>
 
-          <div className="tv-counter-card__meta">
-            {serving.tombol_nama}
-          </div>
-        </>
-      ) : (
-        <div className="tv-counter-card__empty">
-          MENUNGGU PANGGILAN
-        </div>
-      )}
+      <div className="tv-counter-card__meta">
+        {hasNomor ? (serving.tombol_nama || 'ANTRIAN') : 'MENUNGGU PANGGILAN'}
+      </div>
     </div>
   )
 }
@@ -70,15 +66,21 @@ export default function TVDisplay() {
 
   /*
    * ================================
-   * AMBIL DAFTAR LOKET (sekali di awal)
+   * AMBIL DAFTAR LOKET (otomatis diperbarui tiap 10 detik)
    * ================================
    */
-  useEffect(() => {
+  const loadCounters = useCallback(() => {
     api
       .getCounter()
       .then((d) => setCounterList(d.counter || []))
       .catch((e) => console.warn('Gagal ambil daftar counter:', e.message))
   }, [])
+
+  useEffect(() => {
+    loadCounters()
+    const timer = setInterval(loadCounters, 10000)
+    return () => clearInterval(timer)
+  }, [loadCounters])
 
   /*
    * ================================
@@ -151,7 +153,7 @@ export default function TVDisplay() {
           NOMOR ANTRIAN
         </div>
 
-        <div className="tv-counters-grid">
+        <div className={`tv-counters-grid tv-counters-grid--count-${counterList.length}`}>
           {counterList.map((c) => (
             <CounterCard
               key={c.CounterID}

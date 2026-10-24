@@ -5,6 +5,8 @@ import {
   Ticket,
   Users,
   Building2,
+  Briefcase,
+  HeartPulse,
   ArrowRight,
   Printer,
   RotateCcw,
@@ -61,11 +63,17 @@ export default function AmbilNomor() {
     }
   }
 
-  function getIcon(index) {
-    if (index === 0) {
+  function getIcon(t, index) {
+    const nama = (t?.Nama || '').toLowerCase()
+    if (nama.includes('asuransi')) {
       return <Building2 size={28} strokeWidth={1.8} />
     }
-
+    if (nama.includes('perusahaan')) {
+      return <Briefcase size={28} strokeWidth={1.8} />
+    }
+    if (nama.includes('saraf') || nama.includes('dalam')) {
+      return <HeartPulse size={28} strokeWidth={1.8} />
+    }
     return <Users size={28} strokeWidth={1.8} />
   }
 
@@ -184,14 +192,14 @@ export default function AmbilNomor() {
               <button
                 key={t.TombolID}
                 type="button"
-                className={`ambil-option ambil-option--${index % 3}`}
+                className={`ambil-option ambil-option--${index % 4}`}
                 disabled={loadingId !== null}
                 onClick={() => handleAmbil(t)}
               >
 
                 {/* ICON */}
                 <div className="ambil-option__icon">
-                  {getIcon(index)}
+                  {getIcon(t, index)}
                 </div>
 
                 {/* NUMBER */}
@@ -211,9 +219,13 @@ export default function AmbilNomor() {
                   </h3>
 
                   <p>
-                    {index === 0
-                      ? 'Untuk pasien dengan asuransi atau perusahaan.'
-                      : 'Untuk pasien umum tanpa asuransi perusahaan.'}
+                    {t.Nama?.toLowerCase().includes('asuransi')
+                      ? 'Untuk pasien dengan asuransi atau rekanan perusahaan.'
+                      : t.Nama?.toLowerCase().includes('perusahaan')
+                        ? 'Untuk pasien penjaminan perusahaan rekanan.'
+                        : t.Nama?.toLowerCase().includes('saraf') || t.Nama?.toLowerCase().includes('dalam')
+                          ? 'Poli spesialis saraf dan penyakit dalam.'
+                          : 'Untuk pasien umum atau pembayaran pribadi.'}
                   </p>
 
                 </div>

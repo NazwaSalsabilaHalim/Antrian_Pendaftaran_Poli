@@ -84,7 +84,7 @@ if ($method === 'POST') {
   | UPDATE (nama + status)
   |------------------------------------------------------------------------
   */
-  if ($action === 'update') {
+  if ($action === 'update' || $action === 'edit') {
     $counterId = trim((string) input('counter_id', ''));
     $nama      = trim((string) input('nama', ''));
     $status    = input('status', 'Aktif');

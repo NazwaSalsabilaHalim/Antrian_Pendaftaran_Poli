@@ -75,7 +75,7 @@ if ($method === 'POST') {
     json_ok(["id" => mysqli_insert_id($conn)]);
   }
 
-  if ($action === 'update') {
+  if ($action === 'update' || $action === 'edit') {
     $id       = (int) input('id');
     $nama     = trim((string) input('nama', ''));
     $username = trim((string) input('username', ''));

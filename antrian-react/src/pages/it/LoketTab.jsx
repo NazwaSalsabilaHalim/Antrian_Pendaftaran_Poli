@@ -88,7 +88,7 @@ export default function LoketTab() {
     }
 
     api.saveLoketIT({
-      action: modalMode,
+      action: modalMode === 'edit' ? 'update' : modalMode,
       counter_id: form.counter_id,
       nama: form.nama.trim(),
       status: form.status,

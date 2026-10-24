@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom'
 import {
   Users,
   Building2,
+  Briefcase,
+  HeartPulse,
   Megaphone,
   RotateCcw,
   ArrowRight,
@@ -12,8 +14,8 @@ import { api } from '../../api/client'
 import { COUNTER_KEY, LAST_PANGGIL_KEY, getAdmin, getPetugas } from '../../utils/auth'
 import { Toast } from '../../components/it/ITComponents'
 
-const PING_MS = 30000     // tandai loket "masih dipakai" tiap 30 detik
-const REFRESH_MS = 10000  // segarkan daftar loket tiap 10 detik
+const PING_MS = 15000     // tandai loket "masih dipakai" tiap 15 detik
+const REFRESH_MS = 3000   // segarkan daftar loket tiap 3 detik
 
 function getTodayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -122,10 +124,23 @@ export default function Loket() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Segarkan status loket (dipakai / kosong) secara berkala
+  // Segarkan status loket secara berkala dan otomatis saat tab browser aktif / difokuskan
   useEffect(() => {
-    const t = setInterval(() => loadCounters().catch(() => {}), REFRESH_MS)
-    return () => clearInterval(t)
+    function segarkan() {
+      if (!document.hidden) {
+        loadCounters().catch(() => {})
+      }
+    }
+
+    const t = setInterval(segarkan, REFRESH_MS)
+    window.addEventListener('focus', segarkan)
+    document.addEventListener('visibilitychange', segarkan)
+
+    return () => {
+      clearInterval(t)
+      window.removeEventListener('focus', segarkan)
+      document.removeEventListener('visibilitychange', segarkan)
+    }
   }, [loadCounters])
 
   // Heartbeat: selama halaman terbuka, loket tetap dianggap dipakai
@@ -208,10 +223,7 @@ export default function Loket() {
         return
       }
 
-      // 2. Konfirmasi panggilan agar status Panggil menjadi Y
-      await api.panggilKonfirmasi(hasil.panggil_id)
-
-      // 3. Simpan ID panggilan terakhir untuk tombol Ulangi
+      // 2. Simpan ID panggilan terakhir untuk tombol Ulangi
       setLastPanggil((prev) => {
         const next = {
           ...prev,
@@ -279,6 +291,7 @@ export default function Loket() {
           <select
             id="counter"
             value={counterId}
+            onFocus={() => loadCounters().catch(() => {})}
             onChange={(e) => pilihCounter(e.target.value)}
           >
             <option value="">Pilih Counter</option>
@@ -322,13 +335,19 @@ export default function Loket() {
           return (
             <div
               key={t.TombolID}
-              className={`loket-queue-card loket-queue-card--${index % 3}`}
+              className={`loket-queue-card loket-queue-card--${index % 4}`}
             >
               {/* HEADER KARTU */}
               <div className="loket-queue-card__header">
                 <div className="loket-queue-card__category">
                   <span className="loket-queue-card__category-icon">
-                    {index === 0 ? <Users size={17} /> : <Building2 size={17} />}
+                    {(() => {
+                      const n = (t.Nama || '').toLowerCase()
+                      if (n.includes('asuransi')) return <Building2 size={17} />
+                      if (n.includes('perusahaan')) return <Briefcase size={17} />
+                      if (n.includes('saraf') || n.includes('dalam')) return <HeartPulse size={17} />
+                      return <Users size={17} />
+                    })()}
                   </span>
 
                   <span>Jenis Antrian</span>

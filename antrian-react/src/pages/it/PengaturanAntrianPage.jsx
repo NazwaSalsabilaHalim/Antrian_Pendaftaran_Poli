@@ -134,7 +134,7 @@ function JenisTab() {
     }
 
     api.saveJenisPendaftaran({
-      action: modalMode,
+      action: modalMode === 'edit' ? 'update' : modalMode,
       ...form,
     })
       .then(() => {
