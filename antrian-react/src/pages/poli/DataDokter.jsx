@@ -58,6 +58,11 @@ function DisplayOptions() {
 export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
   const [doctors, setDoctors] = useState([])
   const [statuses, setStatuses] = useState([])
+
+  const [yasminDoctors, setYasminDoctors] = useState([])
+  const [selectedYasminDoctor, setSelectedYasminDoctor] = useState('')
+  const [loadingYasmin, setLoadingYasmin] = useState(false)
+
   const [search, setSearch] = useState('')
   const [display, setDisplay] = useState('')
   const [loading, setLoading] = useState(true)
@@ -110,6 +115,19 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     }
   }
 
+  async function fetchYasminDoctors() {
+    setLoadingYasmin(true)
+
+    try {
+      const result = await api.getDoctors('yasmin_doctors=1')
+      setYasminDoctors(Array.isArray(result.data) ? result.data : [])
+    } catch (err) {
+      notify('error', err.message || 'Gagal memuat daftar dokter Yasmin.')
+    } finally {
+      setLoadingYasmin(false)
+    }
+  }
+
   function handleRefresh() {
     setSearch('')
     setDisplay('')
@@ -144,6 +162,8 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     resetPhoto()
     setToast(null)
     setModalOpen(true)
+    setSelectedYasminDoctor('')
+    fetchYasminDoctors()
   }
 
   function openEditForm(doctor) {
@@ -218,6 +238,25 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
     } finally {
       setSaving(false)
     }
+  }
+
+  function handleSelectYasminDoctor(event) {
+    const dokterId = event.target.value
+    setSelectedYasminDoctor(dokterId)
+
+    if (!dokterId) return
+
+    const dokter = yasminDoctors.find(
+      (item) => String(item.DokterID) === dokterId
+    )
+
+    if (!dokter) return
+
+    setForm((current) => ({
+      ...current,
+      Nama: dokter.Nama || '',
+      DokterID: dokter.DokterID || '',
+    }))
   }
 
   // ================= AKSI =================
@@ -485,11 +524,10 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
 
                     <td>
                       <strong
-                        className={`doctor-queue-number${
-                          !doctor.Antrian || formatNomor(doctor.Antrian) === '000'
-                            ? ' queue-zero'
-                            : ''
-                        }`}
+                        className={`doctor-queue-number${!doctor.Antrian || formatNomor(doctor.Antrian) === '000'
+                          ? ' queue-zero'
+                          : ''
+                          }`}
                       >
                         {formatNomor(doctor.Antrian)}
                       </strong>
@@ -535,6 +573,41 @@ export default function DataDokter({ izin = IZIN_PENUH, aksiTambahan = null }) {
         >
           <form onSubmit={submitForm}>
             <div className="it-form-grid">
+
+              {/* PILIH DOKTER DARI YASMIN */}
+              {!editing && (
+                <FormField label="Pilih Dokter" icon={Stethoscope}>
+                  <select
+                    className={FIELD}
+                    value={selectedYasminDoctor}
+                    onChange={handleSelectYasminDoctor}
+                    disabled={loadingYasmin}
+                  >
+                    <option value="">
+                      {loadingYasmin
+                        ? 'Memuat dokter Yasmin...'
+                        : 'Pilih Dokter'}
+                    </option>
+
+                    {yasminDoctors.map((dokter) => (
+                      <option
+                        key={dokter.DokterID}
+                        value={String(dokter.DokterID)}
+                      >
+                        {dokter.Nama} — {dokter.DokterID}
+                      </option>
+                    ))}
+                  </select>
+
+                  {!loadingYasmin && yasminDoctors.length === 0 && (
+                    <small>
+                      Tidak ada dokter Yasmin baru yang tersedia.
+                    </small>
+                  )}
+                </FormField>
+              )}
+
+              {/* FORM NAMA, ID, PASSWORD, POLI, DAN RUANG */}
               {textFields.map(({ label, icon, required = true, ...input }) => (
                 <FormField key={input.name} label={label} icon={icon}>
                   <input

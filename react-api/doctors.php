@@ -228,7 +228,42 @@ try {
          * Ambil pilihan status.
          */
         if (isset($_GET['options'])) {
+        }
+        
+        /*
+         * Ambil dokter Yasmin yang belum terdaftar di Antripol.
+         * Khusus untuk pilihan pada form Tambah Dokter.
+         */
+        if (isset($_GET['yasmin_doctors'])) {
+            $sqlYasmin = "
+                SELECT
+                    d.DokterID,
+                    d.Nama,
+                    d.Sapaan,
+                    d.Inisial,
+                    d.Gelar
+                FROM yasmin2026_testing.dokter AS d
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM antripol.antrian AS a
+                    WHERE TRIM(a.DokterID) = TRIM(d.DokterID)
+                )
+                ORDER BY d.Nama ASC
+            ";
 
+            $stmtYasmin = $pdo->query($sqlYasmin);
+
+            respond(
+                true,
+                'Daftar dokter Yasmin berhasil diambil.',
+                $stmtYasmin->fetchAll(PDO::FETCH_ASSOC)
+            );
+        }
+
+        /*
+         * Ambil pilihan status.
+         */
+        if (isset($_GET['options'])) {
             $stmt = $pdo->query("
                 SELECT
                     Status,
@@ -241,87 +276,77 @@ try {
                 true,
                 'Pilihan status berhasil diambil.',
                 [
-                    'statuses' =>
-                    $stmt->fetchAll(PDO::FETCH_ASSOC)
+                    'statuses' => $stmt->fetchAll(PDO::FETCH_ASSOC)
                 ]
             );
         }
-
-
+        
         /*
-         * Ambil daftar dokter.
-         */
+        * Ambil daftar dokter dari tabel master dokter.
+        * Konfigurasi antrean tetap berasal dari tabel antrian.
+        */
         $sql = "
             SELECT
                 a.AID,
                 a.Display,
-                a.Nama,
+                COALESCE(NULLIF(d.Nama, ''), a.Nama) AS Nama,
                 a.DokterID,
                 a.foto,
                 a.NamaPoli,
                 a.Ruang,
                 a.Status,
                 a.Antrian,
-                s.Nama AS NamaStatus
-            FROM antrian a
-            LEFT JOIN status s
+                s.Nama AS NamaStatus,
+                d.Sapaan,
+                d.Inisial,
+                d.Gelar
+            FROM antripol.antrian AS a
+            LEFT JOIN yasmin2026_testing.dokter AS d
+                ON CONVERT(a.DokterID USING latin1) = d.DokterID
+            LEFT JOIN antripol.status AS s
                 ON a.Status = s.Status
             WHERE 1 = 1
         ";
 
         $params = [];
 
-
-        /*
-         * Filter display.
-         */
+        /* Filter display */
         if (
             isset($_GET['display']) &&
             $_GET['display'] !== ''
         ) {
-
             $sql .= " AND a.Display = ?";
-
             $params[] = (int) $_GET['display'];
         }
 
-
-        /*
-         * Pencarian dokter / poli.
-         */
+        /* Pencarian dokter / poli */
         if (
             isset($_GET['search']) &&
             trim($_GET['search']) !== ''
         ) {
-
             $sql .= "
                 AND (
-                    a.Nama LIKE ?
+                    d.Nama LIKE ?
+                    OR a.Nama LIKE ?
                     OR a.NamaPoli LIKE ?
                 )
             ";
 
-            $keyword =
-                '%' .
-                trim($_GET['search']) .
-                '%';
+            $keyword = '%' . trim($_GET['search']) . '%';
 
+            $params[] = $keyword;
             $params[] = $keyword;
             $params[] = $keyword;
         }
 
-
         $sql .= "
             ORDER BY
                 a.Display ASC,
-                a.Nama ASC
+                Nama ASC
         ";
 
-
         $stmt = $pdo->prepare($sql);
-
         $stmt->execute($params);
-
 
         respond(
             true,
