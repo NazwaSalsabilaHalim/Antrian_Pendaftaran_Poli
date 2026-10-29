@@ -47,6 +47,7 @@ const PENDAFTARAN_INFO = {
   '/pendaftaran/overview': ['Overview Pendaftaran', 'Status seluruh loket pendaftaran secara real-time'],
   '/pendaftaran/loket': ['Loket Pendaftaran', 'Panggil nomor antrian dari loket pendaftaran'],
   '/pendaftaran/dashboard': ['Dashboard Petugas', 'Rekap dan grafik antrian harian'],
+  '/pendaftaran/ambil-nomor': ['Pengambilan Nomor', 'Ambilkan nomor antrian untuk pasien'],
 }
 
 // Buka localhost:5173 -> arahkan sesuai sesi yang masih tersimpan
@@ -152,10 +153,11 @@ export default function App() {
           </RequireRole>
         }
       >
-        <Route index element={<Navigate to="overview" replace />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="overview" element={<Overview />} />
         <Route path="loket" element={<Loket />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="ambil-nomor" element={<AmbilNomor />} />
       </Route>
 
       {/* =====================================================
@@ -179,7 +181,7 @@ export default function App() {
           Login memakai AID + password dokter di dalam halamannya.
           ===================================================== */}
       <Route
-        path="/poli/dokter/antrean"
+        path="/poli/dokter/*"
         element={
           <div className="poli-page-wrapper">
             <KelolaAntrean />

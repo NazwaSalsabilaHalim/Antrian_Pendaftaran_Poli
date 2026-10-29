@@ -65,6 +65,14 @@ function DoctorCard({ doctor, isCalling }) {
 
       {/* Nomor Antrian */}
       <div className="tv-poli-card__queue">
+
+        <div className="tv-poli-card__regpas">
+          <span className="tv-poli-card__regpas-label">NO. REG</span>
+          <strong className="tv-poli-card__regpas-value">
+            {isZero ? '—' : (doctor.RegPasID || '—')}
+          </strong>
+        </div>
+
         <span className="tv-poli-card__queue-label">NOMOR ANTREAN</span>
         <div className="tv-number-wrap">
           <FlapRow value={nomorFormatted} />

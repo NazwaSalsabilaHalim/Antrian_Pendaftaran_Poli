@@ -2504,13 +2504,18 @@ table.data-table {
   min-height: 100vh;
   height: auto !important;
   max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   background:
     radial-gradient(circle at 85% 10%, rgba(74, 169, 160, 0.14), transparent 35%),
     linear-gradient(180deg, var(--primary-dark) 0%, #064a4c 55%, #0c3a4f 100%);
   color: #ffffff;
   font-family: var(--font-body);
+}
+
+.tv-screen:has(.tv-poli-grid) {
+  height: 100dvh !important;
+  overflow: hidden !important;
 }
 
 .tv-bg-shape {
@@ -2556,7 +2561,7 @@ table.data-table {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 36px;
+  padding: clamp(16px, 2.2vh, 32px) clamp(28px, 2.5vw, 60px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(6, 30, 24, 0.28);
   backdrop-filter: blur(10px);
@@ -2569,7 +2574,7 @@ table.data-table {
 }
 
 .tv-brand img {
-  width: 160px;
+  width: clamp(180px, 11vw, 340px);
   height: auto;
   object-fit: contain;
   display: block;
@@ -2590,7 +2595,7 @@ table.data-table {
   background: rgba(74, 169, 160, 0.14);
   border: 1px solid rgba(74, 169, 160, 0.28);
   color: var(--secondary-soft);
-  font-size: 11px;
+  font-size: clamp(12px, 0.9vw, 20px);
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -2626,14 +2631,14 @@ table.data-table {
 }
 
 .tv-clock__time {
-  font-size: 20px;
+  font-size: clamp(22px, 1.6vw, 40px);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .tv-clock__date {
   margin-top: 3px;
-  font-size: 11px;
+  font-size: clamp(12px, 0.85vw, 20px);
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -2681,7 +2686,7 @@ table.data-table {
 /* Efek papan flip angka: gradasi tajam dipertahankan */
 .tv-flap-char {
   min-width: 100px;
-  height: 130px;
+  height: 90px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3077,7 +3082,7 @@ table.data-table {
   position: relative;
   z-index: 5;
   width: 100%;
-  height: 56px;
+  height: clamp(64px, 6vh, 110px);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -3087,15 +3092,15 @@ table.data-table {
 }
 
 .tv-footer__icon {
-  width: 56px;
-  height: 56px;
+  width: clamp(64px, 6vh, 110px);
+  height: clamp(64px, 6vh, 110px);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(217, 243, 243, 0.14);
   color: #d9f3f3;
-  font-size: 18px;
+  font-size: clamp(20px, 1.6vw, 32px);
   font-weight: 800;
 }
 
@@ -3110,14 +3115,14 @@ table.data-table {
 
 .tv-footer__label {
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: clamp(12px, 1vw, 22px);
   font-weight: 800;
   letter-spacing: 0.16em;
   color: #d9f3f3;
 }
 
 .tv-footer marquee {
-  font-size: 13px;
+  font-size: clamp(16px, 1.5vw, 32px);
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -3193,7 +3198,7 @@ table.data-table {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
-  align-items: stretch;
+  align-items: center;
   gap: clamp(10px, 1.4vw, 22px);
   width: 100%;
   flex: 1;
@@ -3205,11 +3210,13 @@ table.data-table {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(6px, 0.8vh, 12px);
+  gap: clamp(4px, 0.6vh, 8px);
   flex: 1 1 0;
   min-width: 0;
+  max-width: clamp(280px, 24vw, 520px);
+  container-type: inline-size;
   min-height: 0;
-  padding: clamp(16px, 2vh, 28px) clamp(12px, 1.4vw, 22px);
+  padding: clamp(10px, 1.4vh, 20px) clamp(12px, 1.2vw, 20px);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3252,9 +3259,9 @@ table.data-table {
 
 .tv-poli-card__photo {
   position: relative;
-  width: clamp(200px, 21vw, 270px);
-  height: clamp(300px, 36vh, 400px);
-  border-radius: 120px;
+  width: min(56cqw, 15vh);
+  aspect-ratio: 3 / 4;
+  border-radius: 999px;
   overflow: hidden;
   flex-shrink: 0;
   background: rgba(217, 243, 243, 0.1);
@@ -3298,9 +3305,9 @@ table.data-table {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: calc(1.25em * 3);
+  min-height: calc(1.25em * 2);
   padding: 0 8px;
-  font-size: clamp(20px, 2.1vw, 30px);
+  font-size: clamp(14px, 7.5cqw, 34px);
   font-weight: 800;
   color: #e6efee;
   line-height: 1.25;
@@ -3310,7 +3317,7 @@ table.data-table {
 .tv-poli-card__specialty {
   display: block;
   min-height: 26px;
-  font-size: clamp(18px, 1.5vw, 24px);
+  font-size: clamp(13px, 6cqw, 26px);
   font-weight: 600;
   color: rgba(190, 220, 220, 0.8);
   letter-spacing: 0.03em;
@@ -3326,7 +3333,7 @@ table.data-table {
   border-radius: 8px;
   background: rgba(217, 243, 243, 0.12);
   border: 1px solid rgba(217, 243, 243, 0.28);
-  font-size: clamp(17px, 1.4vw, 22px);
+  font-size: clamp(12px, 5.2cqw, 22px);
   font-weight: 700;
   color: #d9f3f3;
   letter-spacing: 0.06em;
@@ -3336,7 +3343,7 @@ table.data-table {
 .tv-poli-card__divider {
   width: 60%;
   height: 1px;
-  margin: 6px 0;
+  margin: 0;
   background: rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
@@ -3346,14 +3353,14 @@ table.data-table {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 14px;
-  margin-top: auto;
-  padding-top: 20px;
+  gap: 8px;
+  margin-top: 0;
+  padding-top: 0;
   flex-shrink: 0;
 }
 
 .tv-poli-card__queue-label {
-  font-size: clamp(15px, 1.4vw, 20px);
+  font-size: clamp(11px, 4.6cqw, 20px);
   font-weight: 700;
   color: rgba(255, 255, 255, 0.62);
   letter-spacing: 0.14em;
@@ -3372,21 +3379,42 @@ table.data-table {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(6px, 0.8vw, 12px);
+  gap: 2.5cqw;
   width: 100%;
 }
 
 .tv-poli-card .tv-flap-char {
-  /* Lebar dikunci, jangan diubah */
-  width: clamp(50px, 7.5vw, 100px);
-  min-width: clamp(50px, 7.5vw, 100px);
-  height: clamp(150px, 20vh, 210px);
-  border-radius: 12px;
-  font-size: clamp(76px, 8.5vw, 120px);
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: min(22cqw, 6.5vh);
+  aspect-ratio: 10 / 19;
+  border-radius: 2.5cqw;
+  font-size: min(24cqw, 8.5vh);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+}
+
+.tv-poli-card__regpas {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.tv-poli-card__regpas-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.tv-poli-card__regpas-value {
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
 }
 
 /* =========================================================

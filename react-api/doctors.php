@@ -299,14 +299,22 @@ try {
                 s.Nama AS NamaStatus,
                 d.Sapaan,
                 d.Inisial,
-                d.Gelar
+                d.Gelar,
+            (
+                    SELECT y.RegPasID
+                    FROM yasmin2026_testing.antrian AS y
+                    WHERE y.DokterID = CONVERT(a.DokterID USING latin1)
+                      AND DATE(y.Tanggal) = '2026-03-31'
+                      AND y.Urutan = a.Antrian
+                    ORDER BY y.Tanggal DESC
+                    LIMIT 1
+                ) AS RegPasID
             FROM antripol.antrian AS a
             LEFT JOIN yasmin2026_testing.dokter AS d
                 ON CONVERT(a.DokterID USING latin1) = d.DokterID
             LEFT JOIN antripol.status AS s
                 ON a.Status = s.Status
-            WHERE 1 = 1
-        ";
+            WHERE 1 = 1";
 
         $params = [];
 
@@ -874,6 +882,6 @@ try {
 
     respond(
         false,
-        'Terjadi kesalahan pada server. Silakan coba kembali.'
+        'DEBUG: ' . $e->getMessage()
     );
 }

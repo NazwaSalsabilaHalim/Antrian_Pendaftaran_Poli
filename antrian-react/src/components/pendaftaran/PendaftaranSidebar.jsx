@@ -5,6 +5,7 @@ import {
   History,
   Tv,
   LogOut,
+  Ticket,
 } from 'lucide-react'
 import { getPetugas, logoutPetugas } from '../../utils/auth'
 import { publicUrl } from '../../utils/publicUrl'
@@ -28,6 +29,12 @@ const NAV_PENDAFTARAN = [
     label: 'Overview',
     description: 'Monitoring loket',
     icon: History,
+  },
+  {
+    to: '/pendaftaran/ambil-nomor',
+    label: 'Pengambilan Nomor',
+    description: 'Nomor Antrian Pasien',
+    icon: Ticket,
   },
 ]
 

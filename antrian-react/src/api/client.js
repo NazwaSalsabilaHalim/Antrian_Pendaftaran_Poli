@@ -116,7 +116,7 @@ export const api = {
   },
 
   deleteDoctor: async (aid) => {
-    const body = new URLSearchParams({ AID: String(aid) })
+    const body = new URLSearchParams({ action: 'delete', AID: String(aid) })
     const res = await fetch(`${API}/doctors.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
