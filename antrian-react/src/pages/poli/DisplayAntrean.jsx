@@ -15,6 +15,12 @@ const POLL_MS = 3000
 /* ============================================================
    DOCTOR CARD
    ============================================================ */
+/* Nama panjang dipotong: 2 kata pertama + " ..." */
+function singkatNama(nama, maxKata = 2) {
+  const kata = String(nama || '').trim().split(/\s+/).filter(Boolean)
+  if (kata.length <= maxKata) return kata.join(' ')
+  return kata.slice(0, maxKata).join(' ') + ' ...'
+}
 
 function DoctorCard({ doctor, isCalling }) {
   const nomorFormatted = formatNomor(doctor.Antrian)
@@ -67,11 +73,13 @@ function DoctorCard({ doctor, isCalling }) {
       <div className="tv-poli-card__queue">
 
         <div className="tv-poli-card__regpas">
-          <span className="tv-poli-card__regpas-label">NO. REG</span>
+          <span className="tv-poli-card__regpas-label">PASIEN :</span>
           <strong className="tv-poli-card__regpas-value">
-            {isZero ? '—' : (doctor.RegPasID || '—')}
+            {isZero ? '—' : (singkatNama(doctor.NamaPasien) || '—')}
           </strong>
         </div>
+        {/* (doctor.NamaPasien || '—')} */} 
+        {/* ini yang lama */}
 
         <span className="tv-poli-card__queue-label">NOMOR ANTREAN</span>
         <div className="tv-number-wrap">

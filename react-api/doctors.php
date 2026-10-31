@@ -300,15 +300,17 @@ try {
                 d.Sapaan,
                 d.Inisial,
                 d.Gelar,
-            (
-                    SELECT y.RegPasID
+                (
+                    SELECT r.Nama
                     FROM yasmin2026_testing.antrian AS y
+                    JOIN yasmin2026_testing.regpas AS r
+                        ON r.RegID = y.RegPasID
                     WHERE y.DokterID = CONVERT(a.DokterID USING latin1)
-                      AND DATE(y.Tanggal) = '2026-03-31'
+                      AND DATE(y.Tanggal) = '2026-04-01'
                       AND y.Urutan = a.Antrian
                     ORDER BY y.Tanggal DESC
                     LIMIT 1
-                ) AS RegPasID
+                ) AS NamaPasien
             FROM antripol.antrian AS a
             LEFT JOIN yasmin2026_testing.dokter AS d
                 ON CONVERT(a.DokterID USING latin1) = d.DokterID

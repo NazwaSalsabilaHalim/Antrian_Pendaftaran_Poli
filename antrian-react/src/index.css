@@ -2513,7 +2513,7 @@ table.data-table {
   font-family: var(--font-body);
 }
 
-.tv-screen:has(.tv-poli-grid) {
+:fullscreen .tv-screen:has(.tv-poli-grid) {
   height: 100dvh !important;
   overflow: hidden !important;
 }
@@ -3227,7 +3227,7 @@ table.data-table {
 
 .tv-poli-card__photo {
   position: relative;
-  width: min(56cqw, 15vh);
+  width: min(56cqw, 20vh);
   aspect-ratio: 3 / 4;
   border-radius: 999px;
   overflow: hidden;
@@ -3309,7 +3309,7 @@ table.data-table {
 }
 
 .tv-poli-card__divider {
-  width: 60%;
+  width: 112%;
   height: 1px;
   margin: 0;
   background: rgba(255, 255, 255, 0.12);
@@ -3354,10 +3354,10 @@ table.data-table {
 .tv-poli-card .tv-flap-char {
   flex: 1 1 0;
   min-width: 0;
-  max-width: min(22cqw, 6.5vh);
+  max-width: min(22cqw, 8.2vh);
   aspect-ratio: 10 / 19;
   border-radius: 2.5cqw;
-  font-size: min(24cqw, 8.5vh);
+  font-size: min(24cqw, 10.6vh);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3367,6 +3367,7 @@ table.data-table {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 6px 16px;
   border-radius: 8px;
@@ -3375,12 +3376,18 @@ table.data-table {
 }
 
 .tv-poli-card__regpas-label {
+  flex-shrink: 0; 
+  white-space: nowrap; 
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   opacity: 0.7;
 }
 
 .tv-poli-card__regpas-value {
+  min-width: 0; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
   font-size: 1.25rem;
   letter-spacing: 0.04em;
 }
